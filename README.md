@@ -7,7 +7,7 @@ SpotyMike est une application mobile développée avec **Ionic** et **Angular** 
 ## 🚀 Fonctionnalités
 
 - 🔍 Recherche de musiques, albums et artistes
-- 🎧 Lecture de morceaux en streaming (via Spotify API)
+- 🎧 Lecture de morceaux en streaming 
 - 📜 Affichage des détails d’un artiste ou album
 - ❤️ Ajout de musiques aux favoris
 - 📱 Interface responsive et optimisée pour mobile
