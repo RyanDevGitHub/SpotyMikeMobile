@@ -11,7 +11,7 @@
       <app-music-container-vertical
         [song]="song"
       ></app-music-container-vertical>
-      } @if (items.length === 0) {
+      } @if (items && items.length === 0) {
       <ion-row>
         <ion-col>No songs available.</ion-col>
       </ion-row>

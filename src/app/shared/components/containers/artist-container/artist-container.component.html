@@ -1,8 +1,8 @@
 <ion-row (click)="redirectToArtist()">
-  <ion-col size="3"><ion-img [src]="cover"></ion-img> </ion-col>
+  <ion-col size="3"><ion-img [src]="artist.avatar"></ion-img> </ion-col>
   <ion-col size="auto">
     <ion-text class="ion-text-center">
-      <h6>{{ artistName }}</h6>
+      <h6>{{ artist.firstName }}</h6>
     </ion-text>
   </ion-col>
 </ion-row>

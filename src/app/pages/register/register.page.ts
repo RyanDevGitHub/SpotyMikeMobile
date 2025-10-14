@@ -1,4 +1,4 @@
-import { IUserDataBase } from './../../core/interfaces/user';
+import { ERoleUser, IUserDataBase } from './../../core/interfaces/user';
 import { AuthentificationService } from './../../core/services/authentification.service';
 import { IPlaylist } from 'src/app/core/interfaces/playlistes';
 import { IonImg } from '@ionic/angular/standalone';
@@ -77,15 +77,17 @@ export class RegisterPage implements OnInit {
   };
   user: IUserDataBase = {
     id: '',
+    avatar: '',
     firstName: '',
     lastName: '',
     password: '',
     email: '',
     sexe: '',
     favorites: [],
-    role: 'user',
+    role: ERoleUser.User,
     artiste: {
       id: '',
+      userId: '',
       label: '',
       firstName: '',
       avatar: '',
@@ -300,7 +302,7 @@ export class RegisterPage implements OnInit {
           this.form.get('artistName')?.value || 'artistName non fournie';
         this.user.artiste!.label =
           this.form.get('label')?.value || 'label non fournie';
-        this.user.role = 'artist';
+        this.user.role = ERoleUser.Artist;
         console.log('test!!!!!!!!!!!');
         console.log(this.user.artiste);
       }

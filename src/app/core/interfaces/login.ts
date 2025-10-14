@@ -1,17 +1,19 @@
-import { IToken, IUser } from "./user";
+import { IToken, IUser } from './user';
 export interface LoginRequestError {
+  type: 'error';
   code?: number;
-  error: boolean;
+  error: true;
   message: string;
 }
-export interface LoginRequestSuccess{
+export interface LoginRequestSuccess {
+  type: 'success';
   code?: number;
-  error: boolean;
+  error: false;
   user: IUser;
-  token:IToken;
+  token: IToken;
 }
 
-export interface LoginField{
+export interface LoginField {
   email: string;
-  password:string;
+  password: string;
 }

@@ -41,7 +41,7 @@ export class ResearchComponent implements OnInit {
 
   onSearchChange(event: any) {
     const term = event.target.value || '';
-    console.log('[DEBUG] app-research: Term emitted:', term);
+    // console.log('[DEBUG] app-research: Term emitted:', term);
     this.searchChange.emit(term); // Émet le terme de recherche
   }
 }

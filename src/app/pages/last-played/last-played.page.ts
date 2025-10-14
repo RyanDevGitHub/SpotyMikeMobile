@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -9,11 +9,15 @@ import {
 } from '@ionic/angular/standalone';
 import { HeaderCategoryComponent } from 'src/app/shared/components/headers/header-category/header-category.component';
 import { DisplayItemComponent } from 'src/app/shared/components/display-item/display-item.component';
-import { IPlaylist } from 'src/app/core/interfaces/playlistes';
-import { IMusic } from 'src/app/core/interfaces/music';
+import { IPlaylist, IPlaylistRaw } from 'src/app/core/interfaces/playlistes';
+import { ISong } from 'src/app/core/interfaces/song';
 import { Store } from '@ngrx/store';
 import { AppState } from '@capacitor/app';
-import { selectLastSongsByUser } from 'src/app/core/store/selector/song.selector';
+import {
+  selectLastSongsByUser,
+  selectSortedLastPlayedSongs,
+} from 'src/app/core/store/selector/song.selector';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-last-played',
@@ -33,17 +37,17 @@ import { selectLastSongsByUser } from 'src/app/core/store/selector/song.selector
 })
 export class LastPlayedPage implements OnInit {
   constructor() {}
-  public listMusics: IMusic[];
-  public listPlaylistes: IPlaylist[];
+
   store = inject(Store<AppState>);
+  public listMusics = signal<ISong[]>([]);
+  public listPlaylistes: IPlaylistRaw[];
 
   ngOnInit() {
-    console.log('init last played component');
-
-    this.store.select(selectLastSongsByUser).subscribe({
+    // On se subscribe directement au selecteur trié
+    this.store.select(selectSortedLastPlayedSongs).subscribe({
       next: (songs) => {
-        console.log('[DEBUG] TopsSongs in subscription:', songs);
-        this.listMusics = songs; // Doit être un tableau
+        console.log('🎵 LastPlayed trié reçu du store :', songs);
+        this.listMusics.set(songs); // ⚡ met à jour le signal
       },
       error: (err) => {
         console.error('[DEBUG] Error in subscription:', err);

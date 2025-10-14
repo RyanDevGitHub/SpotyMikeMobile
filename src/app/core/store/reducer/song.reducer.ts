@@ -4,39 +4,51 @@ import {
   createEntityAdapter,
   Dictionary,
 } from '@ngrx/entity';
-import { IMusic } from '../../interfaces/music';
+import { ISong } from '../../interfaces/song';
 import { createReducer, on } from '@ngrx/store';
 import * as ActionSOngs from '../action/song.action';
 
-export interface SongState extends EntityState<IMusic> {
+export interface SongsState extends EntityState<ISong> {
   loading: boolean;
   error: string | null;
 }
 
-export const adapter: EntityAdapter<IMusic> = createEntityAdapter<IMusic>();
+export const adapter: EntityAdapter<ISong> = createEntityAdapter<ISong>();
 
 // Initialisation de l'état avec les valeurs par défaut fournies par l'adapter
-export const initialState: SongState = adapter.getInitialState({
+export const initialState: SongsState = adapter.getInitialState({
   loading: false,
   error: null,
 });
 
 export const musicReducer = createReducer(
   initialState,
-  on(ActionSOngs.loadSong, (state) => ({
-    ...state,
-    loading: true,
-    error: null,
-  })),
+  on(
+    ActionSOngs.loadSongsFromAlbums,
+    (state) => (
+      console.log('[Reducer] Loading songs...'),
+      {
+        ...state,
+        loading: true,
+        error: null,
+      }
+    )
+  ),
   on(ActionSOngs.loadSongSuccess, (state, { songs }) => {
     console.log('[Reducer] Updating state with songs:', songs);
     return adapter.setAll(songs, state);
   }),
-  on(ActionSOngs.loadSongFailure, (state, { error }) => ({
-    ...state,
-    loading: false,
-    error,
-  }))
+  on(
+    ActionSOngs.loadSongFailure,
+    (state, { error }) => (
+      console.log('[Reducer] Loading songs failed...'),
+      {
+        ...state,
+        loading: false,
+        error,
+      }
+    )
+  )
 );
 
 // Générer les sélecteurs

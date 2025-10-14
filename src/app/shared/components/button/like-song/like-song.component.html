@@ -1,8 +1,7 @@
 <ion-button fill="outline" shape="round" (click)="toggleLike()">
-  @if (this.isLiked) {
+  @if (isLiked) {
   <ion-icon slot="icon-only" name="heart" class="like-icon"></ion-icon>
   }@else {
   <ion-icon slot="icon-only" name="heart-outline" class="like-icon"></ion-icon>
   }
-
 </ion-button>

@@ -4,28 +4,13 @@
     [backButton]="false"
   ></app-header-category>
   <ion-grid fixed>
-    @for(playliste of listPlaylistes; track playliste){
-    <ion-row class="playliste-container">
-      <ion-col (click)="openModal()">
-        <ion-img [src]="playliste.cover"></ion-img>
-      </ion-col>
-      <ion-col (click)="openModal()">
-        <p>{{playliste.title}}</p>
-        <p>{{playliste.artist}}</p>
-        <p>{{playliste.nbSong}}</p>
-      </ion-col>
-      <ion-col
-        class="action-button ion-justify-content-between ion-align-items-end"
-      >
-        <ion-row>
-          <app-song-option id="{{playliste.id}}"></app-song-option>
-        </ion-row>
-        <ion-row>
-          <app-like-song></app-like-song>
-          <app-share-song id="{{playliste.id}}"></app-share-song>
-        </ion-row>
-      </ion-col>
-    </ion-row>
+    @for(playlist of (listPlaylistes | async); track playlist){
+    <app-playlist-container
+      nbSong="{{ playlist.songs.length }}"
+      playlistName="{{ playlist.title }}"
+      cover="{{ playlist.cover }}"
+      playlistId="{{ playlist.id }}"
+    ></app-playlist-container>
     }
   </ion-grid>
 </ion-content>

@@ -2,8 +2,13 @@
   <ion-grid>
     @if (!this.isMini) {
     <ion-row>
-      <ion-range aria-label="Volume" min="0" max="{{ duration }}" value="{{ currentTime }}"
-        (ionChange)="seekMusic($event)"></ion-range>
+      <ion-range
+        aria-label="Volume"
+        min="0"
+        max="{{ duration }}"
+        value="{{ currentTime }}"
+        (ionChange)="seekMusic($event)"
+      ></ion-range>
     </ion-row>
     <ion-row class="ion-justify-content-between">
       <ion-col size="auto">
@@ -18,32 +23,62 @@
     <ion-row class="ion-justify-content-center">
       @if (!this.isMini) {
       <ion-col size="auto">
-        <ion-button [fill]="buttonFillLoop" size="default" [color]="buttonColorLoop" shape="round"
-          (click)="loopPlaylist()">
+        <ion-button
+          [fill]="buttonFillLoop"
+          size="default"
+          [color]="buttonColorLoop"
+          shape="round"
+          (click)="loopPlaylist()"
+        >
           <ion-icon slot="icon-only" name="repeat-outline"></ion-icon>
         </ion-button>
       </ion-col>
-
-      <ion-col size="auto"><ion-button size="large" [fill]="buttonFillPrev" [color]="buttonColorPrev"
-          (click)="playPrevMusic()">
+      }
+      <ion-col size="auto"
+        ><ion-button
+          size="large"
+          [fill]="buttonFillPrev"
+          [color]="buttonColorPrev"
+          (click)="playPrevMusic()"
+        >
           <ion-icon slot="icon-only" name="play-skip-back-outline"></ion-icon>
         </ion-button>
       </ion-col>
-      }
-      <ion-col size="auto"  >
-        <ion-button [size]="isMini ? 'small' : 'large'" color="success" (click)="togglePlayPause()">
-          <ion-icon slot="icon-only" [name]="isPlaying ? 'pause-outline' : 'play-outline'"></ion-icon>
-        </ion-button></ion-col>
-      @if (!this.isMini) {
-      <ion-col size="auto">
-        <ion-button [fill]="buttonFillAfter" size="large" [color]="buttonColorAfter" (click)="playAfterMusic()">
-          <ion-icon slot="icon-only" name="play-skip-forward-outline"></ion-icon>
-        </ion-button>
-      </ion-col>
 
       <ion-col size="auto">
-        <ion-button [fill]="buttonFillShuffle" size="default" [color]="buttonColorShuffle" shape="round"
-          (click)="randomPlaylist()">
+        <ion-button
+          [size]="isMini ? 'small' : 'large'"
+          color="success"
+          (click)="togglePlayPause()"
+        >
+          <ion-icon
+            slot="icon-only"
+            [name]="isPlaying ? 'pause-outline' : 'play-outline'"
+          ></ion-icon> </ion-button
+      ></ion-col>
+
+      <ion-col size="auto">
+        <ion-button
+          [fill]="buttonFillAfter"
+          size="large"
+          [color]="buttonColorAfter"
+          (click)="playAfterMusic()"
+        >
+          <ion-icon
+            slot="icon-only"
+            name="play-skip-forward-outline"
+          ></ion-icon>
+        </ion-button>
+      </ion-col>
+      @if (!this.isMini) {
+      <ion-col size="auto">
+        <ion-button
+          [fill]="buttonFillShuffle"
+          size="default"
+          [color]="buttonColorShuffle"
+          shape="round"
+          (click)="randomPlaylist()"
+        >
           <ion-icon slot="icon-only" name="shuffle-outline"></ion-icon>
         </ion-button>
       </ion-col>

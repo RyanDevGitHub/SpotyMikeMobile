@@ -1,52 +1,20 @@
-<!-- <ion-row class="row-playlist-container">
-  <ion-col class="container-img-row-playlist-container" size="auto">
-    <ion-img [src]="cover" (click)="redirectToPlaylist()"></ion-img>
+<ion-row class=".playlist-container">
+  <ion-col (click)="redirectToPlaylist()">
+    <ion-img [src]="cover"></ion-img>
   </ion-col>
-  <div class="div-playlist-container" (click)="redirectToPlaylist()">
-    <ion-col size="auto">
-      <div class="playlist-name">
-        {{ playlistName }}
-      </div>
-    </ion-col>
-    <div class="playlist-name">{{ nbSong }}</div>
-  </div>
-  <ion-row size="auto">
-    <app-song-option
-      class="playlist-settings"
-      id="{{ playlistId }}"
-    ></app-song-option>
-  </ion-row>
-</ion-row> -->
-
-<ion-row class="row-playlist-container ion-justify-content-between">
-  <ion-col class="container-img-row-playlist-container" size="3">
-    <ion-img [src]="cover" (click)="redirectToPlaylist()"></ion-img>
+  <ion-col (click)="redirectToPlaylist()">
+    <p>{{ playlistName }}</p>
+    <p>{{ nbSong }}</p>
   </ion-col>
-  <ion-col size="auto">
-    <div class="playlist-name">
-      <h6>{{ playlistName }}</h6>
-    </div>
-  </ion-col>
-  <ion-col class="container" size="auto">
-    <div class="playlist-name">
-      <h6>{{ nbSong }}</h6>
-    </div>
-  </ion-col>
-  <ion-col size="auto">
+  <ion-col
+    class="action-button ion-justify-content-between ion-align-items-end"
+  >
     <ion-row>
-      <ion-col size="auto" class="col-settings">
-        <app-song-option
-          class="music-settings ion-align-self-center"
-        ></app-song-option>
-      </ion-col>
-      <ion-col class="col-settings" size="auto">
-        <app-like-song></app-like-song>
-      </ion-col>
+      <!-- <app-song-option id="{{ playlistId }}"></app-song-option> -->
     </ion-row>
     <ion-row>
-      <ion-col size="12" class="col-settings"
-        ><app-share-song></app-share-song
-      ></ion-col>
+      <app-like-song></app-like-song>
+      <app-share-song id="{{ playlistId }}"></app-share-song>
     </ion-row>
   </ion-col>
 </ion-row>

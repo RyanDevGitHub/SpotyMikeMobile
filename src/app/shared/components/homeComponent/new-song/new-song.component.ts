@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonCol,
@@ -15,10 +15,10 @@ import {
   standalone: true,
   imports: [IonGrid, IonRow, IonCol, IonIcon, IonImg],
 })
-export class TopSongComponent implements OnInit {
+export class TopSongComponent {
   constructor() {}
+  @Input() img: string;
   router = inject(Router);
-  ngOnInit() {}
 
   redirectToNewPage() {
     this.router.navigate(['/home/new-song']);

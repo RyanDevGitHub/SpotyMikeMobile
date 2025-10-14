@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { SongRepositoryService } from 'src/app/core/services/repositories/song-repository.service';
-import { IMusic, IMusicDate, MusicGenre } from 'src/app/core/interfaces/music';
+import { ISong, SongGenre } from 'src/app/core/interfaces/song';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
   IonButton,
@@ -43,8 +43,8 @@ export class AddSongModalComponent {
   songForm: FormGroup;
   coverFile: File | null = null;
   songFile: File | null = null;
-  genres = Object.values(MusicGenre); // Liste des genres à afficher
-  selectedGenre: MusicGenre | null = null; // Genre sélectionné
+  genres = Object.values(SongGenre); // Liste des genres à afficher
+  selectedGenre: SongGenre | null = null; // Genre sélectionné
 
   constructor(
     private fb: FormBuilder,
@@ -139,24 +139,25 @@ export class AddSongModalComponent {
 
       // Étape 4 : Construire l'objet IMusic
 
-      const newSong: IMusicDate = {
-        id: '', // Sera ajouté par le service
-        title: formValues.title || '', // Valeur par défaut si undefined
-        cover: coverUrl || '', // Si l'URL est undefined
-        artistId: formValues.artistId || '', // Utilisation de l'artistId récupéré
-        duration: formValues.duration || '', // Utilisation de la durée récupérée du MP3
-        url: songUrl || '',
-        featuring: formValues.featuring
-          ? formValues.featuring.split(',').map((f: string) => f.trim())
-          : [], // Garantir un tableau vide si undefined
-        listeningCount: '0', // Valeur par défaut
-        lyrics: formValues.lyrics || '',
-        createAt: new Date(),
-        genre: MusicGenre.Pop, // Valeur par défaut
-      };
+      // const newSong: IMusicDate = {
+      //   id: '', // Sera ajouté par le service
+
+      //   title: formValues.title || '', // Valeur par défaut si undefined
+      //   cover: coverUrl || '', // Si l'URL est undefined
+      //   artistId: formValues.artistId || '', // Utilisation de l'artistId récupéré
+      //   duration: formValues.duration || '', // Utilisation de la durée récupérée du MP3
+      //   url: songUrl || '',
+      //   featuring: formValues.featuring
+      //     ? formValues.featuring.split(',').map((f: string) => f.trim())
+      //     : [], // Garantir un tableau vide si undefined
+      //   listeningCount: '0', // Valeur par défaut
+      //   lyrics: formValues.lyrics || '',
+      //   createAt: new Date(),
+      //   genre: MusicGenre.Pop, // Valeur par défaut
+      // };
 
       // Étape 5 : Ajouter dans la base de données
-      await this.songRepo.addSong(newSong);
+      // await this.songRepo.addSong(newSong);
       console.log('Song added successfully!');
 
       this.dismissModal();
@@ -165,7 +166,7 @@ export class AddSongModalComponent {
     }
   }
 
-  selectGenre(genre: MusicGenre) {
+  selectGenre(genre: SongGenre) {
     this.selectedGenre = genre;
     this.songForm.patchValue({ genre }); // Met à jour la valeur du formulaire
   }

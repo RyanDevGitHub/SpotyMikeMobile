@@ -1,6 +1,6 @@
 .see-all {
   text-align: right;
-  margin-right: 20px;
+  // margin-right: 20px;
 }
 
 .top-songs {
@@ -16,9 +16,6 @@ i-row {
   width: 100%;
 }
 
-ion-img {
-  width: 20%;
-}
 ion-img::part(image) {
   width: 100%;
   height: 100%;
@@ -60,4 +57,20 @@ row {
 
 .col-settings {
   padding: 0;
+}
+
+.action-button {
+  display: flex;
+  flex-direction: column;
+}
+
+.playlist-container {
+  border-bottom: inset;
+  padding: 1rem 0;
+}
+
+ion-img::part(image) {
+  border-radius: 10px;
+  margin-left: auto;
+  margin-right: auto;
 }

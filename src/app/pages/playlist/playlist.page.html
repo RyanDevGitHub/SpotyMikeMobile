@@ -1,13 +1,10 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>playlist</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">playlist</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" [class.modal-open]="isModalOpen">
+  <app-header-category
+    title="{{playlist.title}}"
+    [backButton]="true"
+    [filter]="false"
+  ></app-header-category>
+  @for (song of playlist.songs; track $index) {
+  <app-music-container [song]="song"> </app-music-container>
+  }
 </ion-content>

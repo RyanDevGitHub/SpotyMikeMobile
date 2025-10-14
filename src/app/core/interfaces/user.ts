@@ -1,9 +1,15 @@
-import { IPlaylist } from 'src/app/core/interfaces/playlistes';
+import { FieldValue } from 'firebase/firestore/lite';
+import { IPlaylist, IPlaylistRaw } from './../interfaces/playlistes';
 
-type ERoleUser = 'user' | 'artist';
+export enum ERoleUser {
+  User = 'user',
+  Artist = 'artist',
+}
 
 export interface IUser {
   role: ERoleUser;
+  avatar: string;
+  token?: string;
   email: string;
   id: string;
   lastsplayeds: string[];
@@ -14,7 +20,7 @@ export interface IUser {
   sexe: string;
   favorites: string[];
   artiste?: IArtist;
-  playlists: IPlaylist[];
+  playlists: IPlaylistRaw[];
   created_at: string;
 }
 export interface IToken {
@@ -23,6 +29,7 @@ export interface IToken {
 
 export interface IArtist {
   id: string;
+  userId: string;
   label: string;
   firstName: string;
   description: string;
@@ -32,6 +39,7 @@ export interface IArtist {
 
 export interface IUserDataBase {
   id: string;
+  avatar: string;
   firstName: string;
   lastName: string;
   password: string;
@@ -40,7 +48,7 @@ export interface IUserDataBase {
   sexe: string;
   favorites: string[];
   artiste?: IArtist;
-  playlists: IPlaylist[];
+  playlists: IPlaylistRaw[];
   lastsplayeds: string[];
   created_at: string;
   role: ERoleUser;
@@ -48,14 +56,14 @@ export interface IUserDataBase {
 
 export interface IUserUpdateDataBase {
   id?: string;
-  firstName: string;
+  firstName?: string;
   lastName?: string;
   email?: string;
   tel?: string;
   sexe?: string;
-  favorites?: string[];
+  favorites?: string[] | FieldValue;
   artiste?: IArtist;
-  playlists?: [IPlaylist[]];
-  lastsplayeds?: string[];
+  playlists?: IPlaylistRaw[];
+  lastsplayeds?: string[] | FieldValue;
   created_at?: string;
 }

@@ -6,34 +6,40 @@
           <ion-toolbar>
             <ion-buttons slot="start">
               <app-back-button
-                (click)="toggleSize()"
+                (click)="minimizePlayer()"
                 [closeModal]="true"
               ></app-back-button>
             </ion-buttons>
-            <ion-title>Olivia Lyric</ion-title>
+            <ion-title>{{music.title}}</ion-title>
             <ion-buttons slot="end">
-              <app-song-option></app-song-option>
+              <app-song-option [song]="music"></app-song-option>
             </ion-buttons>
           </ion-toolbar> </ion-header
       ></ion-col>
       <ion-col></ion-col>
     </ion-row>
     <ion-row id="cover">
-      <ion-col size="auto"
-        ><ion-img src="/assets/icon/coverTest.jpg"></ion-img
-      ></ion-col>
+      <ion-col size="auto"><ion-img src="{{music.cover}}"></ion-img></ion-col>
     </ion-row>
     <ion-row>
-      <ion-col>Island Getaway<br />Olivia Lyric</ion-col>
+      <ion-col>{{music.title}}<br /></ion-col>
       <ion-col class="ion-align-self-start container-option"
-        ><app-like-song></app-like-song> <app-share-song></app-share-song
+        ><app-like-song [song]="music"></app-like-song>
+        <app-share-song></app-share-song
       ></ion-col>
     </ion-row>
     <ion-row>
-      <ion-col><app-music-nav-bar></app-music-nav-bar></ion-col>
+      <ion-col
+        ><app-music-nav-bar
+          [music]="music"
+          (nextSong)="handleNextSong()"
+        ></app-music-nav-bar
+      ></ion-col>
     </ion-row>
     <ion-row>
-      <ion-col><app-lyrics-box></app-lyrics-box></ion-col>
+      <ion-col
+        ><app-lyrics-box lyrics="{{music.lyrics}}"></app-lyrics-box
+      ></ion-col>
     </ion-row>
   </ion-grid>
 </ion-content>

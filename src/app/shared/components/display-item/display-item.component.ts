@@ -1,5 +1,5 @@
-import { IPlaylist } from './../../../core/interfaces/playlistes';
-import { IMusic } from './../../../core/interfaces/music';
+import { IPlaylist, IPlaylistRaw } from './../../../core/interfaces/playlistes';
+import { ISong } from '../../../core/interfaces/song';
 import { Component, Input, OnInit, inject } from '@angular/core';
 import {
   IonCol,
@@ -38,10 +38,10 @@ export class DisplayItemComponent implements OnInit {
   constructor() {}
   router = inject(Router);
   modalCtrl = inject(ModalController);
-  @Input() playlists: IPlaylist[];
-  @Input() musicList: IMusic[];
+  @Input() playlists: IPlaylistRaw[];
+  @Input() songList: ISong[];
   ngOnInit() {
-    console.log('init display init component');
+    console.log(this.songList);
   }
 
   async openSong() {
@@ -55,7 +55,7 @@ export class DisplayItemComponent implements OnInit {
   redirectToPlaylist(playlistId: string) {
     this.router.navigate(['home/playlist/' + playlistId]);
   }
-  isTypeOfIPlaylist(input: any): input is IPlaylist[] {
+  isTypeOfIPlaylist(input: any): input is IPlaylistRaw[] {
     return Array.isArray(input) && input.every((item) => this.isPlaylist(item));
   }
   isPlaylist(item: any): item is IPlaylist {
@@ -68,12 +68,12 @@ export class DisplayItemComponent implements OnInit {
     );
   }
 
-  isTypeOfIMusicArray(input: any): input is IMusic[] {
+  isTypeOfIMusicArray(input: any): input is ISong[] {
     return Array.isArray(input) && input.every((item) => this.isMusic(item));
   }
 
   // Garde de type pour vérifier qu'un élément est un objet IMusic
-  isMusic(item: any): item is IMusic {
+  isMusic(item: any): item is ISong {
     return (
       item &&
       typeof item === 'object' &&

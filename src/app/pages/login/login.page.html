@@ -10,7 +10,9 @@
         placeholder="mike@mike.mike"
       ></ion-input>
     </ion-item>
-    <div *ngIf="form.get('email')?.invalid && (form.get('email')?.dirty || form.get('email')?.touched)">
+    <div
+      *ngIf="form.get('email')?.invalid && (form.get('email')?.dirty || form.get('email')?.touched)"
+    >
       <div *ngIf="form.get('email')?.errors?.['required']">
         <p class="error">
           <ion-icon name="alert-outline"></ion-icon>
@@ -24,7 +26,7 @@
         </p>
       </div>
     </div>
-    
+
     <ion-item>
       <ion-input
         type="password"
@@ -35,17 +37,13 @@
         placeholder="••••••••••••••"
       ></ion-input>
     </ion-item>
-    <div *ngIf="form.get('password')?.invalid && (form.get('password')?.dirty || form.get('password')?.touched)">
+    <div
+      *ngIf="form.get('password')?.invalid && (form.get('password')?.dirty || form.get('password')?.touched)"
+    >
       <div *ngIf="form.get('password')?.errors?.['required']">
         <p class="error">
           <ion-icon name="alert-outline"></ion-icon>
           Password required
-        </p>
-      </div>
-      <div *ngIf="form.get('password')?.errors?.['pattern']">
-        <p class="error">
-          <ion-icon name="alert-outline"></ion-icon>
-          Invalid password format
         </p>
       </div>
       <div *ngIf="form.get('password')?.errors?.['minlength']">
@@ -56,17 +54,27 @@
       </div>
     </div>
   </ion-list>
-  
+
+  <!-- Message d'erreur mauvais identifiants -->
   <div *ngIf="error">
     <p class="error">
       <ion-icon name="alert-outline"></ion-icon>
       {{ error }}
     </p>
-  </div> 
+  </div>
 
   <br />
 
-  <ion-button type="submit" [disabled]="!form.valid && !submitForm">Se Connecter</ion-button>
+  <!-- Bouton avec spinner -->
+  <ion-button type="submit" [disabled]="!form.valid || submitForm">
+    <ng-container *ngIf="!submitForm; else loading">
+      Se Connecter
+    </ng-container>
+    <ng-template #loading>
+      <ion-spinner name="crescent" slot="start"></ion-spinner>
+      Connexion...
+    </ng-template>
+  </ion-button>
 
   <a href="/auth/register">Pas encore inscrit ?</a>
 </form>

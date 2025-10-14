@@ -1,14 +1,15 @@
-.avatar{
-    
-    width: 150px; /* Définir la largeur désirée */
-    height: 150px; /* Définir la hauteur désirée */
+.avatar {
+  // width: 150px; /* Définir la largeur désirée */
+  // height: 150px; /* Définir la hauteur désirée */
 }
 .avatar img {
-    width: 100%; /* Assurez-vous que l'image s'ajuste à la taille de l'avatar */
-    height: 100%;
-    object-fit: cover; /* Pour que l'image couvre bien toute la surface sans déformation */
+  width: 100%; /* Assurez-vous que l'image s'ajuste à la taille de l'avatar */
+  height: 100%;
+  object-fit: cover; /* Pour que l'image couvre bien toute la surface sans déformation */
 }
-ion-col,ion-row,ion-grid{
-    padding: 0;
-    margin: 0;
+ion-col,
+ion-row,
+ion-grid {
+  padding: 0;
+  margin: 0;
 }

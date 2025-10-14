@@ -1,4 +1,5 @@
-import { loadSong } from '../../store/action/song.action';
+import { UserRepositoryService } from './user-repository.service';
+import { loadSongsFromAlbums } from '../../store/action/song.action';
 import { inject, Injectable } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import {
@@ -12,9 +13,9 @@ import {
 } from 'firebase/firestore';
 
 import { environment } from 'src/environments/environment';
-import { IMusic, IMusicDate } from '../../interfaces/music';
+import { ISong } from '../../interfaces/song';
 import { IAlbum } from '../../interfaces/album';
-import { v4 as uuidv4 } from 'uuid'; // Assure-toi d'installer cette dépendance via `npm install uuid`
+import { v4 as uuidv4 } from 'uuid';
 import { Store } from '@ngrx/store';
 import { AppState } from '@capacitor/app';
 
@@ -25,15 +26,17 @@ export class SongRepositoryService {
   app = initializeApp(environment.firebaseConfig);
   db = getFirestore(this.app);
   store = inject(Store<AppState>);
+  userRepositoryService = inject(UserRepositoryService);
+  private lastIncrementMap: Record<string, number> = {}; // Anti-spam par chanson
 
   constructor() {}
 
   // Récupérer toutes les chansons
-  async getAllSongs(): Promise<IMusic[]> {
+  async getAllSongsWithArtist(): Promise<ISong[]> {
     const querySnapshot = await getDocs(collection(this.db, 'Albums'));
 
     // Extraire et aplatir les chansons
-    const songs: IMusic[] = querySnapshot.docs
+    const songs: ISong[] = querySnapshot.docs
       .map((doc) => doc.data())
       .filter((doc) => doc['songs'])
       .flatMap((doc) => {
@@ -41,47 +44,64 @@ export class SongRepositoryService {
         return Array.isArray(songList)
           ? songList.map((song, index) => ({
               ...song,
-              id: song['id'] || `${doc['id']}_${index}`, // Génére un ID unique basé sur l'ID de l'album et l'index
+              id: song['id'] || `${doc['id']}_${index}`, // ID unique
+              albumId: doc['id'],
+              createAt: song.createAt?.seconds
+                ? new Date(song.createAt.seconds * 1000)
+                : song.createAt || new Date(),
             }))
           : [];
       });
 
-    console.log('Flattened songs:', songs);
-    return songs; // Retourner la liste aplatie des chansons
+    // Ajouter artistInfo
+    const songsWithArtistInfo = await Promise.all(
+      songs.map(async (song) => {
+        const artistInfo = await this.userRepositoryService.getUsersByField(
+          'id',
+          song.artistId
+        );
+        return { ...song, artistInfo };
+      })
+    );
+
+    return songsWithArtistInfo;
   }
 
   // Récupérer une chanson par ID
-  // Récupérer une chanson par ID
-  async getSongById(songId: string): Promise<IMusic | null> {
-    const albumsCollection = collection(this.db, 'Albums'); // Collection Albums
+  async getSongById(songId: string): Promise<ISong | null> {
+    const albumsCollection = collection(this.db, 'Albums');
     const querySnapshot = await getDocs(albumsCollection);
 
     for (const docSnap of querySnapshot.docs) {
       const albumData = docSnap.data();
       if (albumData['songs'] && Array.isArray(albumData['songs'])) {
-        // Chercher dans les chansons de l'album
         const song = albumData['songs'].find(
-          (song: IMusic) => song.id === songId
+          (song: ISong) => song.id === songId
         );
         if (song) {
-          return { ...song, albumId: docSnap.id }; // Inclure l'ID de l'album si besoin
+          return {
+            ...song,
+            albumId: docSnap.id,
+            createAt: song.createAt?.seconds
+              ? new Date(song.createAt.seconds * 1000)
+              : song.createAt || new Date(),
+          };
         }
       }
     }
 
-    return null; // Si aucune chanson n'est trouvée
+    return null;
   }
 
   // Ajouter une nouvelle chanson
-  async addSong(song: IMusicDate, albumId?: string): Promise<void> {
-    // Génère un identifiant unique si la chanson n'en a pas
-    const songWithId = {
+  async addSong(song: ISong, albumId?: string): Promise<void> {
+    const songWithId: ISong = {
       ...song,
-      id: song.id || uuidv4(), // Ajoute un ID unique à la chanson si elle n'en a pas
+      id: song.id || uuidv4(),
+      createAt: song.createAt || new Date(), // Assure un Date JS
     };
 
     if (albumId) {
-      // Ajouter la chanson à un album existant
       const albumDocRef = doc(this.db, 'Albums', albumId);
       const albumSnap = await getDoc(albumDocRef);
 
@@ -93,16 +113,81 @@ export class SongRepositoryService {
 
         await updateDoc(albumDocRef, { songs: updatedSongs });
         console.log('Success: Song added to existing album');
-        this.store.dispatch(loadSong()); // Cette action va charger toutes les chansons
+        this.store.dispatch(loadSongsFromAlbums());
       } else {
         console.error('Error: Album not found');
       }
     } else {
-      // Créer un nouvel album pour cette chanson
       const newAlbum = { songs: [songWithId] };
       await addDoc(collection(this.db, 'Albums'), newAlbum);
       console.log('Success: New album created with the song');
-      this.store.dispatch(loadSong());
+      this.store.dispatch(loadSongsFromAlbums());
+    }
+  }
+
+  /**
+   * Incrémente le compteur d'écoutes d'une chanson dans Firestore
+   * @param song ISong contenant id et albumId
+   * @param minIntervalMs Intervalle minimal entre deux incréments pour un même utilisateur (default 10s)
+   */
+  async incrementSongListeningCount(
+    song: ISong,
+    minIntervalMs: number = 10000
+  ): Promise<void> {
+    const songId = song.id;
+    const albumId = song.albumInfo?.id;
+
+    if (!albumId || !songId) {
+      console.warn('⚠️ albumId ou songId manquant');
+      return;
+    }
+
+    const now = Date.now();
+    const lastIncrement = this.lastIncrementMap[songId] || 0;
+    if (now - lastIncrement < minIntervalMs) {
+      console.log(
+        `⏱️ Anti-spam: pas d'incrément pour ${songId} pour le moment`
+      );
+      return;
+    }
+
+    try {
+      // Récupérer l'album
+      const albumRef = doc(this.db, 'Albums', albumId);
+      const albumSnap = await getDoc(albumRef);
+      if (!albumSnap.exists()) {
+        console.warn(`⚠️ Album ${albumId} introuvable`);
+        return;
+      }
+
+      const albumData = albumSnap.data();
+      const songs = albumData['songs'] || [];
+      const songIndex = songs.findIndex((s: any) => s.id === songId);
+      if (songIndex === -1) {
+        console.warn(`⚠️ Chanson ${songId} introuvable dans l'album`);
+        return;
+      }
+
+      // Incrémenter listeningCount (conversion string → number)
+      const currentCount = Number(songs[songIndex].listeningCount || 0);
+      songs[songIndex] = {
+        ...songs[songIndex],
+        listeningCount: (currentCount + 1).toString(),
+      };
+
+      // Enregistrer les changements dans Firestore
+      await updateDoc(albumRef, { songs });
+
+      // Mettre à jour la dernière incrémentation pour l’anti-spam
+      this.lastIncrementMap[songId] = now;
+
+      console.log(
+        `🎧 +1 écoute pour "${songs[songIndex].title}" (${currentCount} → ${
+          currentCount + 1
+        })`
+      );
+    } catch (error) {
+      console.error("❌ Erreur lors de l'incrémentation du compteur :", error);
     }
   }
 }

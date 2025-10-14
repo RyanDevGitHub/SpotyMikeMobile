@@ -1,8 +1,4 @@
-import {
-  IMusicDate,
-  MusicGenre,
-  PlaybackMode,
-} from '../../../../core/interfaces/music';
+import { SongGenre, PlaybackMode } from '../../../../core/interfaces/song';
 import { addIcons } from 'ionicons';
 import {
   IonButton,
@@ -13,7 +9,18 @@ import {
   IonRow,
   IonLabel,
 } from '@ionic/angular/standalone';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Inject,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChange,
+  SimpleChanges,
+} from '@angular/core';
 import {
   pauseOutline,
   playOutline,
@@ -23,9 +30,10 @@ import {
   repeatOutline,
   shuffleOutline,
 } from 'ionicons/icons';
-import { IMusic } from 'src/app/core/interfaces/music';
-import { MusicServiceService } from 'src/app/core/services/music-service.service';
+import { ISong } from 'src/app/core/interfaces/song';
+
 import { Subscription } from 'rxjs';
+import { MusicServiceService } from 'src/app/core/services/music-service.service';
 
 @Component({
   selector: 'app-music-nav-bar',
@@ -34,55 +42,12 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./music-nav-bar.component.scss'],
   imports: [IonButton, IonRange, IonIcon, IonGrid, IonCol, IonRow, IonLabel],
 })
-export class MusicNavBarComponent implements OnInit, OnDestroy {
+export class MusicNavBarComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isMini: boolean;
-  private musicPrev: IMusicDate = {
-    cover: 'cover',
-    title: 'title',
-    artistId: 'artist',
-    url: 'https://firebasestorage.googleapis.com/v0/b/spotytest-e89c6.appspot.com/o/%F0%9F%98%ADMessi%20leaves%20Barcelona!%F0%9F%98%AD%20(Lionel%20Messi%20farewell%20song%20press%20conference).mp3?alt=media&token=022f74d2-671c-4ccd-8040-dada277e7fb4',
-    duration: '3.12',
-    id: '12774',
-    featuring: [],
-    listeningCount: '0',
-    lyrics: 'lyrics',
-    createAt: new Date(),
-    genre: MusicGenre.Rock,
-  };
+  @Input() music: ISong;
+  @Output() nextSong = new EventEmitter<void>();
 
-  private musicAfter: IMusicDate = {
-    cover: 'cover',
-    title: 'title',
-    artistId: 'artist',
-    url: 'https://firebasestorage.googleapis.com/v0/b/spotytest-e89c6.appspot.com/o/%F0%9F%8F%86MAN%20CITY%20CHAMPIONS!%F0%9F%8F%86%20Four%20in%20a%20row!%20Who%20Won%20the%20League%20City!%20City!%202023-2024.mp3?alt=media&token=e2d564f6-7095-4ee0-882c-135e23d6ea19',
-    duration: '3.12',
-    id: '1274',
-    featuring: [],
-    listeningCount: '0',
-    lyrics: 'lyrics',
-    createAt: new Date(),
-    genre: MusicGenre.Rock,
-  };
-
-  private music: IMusicDate = {
-    cover: 'cover',
-    title: 'title',
-    artistId: 'artist',
-    url: 'https://firebasestorage.googleapis.com/v0/b/spotytest-e89c6.appspot.com/o/%F0%9F%8E%A4COUTINHO%20GETS%20SOLD!%F0%9F%8E%A4%20Messi%20%26%20Suarez%20sort%20a%20transfer!%20Man%20Utd%20Liverpool%20PSG.mp3?alt=media&token=87fdfd7b-ea78-4e73-a93d-49691e584a78',
-    duration: '3.12',
-    id: '124',
-    featuring: [],
-    listeningCount: '0',
-    lyrics: 'lyrics',
-    createAt: new Date(),
-    genre: MusicGenre.Rock,
-  };
-
-  private musicsList: IMusicDate[] = [
-    this.musicPrev,
-    this.music,
-    this.musicAfter,
-  ];
+  private musicsList: ISong[] = [];
 
   isPlaying: boolean = true;
   currentTime: number = 0;
@@ -95,7 +60,7 @@ export class MusicNavBarComponent implements OnInit, OnDestroy {
   buttonColorPrev: string = '';
   buttonFillAfter: string = '';
   buttonFillPrev: string = '';
-  private indexMusicList = 1;
+  private indexMusicList = 0;
   private isPlayingSubscription: Subscription;
   private currentTimeSubscription: Subscription;
   constructor(private audioService: MusicServiceService) {}
@@ -112,7 +77,7 @@ export class MusicNavBarComponent implements OnInit, OnDestroy {
       pauseOutline,
     });
     if (!this.audioService.isPlaying()) {
-      this.audioService.play(this.musicsList[this.indexMusicList].url);
+      this.audioService.play(this.music.url);
     }
     this.isPlayingSubscription = this.audioService.isPlaying$.subscribe(
       (isPlaying) => {
@@ -129,7 +94,11 @@ export class MusicNavBarComponent implements OnInit, OnDestroy {
     this.duration = await this.audioService.getDuration();
     console.log(this.indexMusicList);
   }
-
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['music'] && this.music) {
+      // this.musicsList = [this.musicPrev, this.music, this.musicAfter];
+    }
+  }
   playMusic() {
     if (!this.audioService.isPlaying()) {
       this.audioService.play(this.music.url);
@@ -154,42 +123,11 @@ export class MusicNavBarComponent implements OnInit, OnDestroy {
   }
 
   async playPrevMusic() {
-    console.log(this.indexMusicList);
-    if (this.indexMusicList - 1 >= 0) {
-      this.buttonFillAfter = '';
-      this.buttonColorAfter = '';
-      this.indexMusicList -= 1;
-      this.audioService.play(this.musicsList[this.indexMusicList].url);
-      this.duration = await this.audioService.getDuration();
-    } else {
-      this.buttonColorPrev = 'medium';
-      this.buttonFillPrev = 'solid';
-    }
+    this.nextSong.emit();
   }
 
   async playAfterMusic() {
-    console.log(this.indexMusicList);
-    console.log(this.currentPlaybackMode);
-
-    if (this.currentPlaybackMode == PlaybackMode.Default) {
-      if (this.musicsList.length > this.indexMusicList + 1) {
-        this.buttonColorPrev = '';
-        this.buttonFillPrev = '';
-        this.indexMusicList++;
-        this.audioService.play(this.musicsList[this.indexMusicList].url);
-        this.duration = await this.audioService.getDuration();
-      } else {
-        this.buttonFillAfter = 'solid';
-        this.buttonColorAfter = 'medium';
-      }
-    } else if (this.currentPlaybackMode == PlaybackMode.Loop) {
-      this.audioService.play(this.musicsList[this.indexMusicList].url);
-    } else if (this.currentPlaybackMode == PlaybackMode.Shuffle) {
-      this.audioService.play(
-        this.musicsList[Math.floor(Math.random() * 3) + 0].url
-      );
-      this.duration = await this.audioService.getDuration();
-    }
+    this.nextSong.emit();
   }
 
   formatTime(time: number): string {

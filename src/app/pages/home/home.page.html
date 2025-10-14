@@ -4,15 +4,15 @@
       <ion-col><app-search-bar></app-search-bar></ion-col>
     </ion-row>
     <ion-row class="">
-      <app-new-song></app-new-song>
+      <app-new-song img="{{(firstTopSong$ | async)?.cover }}"></app-new-song>
     </ion-row>
     <ion-row class="categories">
       <app-music-genres></app-music-genres>
     </ion-row>
     <ion-row class="top-songs">
-      <app-top-songs [items]="topsSongs"></app-top-songs>
+      <app-top-songs [items]="(topsSongs$ |async)"></app-top-songs>
     </ion-row>
-    <ion-row class="top-songs">
+    <ion-row class="last-played-songs">
       <app-last-played></app-last-played>
     </ion-row>
   </ion-grid>

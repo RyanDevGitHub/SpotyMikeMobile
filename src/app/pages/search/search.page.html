@@ -4,28 +4,27 @@
     <ion-row>
       <ion-col size="12">
         <ion-grid fixed>
-          @if (artistLists.length > 0) { @for (artist of artistLists; track
-          $index) {
+          @if (((albums$ | async)?.length ?? 0) > 0){ @for (album of (albums$
+          |async); track $index) {
           <ion-row>
             <ion-col size="12"
-              ><app-artist-container
-                [cover]="artist.cover"
-                [artistName]="artist.name"
-              ></app-artist-container>
+              ><app-album-container [album]="album"> </app-album-container>
             </ion-col>
           </ion-row>
 
-          } } @if (musicPlaylist.length > 0) { @for (music of musicPlaylist;
-          track $index) {
+          } } @if (((artists$ | async)?.length ?? 0) > 0){ @for (artist of
+          (artists$ |async); track $index) {
           <ion-row>
             <ion-col size="12"
-              ><app-music-container
-                [title]="music.title"
-                [duration]="music.duration"
-                [cover]="music.cover"
-                [artistName]="music.title"
-                [id]="music.id"
-              ></app-music-container>
+              ><app-artist-container [artist]="artist"></app-artist-container>
+            </ion-col>
+          </ion-row>
+
+          } } @if (((songs$ | async)?.length ?? 0) > 0) { @for (song of (songs$
+          | async); track $index) {
+          <ion-row>
+            <ion-col size="12"
+              ><app-music-container [song]="song"></app-music-container>
             </ion-col>
           </ion-row>
 
@@ -34,14 +33,14 @@
           <ion-row>
             <ion-col size="12"
               ><app-playlist-container
-                nbSong="{{playlist.nbSong}}"
+                nbSong="{{playlist.songs.length}}"
                 playlistName="{{playlist.title}}"
                 cover="{{playlist.cover}}"
                 playlistId="{{playlist.id}}"
               ></app-playlist-container
             ></ion-col>
           </ion-row>
-          } }@if (listPlaylistes.length === 0 && musicPlaylist.length === 0 &&
+          } }@if (listPlaylistes.length === 0 && (songs$|async)?.length === 0 &&
           artistLists.length === 0){
           <ion-row class="empty-result">
             <ion-col size="12">

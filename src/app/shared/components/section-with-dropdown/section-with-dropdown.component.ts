@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Type } from '@angular/core';
+import { Component, inject, Input, OnInit, Type } from '@angular/core';
 import {
   IonCol,
   IonGrid,
@@ -13,6 +13,7 @@ import {
 import { SeeAllComponent } from '../button/see-all/see-all.component';
 import { PlaylistContainerComponent } from '../containers/playlist-container/playlist-container.component';
 import { MusicContainerComponent } from '../containers/music-container/music-container.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-section-with-dropdown',
@@ -33,16 +34,14 @@ import { MusicContainerComponent } from '../containers/music-container/music-con
     MusicContainerComponent,
   ],
 })
-export class SectionWithDropdownComponent implements OnInit {
+export class SectionWithDropdownComponent {
   constructor() {}
+  private router = inject(Router);
   @Input() type: any;
   @Input() items: any;
   @Input() title: string;
   @Input() redirectTo: string;
   @Input() component: string;
-  ngOnInit() {
-    // this.generateItems();
-  }
 
   private generateItems() {
     const count = this.items.length + 1;

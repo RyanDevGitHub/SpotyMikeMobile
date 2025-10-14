@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import {
   IonLabel,
   IonItemDivider,
@@ -12,10 +12,18 @@ import {
   styleUrls: ['./lyrics-box.component.scss'],
   imports: [IonItemDivider, IonLabel, IonContent],
 })
-export class LyricsBoxComponent implements OnInit {
-  public lyrics = '';
+export class LyricsBoxComponent {
+  @Input() lyrics: string;
+  formattedLyrics: string;
   constructor() {}
   ngOnInit() {
-    this.lyrics = 'Lyrics';
+    this.formattedLyrics = this.lyrics
+      .replace(/\n/g, '<br>')
+      .replace(/\[([^\]]+)\]/g, '<strong>[$1]</strong>');
+
+    this.formattedLyrics = this.lyrics
+      .split('\n')
+      .map((line) => line.trim() || '<br>')
+      .join('<br>');
   }
 }

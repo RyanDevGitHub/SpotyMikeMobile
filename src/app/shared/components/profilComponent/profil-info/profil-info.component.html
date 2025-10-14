@@ -4,15 +4,17 @@
       <ion-avatar class="avatar">
         <img
           alt="Silhouette of a person's head"
-          src="https://ionicframework.com/docs/img/demos/avatar.svg"
+          src="{{ user$?.avatar }}"
         /> </ion-avatar
     ></ion-col>
     <ion-col size="6" class="ion-text-start ion-align-self-center">
       <ion-row>
-        <ion-col>Ryan</ion-col>
+        <ion-col>{{ user$?.email }}</ion-col>
       </ion-row>
       <ion-row>
-        <ion-col>134 following </ion-col>
+        <ion-col>
+          @if ( user$?.role === 'artist') { {{ user$?.artiste?.subscribers }}}
+        </ion-col>
       </ion-row>
     </ion-col>
   </ion-row>

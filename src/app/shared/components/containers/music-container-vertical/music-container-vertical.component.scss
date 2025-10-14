@@ -13,3 +13,9 @@
   text-overflow: ellipsis; /* Ajoute des points de suspension si nécessaire */
   max-width: 100%; /* Limite la largeur au conteneur */
 }
+.music-name {
+  max-width: 96px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

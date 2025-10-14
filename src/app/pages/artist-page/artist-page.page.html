@@ -1,25 +1,33 @@
 <ion-content>
   <ion-grid fixed [class.modal-open]="isModalOpen">
+    <!-- Header avec avatar et nom -->
     <ion-row>
-      <ion-col size="12" class="container-img"
-        ><ion-img [src]="musicList[0].cover"></ion-img
-        ><ion-text>
-          <h1>{{musicList[0].artistId}}</h1>
+      <ion-col size="12" class="container-img">
+        <ion-img [src]="lastAlbumCover$ | async"></ion-img>
+        <ion-text>
+          <h1>{{ (artist$ | async)?.firstName }}</h1>
         </ion-text>
       </ion-col>
     </ion-row>
-    <ion-row class="">
-      <ion-col size="auto" class="ion-padding-horizontal"
-        ><ion-text>
-          <h4>Music</h4>
-        </ion-text></ion-col
-      >
 
-      <ion-col size="auto" class="ion-padding-horizontal"
-        ><ion-text>
-          <h4>Album</h4>
-        </ion-text></ion-col
-      >
+    <!-- Toggle Music / Album -->
+    <ion-row class="ion-align-items-center ion-padding-horizontal">
+      <ion-col size="auto">
+        <ion-segment
+          name="artistSegment"
+          [value]="selectedTab()"
+          (ionChange)="onSegmentChange($event)"
+        >
+          <ion-segment-button value="music">
+            <ion-label>Songs</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="album">
+            <ion-label>Albums</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </ion-col>
+
+      <!-- Play button -->
       <ion-col size="auto" class="ion-align-self-end ion-text-end">
         <ion-button (click)="onClick()" class="ColorGreenBtn">
           <ion-icon slot="icon-only" name="play-outline"></ion-icon>
@@ -27,19 +35,13 @@
       </ion-col>
     </ion-row>
   </ion-grid>
-
   <ion-grid>
-    @for (music of musicList; track $index) {
-    <app-music-container
-      [artistName]="music.artistId"
-      [cover]="music.cover"
-      [duration]="music.duration"
-      [id]="music.id"
-      [musicName]="music.title"
-      [url]="music.url"
-    ></app-music-container>
-    }
+    @switch(selectedTab()) { @case('music') { @for(song of (songList$ | async);
+    track song) {
+    <app-music-container [song]="song"></app-music-container>
+    } } @case('album') { @for(album of (albumList$ | async); track album) {
+    <app-album-container [album]="album"></app-album-container>
+    } } }
   </ion-grid>
-
   <app-back-button color="light"></app-back-button>
 </ion-content>

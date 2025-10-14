@@ -1,16 +1,15 @@
-.action-button{
-    display: flex;
-    flex-direction: column;
+.action-button {
+  display: flex;
+  flex-direction: column;
 }
 
-.favorite-container{
-    border-bottom: inset;
-    padding: 1rem 0;
+.favorite-container {
+  border-bottom: inset;
+  padding: 1rem 0;
 }
 
 ion-img::part(image) {
-    border-radius: 10px;
-    width: 50%;
-    margin-left: auto;
-    margin-right: auto;
+  border-radius: 10px;
+  margin-left: auto;
+  margin-right: auto;
 }

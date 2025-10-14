@@ -19,15 +19,13 @@ import { ShareSongComponent } from '../../button/share-song/share-song.component
     LikeSongComponent,
   ],
 })
-export class PlaylistContainerComponent implements OnInit {
+export class PlaylistContainerComponent {
   @Input() nbSong: string;
   @Input() playlistName: string;
   @Input() cover: string;
   @Input() playlistId: string;
 
   constructor(private router: Router) {}
-
-  ngOnInit() {}
 
   redirectToPlaylist() {
     this.router.navigate(['/home/playlist/' + this.playlistId]);

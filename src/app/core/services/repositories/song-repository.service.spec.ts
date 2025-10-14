@@ -6,7 +6,7 @@ import { provideFirebaseApp } from '@angular/fire/app';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { environment } from 'src/environments/environment';
-import { IMusic } from '../../interfaces/music';
+
 describe('SongRepositoryService', () => {
   let service: SongRepositoryService;
 

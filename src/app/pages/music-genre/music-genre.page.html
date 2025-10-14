@@ -2,15 +2,11 @@
   <app-header-category
     [title]="genre"
     [backButton]="true"
+    page="music_genre"
   ></app-header-category>
   <ion-grid fixed>
     @for(songGenre of songs; track songGenre){
-    <app-music-container
-      [cover]="songGenre.cover"
-      [duration]="songGenre.duration"
-      [id]="songGenre.id"
-      [musicName]="songGenre.title"
-    ></app-music-container>
+    <app-music-container [song]="songGenre"></app-music-container>
     }
   </ion-grid>
 </ion-content>

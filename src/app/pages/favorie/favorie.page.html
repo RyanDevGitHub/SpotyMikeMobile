@@ -1,27 +1,15 @@
 <ion-content [class.modal-open]="isModalOpen">
-  <app-header-category title="Favoris"></app-header-category>
+  <app-header-category
+    [songs]="favorites() ?? []"
+    title="Favoris"
+    [page]="'favoris'"
+  ></app-header-category>
   <ion-grid fixed>
-    @for(favorite of listFavorite; track favorite){
-    <ion-row class="favorite-container">
-      <ion-col (click)="openModal()">
-        <ion-img [src]="favorite.cover"></ion-img>
-      </ion-col>
-      <ion-col (click)="openModal()">
-        <p>{{favorite.title}}</p>
-        <p>{{favorite.duration}}</p>
-      </ion-col>
-      <ion-col
-        class="action-button ion-justify-content-between ion-align-items-end"
-      >
-        <ion-row>
-          <app-song-option id="{{favorite.id}}"></app-song-option>
-        </ion-row>
-        <ion-row>
-          <app-like-song></app-like-song>
-          <app-share-song id="{{favorite.id}}"></app-share-song>
-        </ion-row>
-      </ion-col>
-    </ion-row>
+    @for(favorite of favorites(); track favorite){
+    <app-music-container
+      artistName="test"
+      [song]="favorite"
+    ></app-music-container>
     }
   </ion-grid>
 </ion-content>

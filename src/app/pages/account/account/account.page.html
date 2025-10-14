@@ -9,7 +9,7 @@
       class="profile-info ion-align-items-center ion-justify-content-center"
     >
       <ion-col size="12">
-        <app-profil-info></app-profil-info>
+        <app-profil-info [user$]="(user$ | async)"></app-profil-info>
       </ion-col>
     </ion-row>
 
@@ -24,7 +24,7 @@
           Edit
         </ion-button>
       </ion-col>
-      @if (user?.role === 'artist') {
+      @if ( (user$ | async)?.role === 'artist') {
       <ion-col size="4">
         <ion-button
           (click)="editProfile()"
@@ -53,7 +53,7 @@
     <ion-row class="profile-playlist">
       <ion-col size="12">
         <app-section-with-dropdown
-          [items]="items"
+          [items]="(items | async) ?? []"
           redirectTo="/home/playlistes"
           title="Playlists"
           component="playlist-container"

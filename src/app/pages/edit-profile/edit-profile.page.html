@@ -2,18 +2,45 @@
   <app-header-setting
     title="edit profil"
     [saveData]="true"
-  ></app-header-setting>
+    (saveEvent)="onChildSave($event)"
+  >
+  </app-header-setting>
   <ion-row class="ion-justify-content-center ion-margin">
     <ion-col size="6" class="ion-avatar-container">
       <ion-avatar class="avatar">
         <img
           alt="Silhouette of a person's head"
-          src="https://ionicframework.com/docs/img/demos/avatar.svg"
+          src="{{ (user$ | async)?.avatar }}"
         />
       </ion-avatar>
     </ion-col>
   </ion-row>
   <ion-item>
-    <ion-input label="Name" value="Ryan"></ion-input>
+    <ion-input label="First Name" [(ngModel)]="firstName"></ion-input>
   </ion-item>
+  <ion-item>
+    <ion-input label="Last Name" [(ngModel)]="lastName"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-input label="Email" [(ngModel)]="email"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-select label="Sexe" [(ngModel)]="sexe" placeholder="Sélectionner">
+      <ion-select-option value="1">Homme</ion-select-option>
+      <ion-select-option value="0">Femme</ion-select-option>
+      <ion-select-option value="2"
+        >Je ne souhaite pas répondre !</ion-select-option
+      >
+    </ion-select>
+  </ion-item>
+  <ion-item>
+    <ion-input label="tel" [(ngModel)]="tel" type="tel"></ion-input>
+  </ion-item>
+  <!-- <ion-item>
+    <ion-input
+      label="Password"
+      type="password"
+    
+    ></ion-input>
+  </ion-item> -->
 </ion-content>

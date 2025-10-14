@@ -47,9 +47,7 @@
   /* Couleur personnalisée */
 }
 
-img {
-  width: 100%;
-}
+
 
 .center {
   text-align: center;
@@ -125,6 +123,11 @@ h3 {
 
 ion-img {
   width: 100%;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 10px;
+  overflow: hidden;
+  object-fit: contain;   /* remplit le carré et coupe l’excédent */
+  object-position: center; /* centre l’image dans le cadre */
 }
 
 .relative-row {
@@ -149,3 +152,14 @@ ion-img {
   transform: translateX(-75%);
 }
 
+.custom-create-playlist-modal {
+  --background: transparent !important; /* supprime fond blanc de la modal */
+  --backdrop-opacity: 0.5;           /* fond sombre semi-transparent */
+
+  ion-content {
+    --background: transparent;        /* supprime fond blanc du contenu */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}

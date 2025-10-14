@@ -1,9 +1,12 @@
 .mini-player {
-  background-color: #15ab90;
-  height: fit-content;
-  border-radius: 10px 10px 0 0;
-  position: relative;
-  z-index: 99;
+  width: 100%;
+  position: fixed;
+  bottom: 42px;
+  left: 0;
+  z-index: 1000;
+}
+.mini-player ion-toolbar {
+  width: 100%;
 }
 
 ion-icon {
@@ -16,7 +19,7 @@ ion-img {
 
 ion-row,
 ion-col {
-  height: 7vh;
+  height: fit-content;
 }
 
 p {
@@ -26,3 +29,17 @@ p {
 app-music-nav-bar .player-container ion-grid {
   padding: 0;
 }
+
+// .mini-player {
+//   position: fixed;
+//   bottom: 56px; /* ajuste selon ta bottom nav */
+//   width: 100%;
+//   z-index: 99;
+//   background: var(--ion-color-light);
+//   border-top: 1px solid rgba(0, 0, 0, 0.08);
+// }
+// ion-thumbnail img {
+//   width: 100%;
+//   height: 100%;
+//   object-fit: cover;
+// }

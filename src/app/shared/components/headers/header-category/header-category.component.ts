@@ -12,6 +12,8 @@ import { BackButtonComponent } from '../../button/back-button/back-button.compon
 import { FilterOptionComponent } from '../../filter-option/filter-option.component';
 import { addIcons } from 'ionicons';
 import { ellipsisVerticalOutline } from 'ionicons/icons';
+import { ISong } from 'src/app/core/interfaces/song';
+import { IPageType } from 'src/app/core/interfaces/types';
 
 @Component({
   selector: 'app-header-category',
@@ -33,7 +35,9 @@ import { ellipsisVerticalOutline } from 'ionicons/icons';
 export class HeaderCategoryComponent implements OnInit {
   @Input() title: string;
   @Input() backButton: boolean;
+  @Input() songs: ISong[] = [];
   @Input() filter: boolean = true;
+  @Input() page: IPageType;
   constructor() {
     addIcons({ ellipsisVerticalOutline });
   }

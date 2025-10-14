@@ -1,30 +1,24 @@
-ion-img::part(image) {
-    border-radius: 10px;
-    width: 50%;
-    margin-left: auto;
-    margin-right: auto;
+
+.action-button {
+  display: flex;
+  flex-direction: column;
 }
-.action-button{
-    display: flex;
-    flex-direction: column;
-}
-.playliste-container{
-    border-bottom: inset;
-    padding: 1rem 0;
+.playliste-container {
+  border-bottom: inset;
+  padding: 1rem 0;
 }
 .center-end-row {
-    display: flex;
-    align-items: center; /* Center items vertically */
-    justify-content: space-between; /* Space between to push the last item to the end */
-  }
-  
-  .first-col {
-    flex: 1; /* Take up available space */
-    text-align: center; /* Center text horizontally */
-  }
-  
-  .last-col {
-    flex: 0; /* Take only necessary space */
-    text-align: end; /* Align text to the end */
-   
-  }
+  display: flex;
+  align-items: center; /* Center items vertically */
+  justify-content: space-between; /* Space between to push the last item to the end */
+}
+
+.first-col {
+  flex: 1; /* Take up available space */
+  text-align: center; /* Center text horizontally */
+}
+
+.last-col {
+  flex: 0; /* Take only necessary space */
+  text-align: end; /* Align text to the end */
+}

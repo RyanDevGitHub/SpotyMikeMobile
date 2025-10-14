@@ -1,4 +1,7 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { IAlbum } from './../../../core/interfaces/album';
+import { Store } from '@ngrx/store';
+import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   IonCol,
   IonGrid,
@@ -8,7 +11,12 @@ import {
   IonText,
   ModalController,
 } from '@ionic/angular/standalone';
+import { ISong } from 'src/app/core/interfaces/song';
 import { ModalStateService } from 'src/app/core/services/modal-state.service';
+import { AppState } from '@capacitor/app';
+import { selectAlbumBySong } from 'src/app/core/store/selector/album.selector';
+import { Observable } from 'rxjs';
+import { AddToPlaylistComponent } from '../add-to-playlist/add-to-playlist.component';
 
 @Component({
   selector: 'app-song-option',
@@ -18,23 +26,39 @@ import { ModalStateService } from 'src/app/core/services/modal-state.service';
   imports: [IonRow, IonCol, IonText, IonIcon, IonImg, IonGrid],
 })
 export class SongOptionModalComponent implements OnInit, OnDestroy {
-  private modal = inject(ModalController);
+  private modalCtrl = inject(ModalController);
   private modalStateService = inject(ModalStateService);
+  @Input() song: ISong;
+  private router = inject(Router);
+  store = inject(Store<AppState>);
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log(this.song);
+  }
 
-  onClickAddPlaylist() {}
-
-  onClickRedirectToAlbum() {}
+  async onClickAddPlaylist() {
+    const modal = await this.modalCtrl.create({
+      component: AddToPlaylistComponent,
+      componentProps: {
+        song: this.song,
+      },
+    });
+    modal.present();
+  }
+  onClickRedirectToAlbum() {
+    this.router.navigate(['/home/album', this.song.albumInfo?.id]);
+  }
 
   onClickShare() {}
 
-  onClickRedirectToArtist() {}
+  onClickRedirectToArtist() {
+    this.router.navigate(['/home/artist-page/' + this.song.artistId]);
+  }
 
   cancel() {
-    this.modal.dismiss();
+    this.modalCtrl.dismiss();
     this.modalStateService.setModalOpen(false);
   }
   ngOnDestroy() {

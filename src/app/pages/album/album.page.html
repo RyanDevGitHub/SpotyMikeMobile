@@ -1,0 +1,37 @@
+<ion-content>
+  <ion-grid fixed [class.modal-open]="isModalOpen">
+    <!-- Cover + infos -->
+    <app-back-button></app-back-button>
+    <ion-row class="album-header">
+      <ion-col size="4">
+        <ion-img [src]="album.cover"></ion-img>
+      </ion-col>
+      <ion-col size="8">
+        <h1>{{ album.title }}</h1>
+        <h2>{{ artist?.firstName }}</h2>
+        <p>{{ album.songs.length }} songs • {{ duration }}</p>
+
+        <ion-row class="album-actions">
+          <ion-col>
+            <ion-button class="ColorGreenBtn" (click)="playAlbum()">
+              <ion-icon slot="start" name="play-outline"></ion-icon> Play
+            </ion-button>
+          </ion-col>
+          <ion-col>
+            <!-- <app-like-song [song]="album"></app-like-song> -->
+          </ion-col>
+          <ion-col>
+            <!-- <app-share-song [id]="album.id"></app-share-song> -->
+          </ion-col>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+
+    <!-- Liste des chansons -->
+    <ion-row *ngFor="let song of album.songs">
+      <ion-col>
+        <app-music-container [song]="song"></app-music-container>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

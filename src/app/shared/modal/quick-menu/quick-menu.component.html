@@ -16,7 +16,7 @@
         ><ion-avatar>
           <img
             alt="Silhouette of a person's head"
-            src="https://ionicframework.com/docs/img/demos/avatar.svg"
+            src="{{ (user$ | async)?.avatar }}"
           /> </ion-avatar
       ></ion-col>
       <ion-col

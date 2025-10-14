@@ -25,10 +25,12 @@ import { ModalStateService } from 'src/app/core/services/modal-state.service';
 import { ModalController } from '@ionic/angular/standalone';
 import { AppState } from '@capacitor/app';
 import { Store } from '@ngrx/store';
-import { selectSongsByGenre } from 'src/app/core/store/selector/song.selector';
-import { IMusic, MusicGenre } from 'src/app/core/interfaces/music';
+import {
+  selectFilteredAndSortedSongsByGenre,
+  selectTopSongsByListeningCount,
+} from 'src/app/core/store/selector/song.selector';
+import { ISong, SongGenre } from 'src/app/core/interfaces/song';
 import { MusicContainerComponent } from 'src/app/shared/components/containers/music-container/music-container.component';
-import { loadSong } from 'src/app/core/store/action/song.action';
 
 @Component({
   selector: 'app-music-genre',
@@ -55,12 +57,12 @@ import { loadSong } from 'src/app/core/store/action/song.action';
   ],
 })
 export class MusicGenrePage implements OnInit {
-  genre: MusicGenre;
+  genre: SongGenre;
   // route = inject(ActivatedRoute)
   public isModalOpen: boolean;
   private modalSubscription: Subscription;
   store = inject(Store<AppState>);
-  songs: IMusic[] = [];
+  songs: ISong[] = [];
   constructor(
     private route: ActivatedRoute,
     private modalCtrl: ModalController,
@@ -76,17 +78,14 @@ export class MusicGenrePage implements OnInit {
       this.genre = params['genre'];
     });
 
-    console.log('[HOME] Dispatching loadSong action...');
-    this.store.dispatch(loadSong());
-    this.store.select(selectSongsByGenre(this.genre)).subscribe({
-      next: (songs) => {
-        console.log('[DEBUG] Songs Genre in subscription:', songs);
-        this.songs = songs; // Doit être un tableau
-      },
-      error: (err) => {
-        console.error('[DEBUG] Error in subscription:', err);
-      },
-    });
+    this.store
+      .select(selectFilteredAndSortedSongsByGenre(this.genre))
+      .subscribe({
+        next: (songs) => {
+          this.songs = songs; // Doit être un tableau
+        },
+        error: (err) => {},
+      });
   }
 
   async openModal() {

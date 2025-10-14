@@ -1,3 +1,4 @@
+import { AsyncPipe } from '@angular/common';
 import { MinimizePlayerAudioComponent } from '../../shared/components/playerComponents/minimize-player-audio/minimize-player-audio.component';
 import { Component, Inject, OnInit, inject } from '@angular/core';
 import { IonToast } from '@ionic/angular/standalone';
@@ -12,6 +13,7 @@ import {
 } from 'ionicons/icons';
 import { MinimizePlayerAudioService } from 'src/app/core/services/minimize-player-audio.service';
 import { MusicServiceService } from 'src/app/core/services/music-service.service';
+import { PlayerStateService } from 'src/app/core/services/player-state.service';
 
 @Component({
   selector: 'app-accueil',
@@ -29,15 +31,19 @@ import { MusicServiceService } from 'src/app/core/services/music-service.service
     IonButton,
     IonToast,
     MinimizePlayerAudioComponent,
+    AsyncPipe,
   ],
 })
-export class AccueilPage implements OnInit {
+export class AccueilPage {
+  miniPlayerVisible$ = this.playerState.miniPlayerVisible$;
+  currentSong$ = this.playerState.currentSong$;
+
   constructor(
     @Inject(MusicServiceService) public audioService: MusicServiceService,
     @Inject(MinimizePlayerAudioService)
-    public minimizePlayerAudioService: MinimizePlayerAudioService
+    public minimizePlayerAudioService: MinimizePlayerAudioService,
+    private playerState: PlayerStateService
   ) {
     addIcons({ heartOutline, homeOutline, playOutline, personOutline });
   }
-  ngOnInit(): void {}
 }

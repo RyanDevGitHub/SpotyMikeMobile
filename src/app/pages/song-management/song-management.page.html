@@ -11,14 +11,7 @@
           @for (song of songs; track $index) {
           <ion-row>
             <ion-col>
-              <app-music-container
-                [cover]="song.cover"
-                [musicName]="song.title"
-                [duration]="song.duration"
-                artistName=""
-                [id]="song.artistId"
-              >
-              </app-music-container>
+              <app-music-container [song]="song"> </app-music-container>
             </ion-col>
           </ion-row>
           }

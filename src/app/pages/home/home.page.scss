@@ -1,17 +1,18 @@
-.home-page{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
+.home-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
-ion-row{
-    width: 100%;
+ion-row {
+  width: 100%;
 }
-app-top-songs{
-    width: 100%;
+app-top-songs {
+  width: 100%;
 }
-app-last-played{
-    width: 100%;
+app-last-played {
+  width: 100%;
 }
-
-  
+app-new-song {
+  margin: auto;
+}

@@ -1,13 +1,11 @@
 <ion-grid fixed class="container-song-option" (click)="cancel()">
   <ion-row class="ion-justify-content-center ion-align-items-center">
-    <ion-col size="6"
-      ><ion-img src="assets/avatar/album-photo.jpg"></ion-img
-    ></ion-col>
+    <ion-col size="6"><ion-img src="{{ song.cover }}"></ion-img></ion-col>
   </ion-row>
 
   <ion-row class="ion-justify-content-center">
     <ion-text>
-      <h1>Titre</h1>
+      <h1>{{ song.title }}</h1>
     </ion-text>
   </ion-row>
 

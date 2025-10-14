@@ -1,0 +1,31 @@
+<ion-content class="ion-padding modal-background">
+  <div class="modal-box">
+    <div class="modal-header">
+      <ion-icon name="musical-notes-outline" class="modal-icon"></ion-icon>
+      <h2 class="title">Nouvelle playlist</h2>
+    </div>
+
+    <ion-item lines="none" class="input-item">
+      <ion-label position="stacked">Nom de la playlist</ion-label>
+      <ion-input
+        [(ngModel)]="playlistName"
+        placeholder="Ex: Soirée chill"
+        clear-input="true"
+      ></ion-input>
+    </ion-item>
+
+    <ion-button expand="block" color="success" shape="round" (click)="create()">
+      Créer
+    </ion-button>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      shape="round"
+      color="medium"
+      (click)="close()"
+    >
+      Annuler
+    </ion-button>
+  </div>
+</ion-content>

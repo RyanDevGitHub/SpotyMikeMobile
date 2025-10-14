@@ -14,10 +14,9 @@ import {
 import { HeaderCategoryComponent } from '../../shared/components/headers/header-category/header-category.component';
 import { SectionWithDropdownComponent } from 'src/app/shared/components/section-with-dropdown/section-with-dropdown.component';
 import { MusicContainerComponent } from 'src/app/shared/components/containers/music-container/music-container.component';
-import { IMusic } from 'src/app/core/interfaces/music';
+import { ISong } from 'src/app/core/interfaces/song';
 import { AppState } from '@capacitor/app';
 import { Store } from '@ngrx/store';
-import { loadSong } from 'src/app/core/store/action/song.action';
 import { debugSelectAllSongs } from 'src/app/core/store/selector/song.selector';
 import { Subject, Subscription, takeUntil } from 'rxjs';
 import { AddSongModalComponent } from 'src/app/shared/modal/add-song-modal/add-song-modal.component';
@@ -41,7 +40,7 @@ import { ModalStateService } from 'src/app/core/services/modal-state.service';
   ],
 })
 export class SongManagementPage implements OnInit {
-  songs: IMusic[] = [];
+  songs: ISong[] = [];
   store = inject(Store<AppState>);
   modalStateService = inject(ModalStateService);
   private unsubscribe$ = new Subject<void>();
@@ -54,18 +53,18 @@ export class SongManagementPage implements OnInit {
   }
 
   ngOnInit() {
-    this.store.dispatch(loadSong());
+    // this.store.dispatch(loadSong());
 
     this.store
       .select(debugSelectAllSongs)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (songs) => {
-          console.log('[DEBUG] Songs in subscription:', songs);
+          // console.log('[DEBUG] Songs in subscription:', songs);
           this.songs = songs;
         },
         error: (err) => {
-          console.error('[DEBUG] Error in subscription:', err);
+          // console.error('[DEBUG] Error in subscription:', err);
         },
       });
   }

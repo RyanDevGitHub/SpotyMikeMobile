@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>Add to Playlists</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="apply()">Apply</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    @if (playlists; as playlists) { @for (playlist of playlists; track
+    playlist.id) {
+    <ion-item>
+      <ion-avatar slot="start">
+        <img [src]="playlist.cover" />
+      </ion-avatar>
+
+      <ion-label>
+        <h3>{{ playlist.title }}</h3>
+        <p>{{ playlist.title }} • {{ playlist.songs.length }} Songs •</p>
+      </ion-label>
+
+      <ion-checkbox
+        slot="end"
+        [(ngModel)]="playlist.selected"
+        (ionChange)="logSelectedPlaylists()"
+      ></ion-checkbox>
+    </ion-item>
+    } }
+  </ion-list>
+
+  <div class="ion-padding">
+    <ion-button expand="block" color="success" (click)="openCreatePlaylist()">
+      Create new playlist
+    </ion-button>
+  </div>
+</ion-content>

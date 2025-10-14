@@ -1,11 +1,11 @@
 <ion-row class="row-music-container">
   <ion-col size="3" (click)="openPlayer()">
-    <ion-img [src]="cover"></ion-img>
+    <ion-img [src]="song.cover"></ion-img>
   </ion-col>
 
   <ion-col size="4" (click)="openPlayer()">
     <div class="music-name ion-text-center">
-      <h6>{{ musicName }}</h6>
+      <h6>{{ song.title }}</h6>
 
       <h6>{{ artistName }}</h6>
     </div>
@@ -13,18 +13,19 @@
 
   <ion-col size="auto" (click)="openPlayer()">
     <div class="music-name ion-text-center ion-align-self-center">
-      <h6>{{ duration }}</h6>
+      <h6>{{ getFormattedDuration() }}</h6>
     </div></ion-col
   >
 
   <ion-col size="auto">
     <app-song-option
       (click)="openModal()"
-      id="{{ id }}"
+      id="{{ song.id }}"
+      [song]="song"
       class="music-settings ion-align-self-center"
     ></app-song-option>
 
-    <app-like-song></app-like-song>
-    <app-share-song id="{{ id }}"></app-share-song
+    <app-like-song [song]="song"></app-like-song>
+    <app-share-song id="{{ song.id }}"></app-share-song
   ></ion-col>
 </ion-row>

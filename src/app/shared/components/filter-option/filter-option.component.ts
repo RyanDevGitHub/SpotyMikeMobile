@@ -1,35 +1,55 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { IonButton, IonButtons, IonContent, IonIcon, IonTitle, ModalController } from '@ionic/angular/standalone';
+import { Component, Input, OnInit, inject } from '@angular/core';
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonIcon,
+  IonTitle,
+  ModalController,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { ellipsisVerticalOutline } from 'ionicons/icons';
 import { FilterModalComponent } from '../../modal/filter-modal/filter-modal.component';
+import { ISong } from 'src/app/core/interfaces/song';
+import { IPageType } from 'src/app/core/interfaces/types';
 
 @Component({
   selector: 'app-filter-option',
   templateUrl: './filter-option.component.html',
   styleUrls: ['./filter-option.component.scss'],
   standalone: true,
-  imports: [IonIcon, IonButton,],
+  imports: [IonIcon, IonButton],
 })
 export class FilterOptionComponent implements OnInit {
-
-  constructor() { }
+  constructor() {}
 
   ctrlModal = inject(ModalController);
-
+  @Input() songs: ISong[] = [];
+  @Input() page: IPageType;
   ngOnInit() {
-
     addIcons({ ellipsisVerticalOutline });
   }
 
   async openFilter() {
-    const modal = await this.ctrlModal.create(
-      {
-        component: FilterModalComponent,
-        initialBreakpoint: 1,  // Set the initial breakpoint to 30%
-        breakpoints: [0, 1],  // Allow dragging to full height or lower
-        cssClass: 'custom-modal-filter'
-      });
+    const modal = await this.ctrlModal.create({
+      component: FilterModalComponent,
+      componentProps: {
+        songs: this.songs, // <-- le tableau de chansons à trier
+        page: this.page, // <-- la page actuelle
+      },
+      initialBreakpoint: 1,
+      breakpoints: [0, 1],
+      cssClass: 'custom-modal-filter',
+    });
+
+    // Récupérer les chansons triées quand le modal est dismiss
+    modal.onDidDismiss().then((result) => {
+      if (result.data?.sortedSongs) {
+        // Mettre à jour le tableau dans la page
+        this.songs = result.data.sortedSongs;
+      }
+    });
+
     modal.present();
   }
 }

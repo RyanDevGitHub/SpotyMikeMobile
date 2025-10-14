@@ -2,9 +2,11 @@ import { Injectable } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import {
   addDoc,
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
+  FirestoreDataConverter,
   getDoc,
   getDocs,
   getFirestore,
@@ -16,6 +18,8 @@ import {
 import { environment } from 'src/environments/environment';
 import { IUserDataBase, IUserUpdateDataBase } from '../../interfaces/user';
 import { Observable, from, map } from 'rxjs';
+import { DocumentData } from '@angular/fire/compat/firestore';
+import { IPlaylist, IPlaylistRaw, ISongRef } from '../../interfaces/playlistes';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +29,8 @@ export class UserRepositoryService {
 
   // Initialize Cloud Firestore and get a reference to the service
   db = getFirestore(this.app);
+
+  private usersCollection = collection(this.db, environment.collection.users);
 
   constructor() {}
 
@@ -68,7 +74,7 @@ export class UserRepositoryService {
     console.log('Success : User Created with Playlists and Artist Info');
   }
 
-  async getUserByField(fieldId: string): Promise<IUserDataBase> {
+  async getUserById(fieldId: string | undefined): Promise<IUserDataBase> {
     const usersCollection = collection(this.db, 'Users'); // Référence à la collection
     const q = query(usersCollection, where('id', '==', fieldId)); // Requête sur le champ `id`
 
@@ -76,33 +82,73 @@ export class UserRepositoryService {
 
     if (!querySnapshot.empty) {
       const docSnap = querySnapshot.docs[0]; // Supposons qu'un seul utilisateur correspond
-      console.log('[DEBUG] User found by field:', docSnap.data());
       return docSnap.data() as IUserDataBase;
     } else {
-      console.warn('[DEBUG] No user found with field ID:', fieldId);
+      // console.warn('[DEBUG] No user found with field ID:', fieldId);
       return {} as IUserDataBase;
     }
   }
-  // get a Users in collection by field
-  getUsersByField(fieldName: string, value: string): Observable<any | null> {
-    const querySnapshotPromise = getDocs(
+
+  async setUserField(
+    UserId: string | undefined,
+    fieldName: string,
+    value: any
+  ): Promise<void> {
+    const usersCollection = collection(this.db, 'Users');
+    const q = query(usersCollection, where('id', '==', UserId));
+
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const docRef = querySnapshot.docs[0].ref;
+      await updateDoc(docRef, {
+        [fieldName]: value, // clé dynamique
+      });
+      // console.log(`[DEBUG] Champ "${fieldName}" mis à jour avec :`, value);
+    } else {
+      // console.warn('[DEBUG] Aucun utilisateur trouvé avec field ID:', UserId);
+    }
+  }
+  async getUsersByField(fieldName: string, value: string): Promise<any | null> {
+    const querySnapshotPromise = await getDocs(
       query(
         collection(this.db, environment.collection.users),
         where(fieldName, '==', value)
       )
     );
-    return from(querySnapshotPromise).pipe(
-      map((querySnapshot) => {
-        if (!querySnapshot.empty) {
-          return querySnapshot.docs[0].data();
-        } else {
-          console.log(
-            `No User found with ${fieldName}=${value} in ${environment.collection.users} collection.`
-          );
-          return null;
-        }
-      })
-    );
+    if (!querySnapshotPromise.empty) {
+      return querySnapshotPromise.docs[0].data();
+    } else {
+      return null;
+    }
+  }
+
+  async addToLastPlayed(
+    userId: string | undefined,
+    songId: string
+  ): Promise<IUserDataBase> {
+    if (!userId) {
+      throw new Error('User ID is undefined');
+    }
+
+    // Mettre à jour le champ favorites avec arrayUnion
+    await this.updateUser(userId, { lastsplayeds: arrayUnion(songId) });
+
+    // console.log(`[DEBUG] Song ajoutée aux lastplayeds : ${songId}`);
+
+    // Récupérer le user mis à jour
+    const usersCollection = collection(this.db, 'Users');
+    const q = query(usersCollection, where('id', '==', userId));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const docRef = querySnapshot.docs[0].ref;
+      const updatedDoc = await getDoc(docRef);
+      return updatedDoc.data() as IUserDataBase;
+    } else {
+      // console.warn('[DEBUG] Aucun utilisateur trouvé avec user ID:', userId);
+      throw new Error('User not found after update');
+    }
   }
 
   // get Users collection
@@ -125,45 +171,236 @@ export class UserRepositoryService {
     return querySnapshot.docs.map((doc) => doc.data());
   }
 
-  // Update a Users in collection
   async updateUser(
     userId: string,
-    updates: { [key: string]: IUserUpdateDataBase }
-  ) {
-    await updateDoc(
-      doc(this.db, environment.collection.users, userId),
-      updates
-    );
-    return console.log('Success : User Update');
-  }
-
-  // Delete a User in collection
-  async deleteDocument(userId: string) {
-    await deleteDoc(doc(this.db, environment.collection.users, userId));
-    return console.log('Success : User Delete');
-  }
-
-  // Delete a User in collection By Field
-  async deleteUserByField(fieldName: string, value: string): Promise<void> {
-    const querySnapshot = await getDocs(
-      query(
-        collection(this.db, environment.collection.users),
-        where(fieldName, '==', value)
-      )
+    updates: Partial<IUserUpdateDataBase>
+  ): Promise<void> {
+    const q = query(
+      collection(this.db, environment.collection.users).withConverter(
+        this.userConverter
+      ),
+      where('id', '==', userId)
     );
 
-    if (!querySnapshot.empty) {
-      querySnapshot.forEach(async (doc) => {
-        await deleteDoc(doc.ref);
-      });
+    const querySnap = await getDocs(q);
 
-      console.log(
-        `Success: User(s) with ${fieldName}=${value} deleted from ${environment.collection.users} collection.`
-      );
-    } else {
-      console.log(
-        `No User found with ${fieldName}=${value} in ${environment.collection.users} collection.`
-      );
+    if (querySnap.empty) {
+      throw new Error(`Utilisateur avec id=${userId} non trouvé`);
     }
+
+    // Récupérer la référence du premier doc
+    const docRef = querySnap.docs[0].ref;
+
+    await updateDoc(docRef, updates);
+    console.log('✅ Success : User Update');
   }
+
+  async createPlaylist(
+    userId: string,
+    title: string,
+    song: ISongRef
+  ): Promise<IPlaylistRaw> {
+    console.log('🏗️ Repository createPlaylist appelé avec:', {
+      userId,
+      title,
+      song,
+    });
+
+    const q = query(
+      collection(this.db, environment.collection.users).withConverter(
+        this.userConverter
+      ),
+      where('id', '==', userId)
+    );
+
+    const querySnap = await getDocs(q);
+    console.log('📄 Query Firestore renvoie docs:', querySnap.docs.length);
+
+    if (querySnap.empty) {
+      console.error('❌ Utilisateur non trouvé');
+      throw new Error(`Utilisateur avec id=${userId} non trouvé`);
+    }
+
+    const docRef = querySnap.docs[0].ref;
+
+    const playlist: IPlaylistRaw = {
+      id: crypto.randomUUID(),
+      title,
+      songs: [song],
+      cover: '',
+    };
+
+    console.log('💾 Mise à jour Firestore avec playlist:', playlist);
+    await updateDoc(docRef, {
+      playlists: arrayUnion(playlist),
+    });
+
+    console.log('✅ Playlist ajoutée à Firestore');
+    return playlist;
+  }
+
+  // 🔹 Delete un User via son champ userId
+  async deleteUser(userId: string): Promise<void> {
+    const q = query(
+      collection(this.db, environment.collection.users),
+      where('id', '==', userId)
+    );
+
+    const querySnap = await getDocs(q);
+
+    if (querySnap.empty) {
+      throw new Error(`Utilisateur avec id=${userId} non trouvé`);
+    }
+
+    const docRef = querySnap.docs[0].ref;
+    await deleteDoc(docRef);
+    console.log('✅ Success : User Delete');
+  }
+
+  async addSongToPlaylist(
+    userId: string,
+    playlistId: string,
+    song: ISongRef
+  ): Promise<IPlaylistRaw> {
+    console.log(
+      `[addSongToPlaylist] Called with userId=${userId}, playlistId=${playlistId}, song=`,
+      song
+    );
+
+    const q = query(
+      collection(this.db, environment.collection.users).withConverter(
+        this.userConverter
+      ),
+      where('id', '==', userId)
+    );
+
+    const querySnap = await getDocs(q);
+
+    if (querySnap.empty) {
+      console.error(
+        `[addSongToPlaylist] Utilisateur avec id=${userId} non trouvé`
+      );
+      throw new Error(`Utilisateur avec id=${userId} non trouvé`);
+    }
+
+    const docRef = querySnap.docs[0].ref;
+    const userData = querySnap.docs[0].data();
+
+    // On récupère la playlist ciblée
+    const playlists: IPlaylistRaw[] = userData.playlists || [];
+    console.log(`[addSongToPlaylist] User playlists:`, playlists);
+
+    const playlistIndex = playlists.findIndex((p) => p.id === playlistId);
+
+    if (playlistIndex === -1) {
+      console.error(
+        `[addSongToPlaylist] Playlist avec id=${playlistId} non trouvée`
+      );
+      throw new Error(`Playlist avec id=${playlistId} non trouvée`);
+    }
+
+    // On ajoute la chanson
+    const updatedPlaylist: IPlaylistRaw = {
+      ...playlists[playlistIndex],
+      songs: [...(playlists[playlistIndex].songs || []), song],
+    };
+    console.log(`[addSongToPlaylist] Updated playlist:`, updatedPlaylist);
+
+    // On reconstruit toutes les playlists avec la modif
+    const updatedPlaylists = [...playlists];
+    updatedPlaylists[playlistIndex] = updatedPlaylist;
+
+    // On sauvegarde dans Firestore
+    await updateDoc(docRef, {
+      playlists: updatedPlaylists,
+    });
+
+    console.log(`✅ [addSongToPlaylist] Song added to playlist ${playlistId}`);
+    return updatedPlaylist;
+  }
+
+  async removeSongFromPlaylist(
+    userId: string,
+    playlistId: string,
+    songId: string
+  ): Promise<IPlaylistRaw> {
+    console.log(
+      `[removeSongFromPlaylist] Called with userId=${userId}, playlistId=${playlistId}, songId=${songId}`
+    );
+
+    const q = query(
+      collection(this.db, environment.collection.users).withConverter(
+        this.userConverter
+      ),
+      where('id', '==', userId)
+    );
+
+    const querySnap = await getDocs(q);
+
+    if (querySnap.empty) {
+      throw new Error(`Utilisateur avec id=${userId} non trouvé`);
+    }
+
+    const docRef = querySnap.docs[0].ref;
+    const userData = querySnap.docs[0].data();
+
+    const playlists: IPlaylistRaw[] = userData.playlists || [];
+    const playlistIndex = playlists.findIndex((p) => p.id === playlistId);
+
+    if (playlistIndex === -1) {
+      throw new Error(`Playlist avec id=${playlistId} non trouvée`);
+    }
+
+    const playlist = playlists[playlistIndex];
+    const updatedSongs = (playlist.songs || []).filter(
+      (s) => s.idSong !== songId
+    );
+
+    const updatedPlaylist: IPlaylistRaw = {
+      ...playlist,
+      songs: updatedSongs,
+    };
+
+    const updatedPlaylists = [...playlists];
+    updatedPlaylists[playlistIndex] = updatedPlaylist;
+
+    await updateDoc(docRef, { playlists: updatedPlaylists });
+
+    console.log(
+      `🗑️ [removeSongFromPlaylist] Song ${songId} removed from playlist ${playlistId}`
+    );
+    return updatedPlaylist;
+  }
+
+  // 🔹 Delete un User par un autre champ (ex: email, tel, etc.)
+  async deleteUserByField(fieldName: string, value: string): Promise<void> {
+    const q = query(
+      collection(this.db, environment.collection.users),
+      where(fieldName, '==', value)
+    );
+
+    const querySnap = await getDocs(q);
+
+    if (querySnap.empty) {
+      console.log(`❌ Aucun utilisateur trouvé avec ${fieldName}=${value}`);
+      return;
+    }
+
+    for (const docSnap of querySnap.docs) {
+      await deleteDoc(docSnap.ref);
+    }
+
+    console.log(
+      `✅ Success: User(s) with ${fieldName}=${value} deleted from ${environment.collection.users} collection.`
+    );
+  }
+
+  userConverter: FirestoreDataConverter<IUserUpdateDataBase> = {
+    toFirestore(user: IUserUpdateDataBase): DocumentData {
+      return user;
+    },
+    fromFirestore(snapshot, options): IUserUpdateDataBase {
+      return snapshot.data(options) as IUserUpdateDataBase;
+    },
+  };
 }

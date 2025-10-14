@@ -16,7 +16,7 @@ ion-grid {
 
   .see-all {
     text-align: right;
-    margin-right: 20px;
+    // margin-right: 20px;
   }
 
   ion-col {
@@ -54,13 +54,13 @@ ion-grid {
   display: flex;
   overflow-x: auto;
   white-space: nowrap;
-  padding: 10px;
+  // padding: 10px;
 }
 
 .song {
   display: inline-block;
   font-size: x-large;
-  margin-right: 10px; /* Espacement entre les éléments */
+  // margin-right: 10px; /* Espacement entre les éléments */
   box-sizing: border-box; /* Inclut le padding et la bordure dans la largeur totale */
   text-align: center; /* Centre le texte à l'intérieur de chaque élément */
 }
@@ -71,5 +71,5 @@ ion-grid {
 }
 
 .title-top-song {
-  margin-left: 20px;
+  // margin-left: 20px;
 }

@@ -1,0 +1,26 @@
+.album-header {
+  margin: 1rem 0;
+  ion-img {
+    width: 100%;
+    border-radius: 10px;
+  }
+  h1 {
+    font-size: 1.8rem;
+    margin: 0.5rem 0;
+  }
+  h2 {
+    font-size: 1.2rem;
+    color: gray;
+  }
+  p {
+    font-size: 1rem;
+    color: gray;
+  }
+}
+
+.album-actions {
+  margin-top: 1rem;
+  ion-button {
+    --border-radius: 20px;
+  }
+}

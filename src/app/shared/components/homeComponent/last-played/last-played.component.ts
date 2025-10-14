@@ -17,7 +17,7 @@ import { SongOptionComponent } from '../../button/song-option/song-option.compon
 import { SeeAllComponent } from '../../button/see-all/see-all.component';
 import { IPlaylist } from 'src/app/core/interfaces/playlistes';
 import { SectionWithDropdownComponent } from '../../section-with-dropdown/section-with-dropdown.component';
-import { IMusic } from 'src/app/core/interfaces/music';
+import { ISong } from 'src/app/core/interfaces/song';
 import { selectLastSongsByUser } from 'src/app/core/store/selector/song.selector';
 import { Store } from '@ngrx/store';
 import { AppState } from '@capacitor/app';
@@ -45,7 +45,7 @@ import { AppState } from '@capacitor/app';
   ],
 })
 export class LastPlayedComponent implements OnInit {
-  musicList: IMusic[];
+  musicList: ISong[];
   store = inject(Store<AppState>);
 
   constructor() {}
@@ -53,11 +53,10 @@ export class LastPlayedComponent implements OnInit {
   ngOnInit() {
     this.store.select(selectLastSongsByUser).subscribe({
       next: (songs) => {
-        console.log('[DEBUG] TopsSongs in subscription:', songs);
         this.musicList = songs; // Doit être un tableau
       },
       error: (err) => {
-        console.error('[DEBUG] Error in subscription:', err);
+        // console.error('[DEBUG] Error in subscription:', err);
       },
     });
     this.generateItems();

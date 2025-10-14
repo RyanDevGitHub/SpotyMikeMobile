@@ -35,6 +35,11 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'album/:id',
+        loadComponent: () =>
+          import('./pages/album/album.page').then((m) => m.AlbumPage),
+      },
+      {
         path: 'home',
         loadComponent: () =>
           import('./pages/home/home.page').then((m) => m.HomePage).then(),

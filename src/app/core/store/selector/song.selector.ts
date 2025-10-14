@@ -1,25 +1,24 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 import { AppState } from '../app.state';
-import { adapter, SongState } from '../reducer/song.reducer';
-import { IMusic, MusicGenre } from '../../interfaces/music';
+import { adapter, SongsState } from '../reducer/song.reducer';
+import { ISong, SongGenre } from '../../interfaces/song';
+import { selectUser } from './user.selector';
+import { selectAllArtists, selectAllArtistInfos } from './artist.selector';
+import { selectSortState } from './sort.selectors';
 // Sélecteur pour récupérer l'état de la musique
-export const selectMusicState = createFeatureSelector<SongState>('music');
+export const selectMusicState = createFeatureSelector<SongsState>('music');
 
 // Sélecteurs générés par l'adapter
 const { selectAll, selectEntities, selectIds, selectTotal } =
   adapter.getSelectors();
 
 // Sélecteurs spécifiques
-export const selectAllSongs = createSelector(
-  selectMusicState,
-  (state: SongState) => {
-    console.log('[DEBUG] State in selectAllSongs:', state);
-    return state ? adapter.getSelectors().selectAll(state) || [] : [];
-  }
+export const selectAllSongs = createSelector(selectMusicState, (state) =>
+  state ? adapter.getSelectors().selectAll(state) : []
 );
 
 export const selectLastPlayedSongs = createSelector(selectAllSongs, (songs) => {
-  console.log('[DEBUG] LastPlayedSongs selectAllSongs:', songs);
+  console.log('[Selector] LastPlayedSongs selectAllSongs:', songs);
   return songs;
 });
 
@@ -41,62 +40,145 @@ export const selectError = createSelector(
 );
 
 export const debugSelectAllSongs = createSelector(selectAllSongs, (songs) => {
-  console.log('[DEBUG] Songs from selectAllSongs:', songs);
+  console.log('[Selector] Songs from selectAllSongs:', songs);
   return songs;
 });
 
+/**
+ * Sélecteur pour filtrer les chansons par genre.
+ * @param genre Genre à filtrer, 'All' pour toutes les chansons
+ */
+export const selectFilteredAndSortedSongsByGenre = (genre: string) =>
+  createSelector(selectAllSongs, selectSortState, (songs, sortState) => {
+    // Filtrage par genre
+    let filteredSongs =
+      genre && genre !== 'All'
+        ? songs.filter((song) => song.genre === genre)
+        : songs;
+
+    // Récupérer le tri pour music_genre
+    const sort = sortState.music_genre; // clé fixe dans SortState
+    if (!sort) return filteredSongs;
+
+    // Trier
+    return [...filteredSongs].sort((a, b) => {
+      switch (sort.key) {
+        case 'title':
+          return sort.direction === 'asc'
+            ? a.title.localeCompare(b.title)
+            : b.title.localeCompare(a.title);
+        case 'artist':
+          return sort.direction === 'asc'
+            ? (a.artistInfo?.firstName || '').localeCompare(
+                b.artistInfo?.firstName || ''
+              )
+            : (b.artistInfo?.firstName || '').localeCompare(
+                a.artistInfo?.firstName || ''
+              );
+        case 'album':
+          return sort.direction === 'asc'
+            ? (a.albumInfo?.title || '').localeCompare(b.albumInfo?.title || '')
+            : (b.albumInfo?.title || '').localeCompare(
+                a.albumInfo?.title || ''
+              );
+        default:
+          return 0;
+      }
+    });
+  });
+
 export const selectRecentSongs = createSelector(selectAllSongs, (songs) => {
-  return songs
+  console.log('[Selector] All songs from store:', songs);
+
+  const recentSongs = songs
     .filter((song) => song.createAt)
-    .sort((a, b) => toDate(b.createAt).getTime() - toDate(a.createAt).getTime())
+    .sort((a, b) => b.createAt.getTime() - a.createAt.getTime())
     .slice(0, 3);
+
+  console.log('[Selector] Recent 3 songs:', recentSongs);
+  return recentSongs;
 });
 
 function toDate(timestamp: { seconds: number; nanoseconds: number }): Date {
   return new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1e6);
 }
 
-// Sélecteur pour récupérer toutes les chansons d'un genre spécifique ou toutes si le genre est "All"
-export const selectSongsByGenre = (genre: MusicGenre | 'All') =>
-  createSelector(selectAllSongs, (songs) => {
-    console.log('[DEBUG] Filtering songs by genre:', genre);
-    if (genre === 'All') {
-      return songs; // Retourne toutes les chansons si le genre est "All"
-    }
-    return songs.filter((song) => song.genre === genre);
-  });
-
 // Sélecteur pour les 5 chansons avec le plus de listeningCount
 export const selectTopSongsByListeningCount = createSelector(
   selectAllSongs,
   (songs) => {
-    console.log('[DEBUG] Filtering top 5 songs by listeningCount:', songs);
     return songs
-      .sort((a, b) => b.listeningCount - a.listeningCount) // Trier par listeningCount décroissant
-      .slice(0, 5); // Limiter à 5 chansons
+      .sort((a, b) => Number(b.listeningCount) - Number(a.listeningCount)) // convertir en nombre pour trier
+      .slice(0, 5); // top 5 chansons
   }
 );
 
-import { selectUser } from './user.selector';
+export const selectSortedTopSongs = createSelector(
+  selectAllSongs,
+  selectSortState,
+  (songs, sortState) => {
+    // On récupère le tri pour la page 'topSongs'
+    const sort = sortState.top_songs;
+    if (!sort) {
+      // Si pas de tri, on fait le top 5 par écoute par défaut
+      return [...songs]
+        .sort((a, b) => Number(b.listeningCount) - Number(a.listeningCount))
+        .slice(0, 5);
+    }
+
+    // Sinon, on trie selon la clé et la direction
+    const sorted = [...songs].sort((a, b) => {
+      switch (sort.key) {
+        case 'title':
+          return sort.direction === 'asc'
+            ? a.title.localeCompare(b.title)
+            : b.title.localeCompare(a.title);
+        case 'artist':
+          return sort.direction === 'asc'
+            ? (a.artistInfo?.firstName || '').localeCompare(
+                b.artistInfo?.firstName || ''
+              )
+            : (b.artistInfo?.firstName || '').localeCompare(
+                a.artistInfo?.firstName || ''
+              );
+        case 'album':
+          return sort.direction === 'asc'
+            ? (a.albumInfo?.title || '').localeCompare(b.albumInfo?.title || '')
+            : (b.albumInfo?.title || '').localeCompare(
+                a.albumInfo?.title || ''
+              );
+        case 'listeningCount':
+          return sort.direction === 'asc'
+            ? Number(a.listeningCount) - Number(b.listeningCount)
+            : Number(b.listeningCount) - Number(a.listeningCount);
+        default:
+          return 0;
+      }
+    });
+
+    // Top 5 chansons
+    return sorted.slice(0, 5);
+  }
+);
 
 export const selectLastSongsByUser = createSelector(
   selectUser,
   selectAllSongs,
-  (user, songs): IMusic[] => {
-    console.log('[DEBUG] User last songs IDs:', user?.lastsplayeds);
+  (user, songs): ISong[] => {
+    console.log('[Selector] User last songs IDs:', user?.lastsplayeds);
     if (!user || !user.lastsplayeds) {
       return []; // Retourner une liste vide si l'utilisateur ou lastSongs est indéfini
     }
     return user.lastsplayeds
       .map((songId) => songs.find((song) => song.id === songId))
-      .filter((song): song is IMusic => song !== undefined); // Filtrer et garantir le type
+      .filter((song): song is ISong => song !== undefined); // Filtrer et garantir le type
   }
 );
 
 export const selectSongsBySearchTerm = (searchTerm: string) =>
   createSelector(selectAllSongs, (songs) => {
     console.log(
-      '[DEBUG] selectSongsBySearchTerm: Songs before filtering:',
+      '[Selector] selectSongsBySearchTerm: Songs before filtering:',
       songs
     ); // Avant filtrage
     const lowerCaseTerm = searchTerm.toLowerCase();
@@ -104,7 +186,7 @@ export const selectSongsBySearchTerm = (searchTerm: string) =>
       song.title.toLowerCase().includes(lowerCaseTerm)
     );
     console.log(
-      '[DEBUG] selectSongsBySearchTerm: Filtered songs:',
+      '[Selector] selectSongsBySearchTerm: Filtered songs:',
       filteredSongs
     ); // Après filtrage
     return filteredSongs;
@@ -113,13 +195,53 @@ export const selectSongsBySearchTerm = (searchTerm: string) =>
 export const selectFavoriteSongsByUser = createSelector(
   selectUser,
   selectAllSongs,
-  (user, songs): IMusic[] => {
-    console.log('[DEBUG] User favorite song IDs:', user);
+  (user, songs): ISong[] => {
+    console.log('[Selector] User favorite song IDs:', user);
     if (!user || !user.favorites) {
       return []; // Retourner une liste vide si l'utilisateur ou favorites est indéfini
     }
     return user.favorites
       .map((songId) => songs.find((song) => song.id === songId))
-      .filter((song): song is IMusic => song !== undefined); // Filtrer et garantir le type
+      .filter((song): song is ISong => song !== undefined); // Filtrer et garantir le type
+  }
+);
+
+export const selectSortedLastPlayedSongs = createSelector(
+  selectLastSongsByUser,
+  selectSortState,
+  (lastPlayedSongs, sortState) => {
+    const sort = sortState.lastPlayed; // page "lastPlayed" dans le store
+    console.log('📝 SortState lastPlayed:', sort);
+    console.log('📝 LastPlayedSongs avant tri:', lastPlayedSongs);
+
+    if (!sort) return lastPlayedSongs;
+
+    const sorted = [...lastPlayedSongs].sort((a, b) => {
+      switch (sort.key) {
+        case 'title':
+          return sort.direction === 'asc'
+            ? a.title.localeCompare(b.title)
+            : b.title.localeCompare(a.title);
+        case 'artist':
+          return sort.direction === 'asc'
+            ? (a.artistInfo?.firstName || '').localeCompare(
+                b.artistInfo?.firstName || ''
+              )
+            : (b.artistInfo?.firstName || '').localeCompare(
+                a.artistInfo?.firstName || ''
+              );
+        case 'album':
+          return sort.direction === 'asc'
+            ? (a.albumInfo?.title || '').localeCompare(b.albumInfo?.title || '')
+            : (b.albumInfo?.title || '').localeCompare(
+                a.albumInfo?.title || ''
+              );
+        default:
+          return 0;
+      }
+    });
+
+    console.log('📝 LastPlayedSongs après tri:', sorted, 'avec sort:', sort);
+    return sorted;
   }
 );

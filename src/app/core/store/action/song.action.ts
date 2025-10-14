@@ -1,10 +1,13 @@
+// core/store/actions/song.action.ts
 import { createAction, props } from '@ngrx/store';
-import { IMusic } from '../../interfaces/music';
+import { ISong } from '../../interfaces/song';
 
-export const loadSong = createAction('[Music] Load Song');
+export const loadSongsFromAlbums = createAction(
+  '[Music] Load Songs From Albums'
+);
 export const loadSongSuccess = createAction(
   '[Music] Load Song Success',
-  props<{ songs: IMusic[] }>()
+  props<{ songs: ISong[] }>()
 );
 export const loadSongFailure = createAction(
   '[Music] Load Song Failure',

@@ -1,0 +1,5 @@
+app-new-song {
+  display: block; /* nécessaire pour que margin: auto fonctionne */
+  margin: 0 auto; /* centre horizontalement */
+  max-width: 600px; /* optionnel : limite la largeur */
+}

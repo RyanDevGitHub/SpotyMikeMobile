@@ -1,57 +1,57 @@
 ion-grid {
-    margin:  0 20px;
-  }
-  .categories {
+  // margin:  0 20px;
+}
+.categories {
+  width: 100%;
+  // margin-bottom: 10%;
+  display: flex;
+  align-items: center;
+
+  ion-row {
     width: 100%;
-    margin-bottom: 10%;
     display: flex;
-    align-items: center;
-  
-    ion-row {
-      width: 100%;
-      display: flex;
-    }
-  
-    .see-all {
-      text-align: right; 
-    }
-  
-    ion-col {
-      font-size: 20px;
-      display: flex;
-      flex-direction: column;
+  }
+
+  .see-all {
+    text-align: right;
+  }
+
+  ion-col {
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
     // justify-content: center;
-      //align-items: center; 
-    }
-  
-    .genre-buttons {
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-      margin-top: 10px;
-    }
-  
-    .genre-buttons {
-      width: 100%;
-      display: flex;
-      justify-content: space-around; 
-      margin-top: 10px;
-    }
-  
-    .genre-button {
-      --background: white;
-      --color: black;
-      --border-color: #ccc;
-      --background-focused: #15AB90;
-      --background-activated: #15AB90;
-      width: 80px;
-      height: 40px;
-      text-align: center;
-    }
-  
-    .genre-button.selected {
-      --background: #15AB90;
-      --color: white;
-      --border-color: #15AB90;
-    }
-    }
+    //align-items: center;
+  }
+
+  .genre-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    // margin-top: 10px;
+  }
+
+  .genre-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    // margin-top: 10px;
+  }
+
+  .genre-button {
+    --background: white;
+    --color: black;
+    --border-color: #ccc;
+    --background-focused: #15ab90;
+    --background-activated: #15ab90;
+    // width: 80px;
+    // height: 40px;
+    text-align: center;
+  }
+
+  .genre-button.selected {
+    --background: #15ab90;
+    --color: white;
+    --border-color: #15ab90;
+  }
+}

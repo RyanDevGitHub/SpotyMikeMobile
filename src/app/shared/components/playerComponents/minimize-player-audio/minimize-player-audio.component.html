@@ -1,14 +1,24 @@
-<div class="mini-player">
-  <ion-grid fixed>
-    <ion-row class="ion-justify-content-end">
-      <ion-col size="3" (click)="deleteComponent()"> <ion-img [src]="image"></ion-img></ion-col>
-      <ion-col size="7" (click)="deleteComponent()">
-        <p class=" ion-text-left">Titre</p>
-        <p class="ion-text-left">autheur</p>
-      </ion-col>
-      <ion-col size="2">
-        <app-music-nav-bar [isMini]="true" style="padding: 0;"></app-music-nav-bar>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+<div class="mini-player" #miniPlayer>
+  <ion-toolbar>
+    <ion-grid fixed>
+      <ion-row class="ion-align-items-center">
+        <ion-col size="auto">
+          <ion-img
+            [src]="music?.cover"
+            style="width: 50px; height: auto"
+          ></ion-img>
+        </ion-col>
+        <ion-col>
+          <p class="ion-text-left">{{ music?.title }}</p>
+          <p class="ion-text-left"></p>
+        </ion-col>
+        <ion-col size="auto">
+          <app-music-nav-bar
+            [isMini]="true"
+            style="padding: 0"
+          ></app-music-nav-bar>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
 </div>

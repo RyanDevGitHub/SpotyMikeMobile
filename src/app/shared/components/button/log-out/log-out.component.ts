@@ -1,22 +1,22 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonButton } from "@ionic/angular/standalone";
+import { AppState } from '@capacitor/app';
+import { IonButton } from '@ionic/angular/standalone';
+import { Store } from '@ngrx/store';
+import { logout } from 'src/app/core/store/action/user.action';
 
 @Component({
   selector: 'app-log-out',
   templateUrl: './log-out.component.html',
   styleUrls: ['./log-out.component.scss'],
   standalone: true,
-  imports: [IonButton,],
+  imports: [IonButton],
 })
-export class LogOutComponent implements OnInit {
-  router = inject(Router);
-  constructor() { }
-
-
-  ngOnInit() { }
+export class LogOutComponent {
+  store = inject(Store<AppState>);
+  constructor() {}
+  
   logOut() {
-    this.router.navigate(['/auth/login'])
-
+    this.store.dispatch(logout());
   }
 }

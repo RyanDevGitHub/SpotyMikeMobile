@@ -1,13 +1,18 @@
 import { Injectable } from '@angular/core';
 import { catchError, from, map, Observable, Subject } from 'rxjs';
 import { SongRepositoryService } from './repositories/song-repository.service';
-import { IMusic, IMusicDate } from '../interfaces/music';
+import { ISong } from '../interfaces/song';
+import { AlbumsRepository } from './repositories/album-repository.service';
+import { IAlbum } from '../interfaces/album';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MusicServiceService {
-  constructor(private songRepository: SongRepositoryService) {}
+  constructor(
+    private songRepository: SongRepositoryService,
+    private albumRepository: AlbumsRepository
+  ) {}
   private audio = new Audio();
   private isPlayingSubject = new Subject<boolean>();
   isPlaying$ = this.isPlayingSubject.asObservable();
@@ -58,11 +63,24 @@ export class MusicServiceService {
   }
 
   // Récupérer toutes les musiques
-  getSongs(): Observable<IMusic[]> {
-    return from(this.songRepository.getAllSongs()).pipe(
+  getSongs(): Observable<ISong[]> {
+    return from(this.songRepository.getAllSongsWithArtist()).pipe(
       map((songs) => {
         // Assurez-vous que les chansons sont un tableau et qu'il n'y a pas de mutation accidentelle des objets
-        console.log('Songs fetched:', songs);
+        return songs;
+      }),
+      catchError((error) => {
+        console.error('Error in getSongs:', error);
+        throw error;
+      })
+    );
+  }
+
+  // Récupérer touts les albums
+  getAlbums(): Observable<IAlbum[]> {
+    return from(this.albumRepository.getAllAlbums()).pipe(
+      map((songs) => {
+        // Assurez-vous que les chansons sont un tableau et qu'il n'y a pas de mutation accidentelle des objets
         return songs;
       }),
       catchError((error) => {
@@ -73,12 +91,12 @@ export class MusicServiceService {
   }
 
   // Récupérer une musique par ID
-  getSongById(songId: string): Observable<IMusic | null> {
+  getSongById(songId: string): Observable<ISong | null> {
     return from(this.songRepository.getSongById(songId));
   }
 
   // Ajouter une musique
-  addSong(song: IMusicDate): Observable<void> {
+  addSong(song: ISong): Observable<void> {
     return from(this.songRepository.addSong(song));
   }
 }

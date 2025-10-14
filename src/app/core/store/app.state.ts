@@ -1,9 +1,17 @@
-import { IMusic } from '../interfaces/music';
+import { ISong } from '../interfaces/song';
 import { IPlaylist } from '../interfaces/playlistes';
-import { SongState } from './reducer/song.reducer';
+import { AlbumsState } from './reducer/album.reducer';
+import { ArtistsState } from './reducer/artist.reducer';
+import { FavoritesState } from './reducer/favorite.reducer';
+import { SongsState } from './reducer/song.reducer';
 import { UserState } from './reducer/user.reducer';
+import { SortState } from './reducer/sort.reducer';
 
 export interface AppState {
-  music: SongState; // Assurez-vous que le type est correct
+  music: SongsState; // Assurez-vous que le type est correct
   user: UserState;
+  favorites: FavoritesState;
+  album: AlbumsState;
+  artists: ArtistsState;
+  sort: SortState;
 }

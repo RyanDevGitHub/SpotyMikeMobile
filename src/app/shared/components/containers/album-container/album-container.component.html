@@ -1,0 +1,29 @@
+<ion-row class="album-container">
+  <!-- Cover -->
+  <ion-col size="3" (click)="redirectToAlbum()">
+    <ion-img [src]="album.cover"></ion-img>
+  </ion-col>
+
+  <!-- Infos principales -->
+  <ion-col size="7" (click)="redirectToAlbum()">
+    <p class="album-title">{{ album.title }}</p>
+    <!-- <p class="album-author">{{ artist.firstName }}</p> -->
+    <p class="album-meta">
+      {{ album.songs.length }} titres • {{ duration }} min
+    </p>
+  </ion-col>
+
+  <!-- Actions -->
+  <ion-col
+    size="2"
+    class="action-button ion-justify-content-between ion-align-items-end"
+  >
+    <ion-row>
+      <!-- <app-song-option id="{{ albumId }}"></app-song-option> -->
+    </ion-row>
+    <ion-row>
+      <app-like-song></app-like-song>
+      <app-share-song id="{{ album.id }}"></app-share-song>
+    </ion-row>
+  </ion-col>
+</ion-row>

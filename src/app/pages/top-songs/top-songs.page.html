@@ -2,11 +2,12 @@
   [backButton]="true"
   title="Top Songs"
   [class.modal-open]="isModalOpen"
+  page="top_songs"
 ></app-header-category>
 
 <ion-content [class.modal-open]="isModalOpen">
   <app-display-item
     [playlists]="listPlaylistes"
-    [musicList]="listMusics"
+    [songList]="listMusics() || []"
   ></app-display-item>
 </ion-content>

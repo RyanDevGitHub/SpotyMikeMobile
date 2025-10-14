@@ -20,6 +20,8 @@ import {
   IonButton,
   IonIcon,
   IonAvatar,
+  ToastController,
+  IonSpinner,
 } from '@ionic/angular/standalone';
 import { AuthentificationService } from 'src/app/core/services/authentification.service';
 import { TranslateModule } from '@ngx-translate/core';
@@ -32,6 +34,11 @@ import { ModalController } from '@ionic/angular/standalone';
 import { PasswordLostComponent } from 'src/app/shared/modal/password-lost/password-lost.component';
 import { LocalStorageService } from 'src/app/core/services/local-strorage.service';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { timeout } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { AppState } from '@capacitor/app';
+import { log } from 'console';
+import { login } from 'src/app/core/store/action/user.action';
 
 @Component({
   selector: 'app-login',
@@ -39,6 +46,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
   styleUrls: ['./login.page.scss'],
   standalone: true,
   imports: [
+    IonSpinner,
     IonAvatar,
     IonIcon,
     IonItem,
@@ -63,6 +71,8 @@ export class LoginPage implements OnInit {
   private router = inject(Router);
   private modalCtl = inject(ModalController);
   private serviceAuth = inject(AuthentificationService);
+  private toastCtrl = inject(ToastController);
+  private store = inject(Store<AppState>);
 
   form: FormGroup = new FormGroup({
     email: new FormControl('', [
@@ -76,35 +86,40 @@ export class LoginPage implements OnInit {
   });
 
   constructor() {}
-
   ngOnInit() {
-    console.log('Init');
+    window.addEventListener('offline', () => {
+      this.showNetworkToast();
+    });
   }
-
   onSubmit() {
     this.error = '';
-    if (this.form.valid) {
-      this.submitForm = true;
-      this.serviceAuth
-        .login(this.form.value.email, this.form.value.password)
-        .subscribe((data: any | LoginRequestError | LoginRequestSuccess) => {
-          if (data.error) {
-            this.error = 'Identifiants incorrects';
-          } else {
-            // Add LocalStorage User
-            this.localStore.setItem('user', data.user);
-            setTimeout(() => {
-              console.log(data.token);
 
-              // Add LocalStorage Token
-              this.localStore.setItem('token', data.token);
-
-              // Navigate to home/home
-              this.router.navigate(['home/home']);
-            }, 3000);
-          }
-        });
+    // Vérification connexion réseau
+    if (!navigator.onLine) {
+      this.showNetworkToast();
+      return;
     }
+
+    if (!this.form.valid) return;
+
+    this.submitForm = true;
+
+    this.store.dispatch(
+      login({
+        email: this.form.value.email,
+        password: this.form.value.password,
+      })
+    );
+  }
+
+  async showNetworkToast() {
+    const toast = await this.toastCtrl.create({
+      message: 'Impossible de se connecter au serveur, réessayez plus tard',
+      color: 'danger',
+      duration: 3000,
+      position: 'top',
+    });
+    await toast.present();
   }
 
   async onPasswordLostModal() {

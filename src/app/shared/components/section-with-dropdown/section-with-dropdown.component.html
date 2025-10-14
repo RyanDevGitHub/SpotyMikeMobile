@@ -12,20 +12,13 @@
         <ion-col>
           @if (component === 'playlist-container') {
           <app-playlist-container
-            nbSong="{{ item.nbSong }}"
-            playlistName="{{ item.playlistName }}"
+            nbSong="{{ item.songs.length }}"
+            playlistName="{{ item.title }}"
             cover="{{ item.cover }}"
-            playlistId="{{ item.playlistId }}"
+            playlistId="{{ item.id }}"
           ></app-playlist-container>
           }@else if(component === 'music-container'){
-          <app-music-container
-            cover="{{ item.cover }}"
-            musicName="{{ item.title }}"
-            duration="{{ item.duration }}"
-            artistName="{{ item.artist }}"
-            id="{{ item.id }}"
-          >
-          </app-music-container>
+          <app-music-container [song]="item"> </app-music-container>
           }
         </ion-col>
       </ion-row>

@@ -13,7 +13,11 @@
 
     <!-- Filtre (aligné à droite) -->
     @if (filter) {
-    <app-filter-option slot="end"></app-filter-option>
+    <app-filter-option
+      [songs]="songs"
+      slot="end"
+      [page]="page"
+    ></app-filter-option>
     }
   </ion-toolbar>
 </ion-header>

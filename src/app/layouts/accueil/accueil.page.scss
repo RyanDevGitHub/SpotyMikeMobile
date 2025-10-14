@@ -6,7 +6,6 @@ code .main-grid {
 }
 
 .minimizePlayer {
-  height: 60px;
   /* Hauteur fixe du mini player */
   flex-shrink: 0;
   /* Ne pas rétrécir même sur petits écrans */
@@ -23,6 +22,4 @@ code .main-grid {
   /* Les onglets vont rester en bas */
 }
 
-.mini-player {
-  height: 8vh;
-}
+

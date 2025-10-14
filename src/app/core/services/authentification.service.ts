@@ -3,7 +3,15 @@ import { IToken, IUserDataBase } from './../interfaces/user';
 import { Firebase } from './firebase.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { catchError, map, Observable, of } from 'rxjs';
+import {
+  catchError,
+  from,
+  map,
+  Observable,
+  of,
+  switchMap,
+  throwError,
+} from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { LoginRequestError, LoginRequestSuccess } from '../interfaces/login';
 import { FirebaseError } from 'firebase/app';
@@ -17,48 +25,54 @@ export class AuthentificationService {
   private auth = inject(AuthService);
   private userRepository = inject(UserRepositoryService);
 
-  constructor() {}
   private token: IToken = { token: '' };
+
+  constructor() {}
+
   login(
     email: string,
     password: string
-  ): Observable<LoginRequestSuccess | LoginRequestError | any> {
+  ): Observable<LoginRequestSuccess | LoginRequestError> {
     return this.firestore.getDocumentByField('Users', 'email', email).pipe(
-      map((user) => {
-        if (user) {
-          if (user.password === password) {
-            this.auth.signIn(email, password).then((myToken) => {
-              this.auth.verifyToken(myToken).then((myVerifyToken: any) => {
-                if (myVerifyToken) {
-                  this.token.token = myToken;
-                }
-              });
-            });
-            return {
-              error: false,
-              token: this.token,
-              user: user,
-            } as LoginRequestSuccess;
-          } else {
-            return { message: 'Invalid credentials' } as LoginRequestError;
-          }
-        } else {
-          return { message: 'User not found' } as LoginRequestError;
-        }
+      switchMap((user) => {
+        // Utilisateur non trouvé
+        if (!user)
+          return of({ message: 'User not found' } as LoginRequestError);
+
+        // Mauvais mot de passe
+        if (user.password !== password)
+          return of({ message: 'Invalid credentials' } as LoginRequestError);
+
+        // Login correct → convertir Promise signIn en Observable
+        return from(this.auth.signIn(email, password)).pipe(
+          switchMap((myToken) =>
+            from(this.auth.verifyToken(myToken)).pipe(
+              map((myVerifyToken) => {
+                if (myVerifyToken) this.token.token = myToken;
+
+                return {
+                  type: 'success',
+                  error: false,
+                  token: this.token,
+                  user: user,
+                } as LoginRequestSuccess;
+              })
+            )
+          )
+        );
       }),
       catchError((error) => {
         console.error('Error during login:', error);
-        return of({
-          message: 'An error occurred during login',
-        } as LoginRequestError);
+        // Timeout ou autre erreur réseau
+        return throwError(() => new Error('NETWORK_ERROR'));
       })
     );
   }
+
   register(email: string, password: string, user: IUserDataBase) {
     this.auth
       .signUp(email, password)
       .then((userCredential) => {
-        // Inscription réussie
         console.log('Inscription réussie', userCredential);
         user.id = userCredential;
         if (user.artiste?.firstName) user.artiste.id = userCredential;
@@ -74,8 +88,7 @@ export class AuthentificationService {
         }
       });
   }
-
-  errorRequest(httpError: HttpErrorResponse): Observable<LoginRequestError> {
-    return of({ ...httpError.error, error: true });
+  logout(): Promise<void> {
+    return this.auth.signOut(); // Firebase Auth fournit signOut()
   }
 }
