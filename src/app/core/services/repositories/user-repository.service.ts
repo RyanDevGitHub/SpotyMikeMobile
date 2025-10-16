@@ -1,3 +1,4 @@
+import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { LocalStorageService } from 'src/app/core/services/local-strorage.service';
 import { inject, Injectable } from '@angular/core';
 import { initializeApp } from 'firebase/app';
@@ -38,46 +39,59 @@ export class UserRepositoryService {
 
   private usersCollection = collection(this.db, environment.collection.users);
   localStorageService: LocalStorageService = inject(LocalStorageService);
-  constructor(private firestore: AngularFirestore) {}
+  constructor(
+    private firestore: AngularFirestore,
+    private storage: AngularFireStorage
+  ) {}
 
   getOrCreateUser(firebaseUser: any): Observable<IUser> {
     const userRef = this.firestore.collection('Users').doc(firebaseUser.uid);
 
     return userRef.get().pipe(
       switchMap((doc) => {
-        let user: IUserDataBase;
-
         if (doc.exists) {
-          user = doc.data() as IUserDataBase;
+          const user = doc.data() as IUserDataBase;
+          return of(user);
         } else {
           const displayName = firebaseUser.displayName ?? '';
           const nameParts = displayName.split(' ');
 
-          user = {
-            id: firebaseUser.uid,
-            avatar: firebaseUser.photoURL ?? '',
-            firstName: nameParts[0] ?? '',
-            lastName: nameParts.slice(1).join(' ') ?? '',
-            password: '',
-            email: firebaseUser.email ?? '',
-            tel: '',
-            sexe: 'non-defini',
-            favorites: [],
-            playlists: [],
-            lastsplayeds: [],
-            created_at: new Date().toISOString(),
-            role: ERoleUser.User,
-          };
-          userRef.set(user);
+          // Ici on récupère l'avatar par défaut en Observable
+          const defaultAvatar$ = from(
+            this.storage.ref('avatar/user.png').getDownloadURL().toPromise()
+          );
+
+          return defaultAvatar$.pipe(
+            switchMap((defaultAvatarUrl) => {
+              const user: IUserDataBase = {
+                id: firebaseUser.uid,
+                avatar: defaultAvatarUrl, // ← avatar par défaut
+                firstName: nameParts[0] ?? '',
+                lastName: nameParts.slice(1).join(' ') ?? '',
+                password: '',
+                email: firebaseUser.email ?? '',
+                tel: '',
+                sexe: 'non-defini',
+                favorites: [],
+                playlists: [],
+                lastsplayeds: [],
+                created_at: new Date().toISOString(),
+                role: ERoleUser.User,
+              };
+
+              // Enregistrer dans Firestore
+              userRef.set(user);
+
+              // Stockage local
+              this.localStorageService.setItem('token', {
+                token: firebaseUser.stsTokenManager?.accessToken ?? '',
+              });
+              this.localStorageService.setItem('idUser', user.id);
+
+              return of(user);
+            })
+          );
         }
-
-        // ⚡ Stockage localStorage pour compatibilité existante
-        this.localStorageService.setItem('token', {
-          token: firebaseUser.stsTokenManager?.accessToken ?? '',
-        });
-        this.localStorageService.setItem('idUser', user.id);
-
-        return of(user);
       })
     );
   }

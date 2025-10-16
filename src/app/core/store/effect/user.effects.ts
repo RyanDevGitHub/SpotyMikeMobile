@@ -221,7 +221,7 @@ export class UserEffects {
           // à ajouter dans AuthentificationService
           tap(() => {
             this.localStorageService.removeItem('token');
-            this.localStorageService.removeItem('user');
+            this.localStorageService.removeItem('idUser');
             this.localStorageService.removeItem('mesFavoris');
             this.router.navigate(['/auth/login']);
           }),

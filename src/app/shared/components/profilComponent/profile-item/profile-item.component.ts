@@ -25,14 +25,5 @@ export class ProfileItemComponent implements OnInit {
   user$ = this.store.select(selectUser);
   constructor() {}
 
-  ngOnInit() {
-    this.user$
-      .pipe(
-        filter((user): user is IUser => !!user),
-        take(1)
-      )
-      .subscribe((user) => {
-        // console.log('[DEBUG] User reçu:', user);
-      });
-  }
+  ngOnInit() {}
 }

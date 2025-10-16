@@ -2,11 +2,18 @@
   <ion-row>
     <ion-col class="ion-align-self-center"
       ><ion-avatar>
-        <img
-          alt="Silhouette of a person's head"
-          src="https://ionicframework.com/docs/img/demos/avatar.svg"
-        /> </ion-avatar
-    ></ion-col>
+        <!-- <ng-container *ngIf="user$ | async; else defaultAvatar">
+          <img
+            [src]="(user$ | async)?.avatar || 'assets/avatar/album-photo.jpg'"
+            alt="Avatar"
+          />
+        </ng-container> -->
+
+        <ng-template #defaultAvatar>
+          <img src="assets/avatar/album-photo.jpg" alt="Avatar par défaut" />
+        </ng-template>
+      </ion-avatar>
+    </ion-col>
     <ion-col
       ><ion-text>
         <h6>{{ (user$ | async)?.email }}<br />ViewProfile</h6>
