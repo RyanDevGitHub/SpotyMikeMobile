@@ -1,4 +1,4 @@
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, JsonPipe } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import {
   IonAvatar,
@@ -6,6 +6,7 @@ import {
   IonContent,
   IonGrid,
   IonRow,
+  IonSkeletonText,
 } from '@ionic/angular/standalone';
 import { IUser } from 'src/app/core/interfaces/user';
 
@@ -14,7 +15,16 @@ import { IUser } from 'src/app/core/interfaces/user';
   templateUrl: './profil-info.component.html',
   styleUrls: ['./profil-info.component.scss'],
   standalone: true,
-  imports: [IonAvatar, IonContent, IonGrid, IonRow, IonCol, AsyncPipe],
+  imports: [
+    IonSkeletonText,
+    IonAvatar,
+    IonContent,
+    IonGrid,
+    IonRow,
+    IonCol,
+    AsyncPipe,
+    JsonPipe,
+  ],
 })
 export class ProfilInfoComponent {
   @Input() user$: IUser | null;

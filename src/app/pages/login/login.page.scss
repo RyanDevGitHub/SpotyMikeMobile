@@ -1,25 +1,70 @@
-app-login{
+app-login {
   width: 100%;
 }
-form{
+form {
   padding: 0 5%;
   text-align: center;
-  ion-list{
+  ion-list {
     padding-bottom: 5%;
-    ion-item{
+    ion-item {
       --background: transparent;
     }
   }
-  ion-button{
-  --color: white;
-    --background: #15AB90;
+  ion-button {
+    --color: white;
+    --background: #15ab90;
   }
-  a{
+  a {
     display: block;
-    color: #15AB90;
+    color: #15ab90;
   }
   .bg-transparent {
     background: transparent;
   }
+}
+.social-login-bar {
+  display: flex;
+  justify-content: center;
 
+  margin: 20px 0;
+  .social-btn.google {
+    border-left: 1px solid #333;
+  }
+  .social-btn {
+    all: unset; // annule les styles hérités
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    border-right: 1px solid #dadce0;
+    border-bottom: 1px solid #dadce0;
+    border-top: 1px solid #dadce0;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: filter 0.2s;
+
+    img {
+      width: 24px;
+      height: 24px;
+      pointer-events: none; // éviter que le logo capture le clic
+    }
+
+    &:hover {
+      filter: brightness(0.9);
+    }
+  }
+
+  .google {
+    border-color: #333;
+  }
+  .facebook {
+    border-color: #333;
+  }
+  .github {
+    border-color: #333;
+  }
+  .x {
+    border-color: #333;
+  }
 }

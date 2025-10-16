@@ -38,7 +38,7 @@ import { timeout } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AppState } from '@capacitor/app';
 import { log } from 'console';
-import { login } from 'src/app/core/store/action/user.action';
+import { login, loginFailure, loginSuccess } from 'src/app/core/store/action/user.action';
 
 @Component({
   selector: 'app-login',
@@ -127,5 +127,22 @@ export class LoginPage implements OnInit {
       component: PasswordLostComponent,
     });
     modal.present();
+  }
+
+  loginWithGoogle() {
+    this.error = '';
+    this.submitForm = true;
+
+    this.serviceAuth.signInWithGoogle().subscribe((result) => {
+      this.submitForm = false;
+      if (result.type === 'success') {
+        this.store.dispatch(
+          loginSuccess({ user: result.user, token: result.token })
+        );
+      } else {
+        this.error = result.message;
+        this.store.dispatch(loginFailure({ error: result.message }));
+      }
+    });
   }
 }

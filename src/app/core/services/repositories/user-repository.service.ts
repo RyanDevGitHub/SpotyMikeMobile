@@ -1,4 +1,6 @@
-import { Injectable } from '@angular/core';
+import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { LocalStorageService } from 'src/app/core/services/local-strorage.service';
+import { inject, Injectable } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import {
   addDoc,
@@ -16,9 +18,14 @@ import {
   where,
 } from 'firebase/firestore';
 import { environment } from 'src/environments/environment';
-import { IUserDataBase, IUserUpdateDataBase } from '../../interfaces/user';
-import { Observable, from, map } from 'rxjs';
-import { DocumentData } from '@angular/fire/compat/firestore';
+import {
+  ERoleUser,
+  IUser,
+  IUserDataBase,
+  IUserUpdateDataBase,
+} from '../../interfaces/user';
+import { Observable, from, map, of, switchMap } from 'rxjs';
+import { AngularFirestore, DocumentData } from '@angular/fire/compat/firestore';
 import { IPlaylist, IPlaylistRaw, ISongRef } from '../../interfaces/playlistes';
 
 @Injectable({
@@ -31,8 +38,63 @@ export class UserRepositoryService {
   db = getFirestore(this.app);
 
   private usersCollection = collection(this.db, environment.collection.users);
+  localStorageService: LocalStorageService = inject(LocalStorageService);
+  constructor(
+    private firestore: AngularFirestore,
+    private storage: AngularFireStorage
+  ) {}
 
-  constructor() {}
+  getOrCreateUser(firebaseUser: any): Observable<IUser> {
+    const userRef = this.firestore.collection('Users').doc(firebaseUser.uid);
+
+    return userRef.get().pipe(
+      switchMap((doc) => {
+        if (doc.exists) {
+          const user = doc.data() as IUserDataBase;
+          return of(user);
+        } else {
+          const displayName = firebaseUser.displayName ?? '';
+          const nameParts = displayName.split(' ');
+
+          // Ici on récupère l'avatar par défaut en Observable
+          const defaultAvatar$ = from(
+            this.storage.ref('avatar/user.png').getDownloadURL().toPromise()
+          );
+
+          return defaultAvatar$.pipe(
+            switchMap((defaultAvatarUrl) => {
+              const user: IUserDataBase = {
+                id: firebaseUser.uid,
+                avatar: defaultAvatarUrl, // ← avatar par défaut
+                firstName: nameParts[0] ?? '',
+                lastName: nameParts.slice(1).join(' ') ?? '',
+                password: '',
+                email: firebaseUser.email ?? '',
+                tel: '',
+                sexe: 'non-defini',
+                favorites: [],
+                playlists: [],
+                lastsplayeds: [],
+                created_at: new Date().toISOString(),
+                role: ERoleUser.User,
+              };
+
+              // Enregistrer dans Firestore
+              userRef.set(user);
+
+              // Stockage local
+              this.localStorageService.setItem('token', {
+                token: firebaseUser.stsTokenManager?.accessToken ?? '',
+              });
+              this.localStorageService.setItem('idUser', user.id);
+
+              return of(user);
+            })
+          );
+        }
+      })
+    );
+  }
 
   async createUser(user: IUserDataBase) {
     // Construire l'objet utilisateur

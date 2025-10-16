@@ -69,6 +69,10 @@ export class AuthentificationService {
     );
   }
 
+  signInWithGoogle(): Observable<LoginRequestSuccess | LoginRequestError> {
+    return this.auth.signInWithGoogle();
+  }
+
   register(email: string, password: string, user: IUserDataBase) {
     this.auth
       .signUp(email, password)

@@ -1,21 +1,37 @@
 <ion-grid fixed>
   <ion-row>
+    <!-- Avatar -->
     <ion-col size="6">
       <ion-avatar class="avatar">
+        @if (user$) {
         <img
-          alt="Silhouette of a person's head"
-          src="{{ user$?.avatar }}"
-        /> </ion-avatar
-    ></ion-col>
+          [src]="user$.avatar || 'assets/avatar/album-photo.jpg'"
+          alt="Avatar"
+        />
+        } @else {
+        <ion-skeleton-text
+          animated
+          style="border-radius: 50%; width: 48px; height: 48px"
+        ></ion-skeleton-text>
+        }
+      </ion-avatar>
+    </ion-col>
+
+    <!-- Infos utilisateur -->
     <ion-col size="6" class="ion-text-start ion-align-self-center">
       <ion-row>
-        <ion-col>{{ user$?.email }}</ion-col>
-      </ion-row>
-      <ion-row>
         <ion-col>
-          @if ( user$?.role === 'artist') { {{ user$?.artiste?.subscribers }}}
+          {{ user$?.email }}
         </ion-col>
       </ion-row>
+
+      @if (user$?.role === 'artist') {
+      <ion-row>
+        <ion-col>
+          {{ user$?.artiste?.subscribers }}
+        </ion-col>
+      </ion-row>
+      }
     </ion-col>
   </ion-row>
 </ion-grid>
