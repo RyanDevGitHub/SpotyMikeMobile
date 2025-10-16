@@ -2,7 +2,11 @@ import { Injectable } from '@angular/core';
 import { EAuthPage } from '../models/refData';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { from, Observable, of, switchMap } from 'rxjs';
+import { LoginRequestError, LoginRequestSuccess } from '../interfaces/login';
+import { UserRepositoryService } from './repositories/user-repository.service';
+import { GoogleAuthProvider, UserCredential } from 'firebase/auth';
+import { IToken } from '../interfaces/user';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +14,11 @@ import { Observable, of } from 'rxjs';
 export class AuthService {
   private serverUrl = 'http://localhost:3000'; // URL de ton serveur Node.js
 
-  constructor(private afAuth: AngularFireAuth, private http: HttpClient) {}
+  constructor(
+    private afAuth: AngularFireAuth,
+    private http: HttpClient,
+    private userService: UserRepositoryService
+  ) {}
   getPageAuth() {
     return of(EAuthPage.Login);
   }
@@ -21,6 +29,40 @@ export class AuthService {
       password
     );
     return userCredential.user?.getIdToken() ?? '';
+  }
+  signInWithGoogle(): Observable<LoginRequestSuccess | LoginRequestError> {
+    const provider = new GoogleAuthProvider();
+
+    return from(this.afAuth.signInWithPopup(provider)).pipe(
+      switchMap((userCredential) => {
+        const firebaseUser = userCredential.user;
+        if (!firebaseUser) {
+          return of({
+            type: 'error',
+            message: 'Google login failed',
+          } as LoginRequestError);
+        }
+
+        // Récupération du token Firebase sans await
+        return from(firebaseUser.getIdToken()).pipe(
+          switchMap((idToken) => {
+            const tokenObj: IToken = { token: idToken };
+
+            // Création / récupération du user dans Firestore
+            return this.userService.getOrCreateUser(firebaseUser).pipe(
+              switchMap((user) =>
+                of({
+                  type: 'success',
+                  user,
+                  token: tokenObj,
+                  error: false,
+                } as LoginRequestSuccess)
+              )
+            );
+          })
+        );
+      })
+    );
   }
 
   async signUp(email: string, password: string): Promise<string> {

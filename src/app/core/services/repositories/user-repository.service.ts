@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { LocalStorageService } from 'src/app/core/services/local-strorage.service';
+import { inject, Injectable } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import {
   addDoc,
@@ -16,9 +17,14 @@ import {
   where,
 } from 'firebase/firestore';
 import { environment } from 'src/environments/environment';
-import { IUserDataBase, IUserUpdateDataBase } from '../../interfaces/user';
-import { Observable, from, map } from 'rxjs';
-import { DocumentData } from '@angular/fire/compat/firestore';
+import {
+  ERoleUser,
+  IUser,
+  IUserDataBase,
+  IUserUpdateDataBase,
+} from '../../interfaces/user';
+import { Observable, from, map, of, switchMap } from 'rxjs';
+import { AngularFirestore, DocumentData } from '@angular/fire/compat/firestore';
 import { IPlaylist, IPlaylistRaw, ISongRef } from '../../interfaces/playlistes';
 
 @Injectable({
@@ -31,8 +37,50 @@ export class UserRepositoryService {
   db = getFirestore(this.app);
 
   private usersCollection = collection(this.db, environment.collection.users);
+  localStorageService: LocalStorageService = inject(LocalStorageService);
+  constructor(private firestore: AngularFirestore) {}
 
-  constructor() {}
+  getOrCreateUser(firebaseUser: any): Observable<IUser> {
+    const userRef = this.firestore.collection('Users').doc(firebaseUser.uid);
+
+    return userRef.get().pipe(
+      switchMap((doc) => {
+        let user: IUserDataBase;
+
+        if (doc.exists) {
+          user = doc.data() as IUserDataBase;
+        } else {
+          const displayName = firebaseUser.displayName ?? '';
+          const nameParts = displayName.split(' ');
+
+          user = {
+            id: firebaseUser.uid,
+            avatar: firebaseUser.photoURL ?? '',
+            firstName: nameParts[0] ?? '',
+            lastName: nameParts.slice(1).join(' ') ?? '',
+            password: '',
+            email: firebaseUser.email ?? '',
+            tel: '',
+            sexe: 'non-defini',
+            favorites: [],
+            playlists: [],
+            lastsplayeds: [],
+            created_at: new Date().toISOString(),
+            role: ERoleUser.User,
+          };
+          userRef.set(user);
+        }
+
+        // ⚡ Stockage localStorage pour compatibilité existante
+        this.localStorageService.setItem('token', {
+          token: firebaseUser.stsTokenManager?.accessToken ?? '',
+        });
+        this.localStorageService.setItem('idUser', user.id);
+
+        return of(user);
+      })
+    );
+  }
 
   async createUser(user: IUserDataBase) {
     // Construire l'objet utilisateur

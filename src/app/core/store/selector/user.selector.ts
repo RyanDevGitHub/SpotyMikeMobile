@@ -26,7 +26,14 @@ export const selectUserError = createSelector(
   selectUserState,
   (state) => state.error
 );
-
+export const selectAuthToken = createSelector(
+  selectUserState,
+  (userState) => userState.token
+);
+export const selectUserId = createSelector(
+  selectUserState,
+  (userState) => userState.user?.id ?? null
+);
 // Sélecteurs pour charger l'état de la musique
 export const selectLoading = createSelector(
   selectUserState,

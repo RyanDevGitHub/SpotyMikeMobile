@@ -46,6 +46,7 @@ export interface IUserDataBase {
   email: string;
   tel?: string;
   sexe: string;
+  // hasAlbum?: boolean;
   favorites: string[];
   artiste?: IArtist;
   playlists: IPlaylistRaw[];
