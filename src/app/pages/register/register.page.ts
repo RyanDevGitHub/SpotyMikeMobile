@@ -83,7 +83,7 @@ export class RegisterPage implements OnInit {
     password: '',
     email: '',
     sexe: '',
-    favorites: [],
+    favorites: { songs: [], albums: [] },
     role: ERoleUser.User,
     artiste: {
       id: '',

@@ -205,7 +205,13 @@ export class UserEffects {
     () =>
       this.actions$.pipe(
         ofType(loginSuccess),
-        tap(() => {
+        tap(({ token, user }) => {
+          if (token) {
+            this.localStorageService.setItem('token', token);
+          }
+          if (user?.id) {
+            this.localStorageService.setItem('idUser', user.id);
+          }
           this.router.navigate(['/home/home']);
         })
       ),

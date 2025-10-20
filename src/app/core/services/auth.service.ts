@@ -47,6 +47,7 @@ export class AuthService {
         return from(firebaseUser.getIdToken()).pipe(
           switchMap((idToken) => {
             const tokenObj: IToken = { token: idToken };
+        
 
             // Création / récupération du user dans Firestore
             return this.userService.getOrCreateUser(firebaseUser).pipe(

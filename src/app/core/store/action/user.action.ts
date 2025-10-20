@@ -12,7 +12,7 @@ import { ISong } from '../../interfaces/song';
 export const loadUser = createAction('[User] Load User');
 export const loadUserSuccess = createAction(
   '[User] Load User Success',
-  props<{ user: IUser | IUserDataBase }>()
+  props<{ user: IUser }>()
 );
 export const loadUserFailure = createAction(
   '[User] Load User Failure',
@@ -28,7 +28,7 @@ export const addLastSongUser = createAction(
 // Action de succès : renvoie l'utilisateur complet mis à jour
 export const addLastSongUserSuccess = createAction(
   '[User] Add Last Song User Success',
-  props<{ updatedUser: IUserDataBase }>()
+  props<{ updatedUser: IUser }>()
 );
 
 // Action d'échec

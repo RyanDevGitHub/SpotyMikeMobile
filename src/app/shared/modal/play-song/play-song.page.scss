@@ -12,10 +12,12 @@ ion-grid {
     min-height: auto;
     max-height: 100%;
     max-width: 100%;
+    width: revert-layer;
   }
 
   ion-row#cover {
     height: 50%;
+    width: 100%;
   }
   ion-row#lyrics {
     height: 20%;

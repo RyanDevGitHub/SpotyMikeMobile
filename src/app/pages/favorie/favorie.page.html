@@ -1,15 +1,20 @@
 <ion-content [class.modal-open]="isModalOpen">
   <app-header-category
-    [songs]="favorites() ?? []"
+    [songs]="favoriteSongs() ?? []"
     title="Favoris"
     [page]="'favoris'"
   ></app-header-category>
   <ion-grid fixed>
-    @for(favorite of favorites(); track favorite){
+    @for(favorite of favoriteSongs(); track favorite){
     <app-music-container
       artistName="test"
       [song]="favorite"
     ></app-music-container>
+    } @for(favorite of favoriteAlbums(); track favorite){
+    <app-album-container
+      artistName="test"
+      [album]="favorite"
+    ></app-album-container>
     }
   </ion-grid>
 </ion-content>
