@@ -22,7 +22,7 @@
       <!-- <app-song-option id="{{ albumId }}"></app-song-option> -->
     </ion-row>
     <ion-row>
-      <app-like-song></app-like-song>
+      <app-like-song [album]="album"></app-like-song>
       <app-share-song id="{{ album.id }}"></app-share-song>
     </ion-row>
   </ion-col>

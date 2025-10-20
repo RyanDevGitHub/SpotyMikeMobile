@@ -200,9 +200,9 @@ export const selectFavoriteSongsByUser = createSelector(
     if (!user || !user.favorites) {
       return []; // Retourner une liste vide si l'utilisateur ou favorites est indéfini
     }
-    return user.favorites
+    return user.favorites.songs
       .map((songId) => songs.find((song) => song.id === songId))
-      .filter((song): song is ISong => song !== undefined); // Filtrer et garantir le type
+      .filter((song): song is ISong => song !== undefined);
   }
 );
 

@@ -72,7 +72,7 @@ export class UserRepositoryService {
                 email: firebaseUser.email ?? '',
                 tel: '',
                 sexe: 'non-defini',
-                favorites: [],
+                favorites: { songs: [], albums: [] },
                 playlists: [],
                 lastsplayeds: [],
                 created_at: new Date().toISOString(),

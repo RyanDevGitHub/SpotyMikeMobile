@@ -18,7 +18,7 @@ export interface IUser {
   password: string;
   tel?: string;
   sexe: string;
-  favorites: string[];
+  favorites: IFavorite;
   artiste?: IArtist;
   playlists: IPlaylistRaw[];
   created_at: string;
@@ -47,12 +47,16 @@ export interface IUserDataBase {
   tel?: string;
   sexe: string;
   // hasAlbum?: boolean;
-  favorites: string[];
+  favorites: IFavorite;
   artiste?: IArtist;
   playlists: IPlaylistRaw[];
   lastsplayeds: string[];
   created_at: string;
   role: ERoleUser;
+}
+export interface IFavorite {
+  songs: string[];
+  albums: string[];
 }
 
 export interface IUserUpdateDataBase {
@@ -62,7 +66,7 @@ export interface IUserUpdateDataBase {
   email?: string;
   tel?: string;
   sexe?: string;
-  favorites?: string[] | FieldValue;
+  favorites?: IFavorite | FieldValue;
   artiste?: IArtist;
   playlists?: IPlaylistRaw[];
   lastsplayeds?: string[] | FieldValue;

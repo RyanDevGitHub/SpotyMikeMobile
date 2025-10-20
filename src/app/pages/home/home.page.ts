@@ -1,4 +1,4 @@
-import { loadFavorites } from './../../core/store/action/favorites.actions';
+
 import {
   debugSelectAllSongs,
   selectLastSongsByUser,
