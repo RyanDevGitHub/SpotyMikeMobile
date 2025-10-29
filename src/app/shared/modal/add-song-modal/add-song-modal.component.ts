@@ -51,7 +51,7 @@ export class AddSongModalComponent {
     private storageService: StorageService,
     private songRepo: SongRepositoryService,
     private localStorageService: LocalStorageService,
-    private modalController: ModalController
+    private modalController: ModalController,
   ) {
     this.songForm = this.fb.group({
       title: ['', Validators.required],

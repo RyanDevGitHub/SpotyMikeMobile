@@ -23,7 +23,10 @@ export class CreatePlaylistComponent {
   @Input() song!: ISong;
   playlistName = '';
 
-  constructor(private store: Store, private modalCtrl: ModalController) {} // 👈 injecte ici
+  constructor(
+    private store: Store,
+    private modalCtrl: ModalController,
+  ) {} // 👈 injecte ici
 
   close() {
     this.modalCtrl.dismiss();
@@ -37,7 +40,7 @@ export class CreatePlaylistComponent {
       '🚀 Création playlist déclenchée, titre:',
       this.playlistName,
       'song:',
-      this.song
+      this.song,
     );
 
     if (!this.playlistName.trim()) {
@@ -46,7 +49,7 @@ export class CreatePlaylistComponent {
     }
 
     this.store.dispatch(
-      createPlaylist({ title: this.playlistName, song: this.song })
+      createPlaylist({ title: this.playlistName, song: this.song }),
     );
 
     console.log('✅ Action createPlaylist dispatchée');

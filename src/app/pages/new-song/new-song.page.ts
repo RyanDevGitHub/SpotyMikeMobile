@@ -48,7 +48,7 @@ export class NewSongPage implements OnInit {
   songs: ISong[] = [];
   constructor(private modalStateService: ModalStateService) {
     this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
+      (value) => (this.isModalOpen = value),
     );
   }
 

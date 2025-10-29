@@ -26,19 +26,17 @@ import { BackButtonComponent } from '../../button/back-button/back-button.compon
     IonText,
   ],
 })
-export class HeaderSettingComponent implements OnInit {
+export class HeaderSettingComponent {
   @Input() title: string;
   @Input() saveData: boolean;
 
   @Output() saveEvent = new EventEmitter<any>(); // l’EventEmitter
   constructor() {}
 
-  ngOnInit() {}
   save() {
     if (this.saveData) {
       this.saveEvent.emit(this.saveData); // on envoie la data au parent
       console.log('[Child] Save data emitted:', this.saveData);
     }
   }
-  
 }

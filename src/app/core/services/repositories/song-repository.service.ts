@@ -58,10 +58,10 @@ export class SongRepositoryService {
       songs.map(async (song) => {
         const artistInfo = await this.userRepositoryService.getUsersByField(
           'id',
-          song.artistId
+          song.artistId,
         );
         return { ...song, artistInfo };
-      })
+      }),
     );
 
     return songsWithArtistInfo;
@@ -76,7 +76,7 @@ export class SongRepositoryService {
       const albumData = docSnap.data();
       if (albumData['songs'] && Array.isArray(albumData['songs'])) {
         const song = albumData['songs'].find(
-          (song: ISong) => song.id === songId
+          (song: ISong) => song.id === songId,
         );
         if (song) {
           return {
@@ -132,7 +132,7 @@ export class SongRepositoryService {
    */
   async incrementSongListeningCount(
     song: ISong,
-    minIntervalMs: number = 10000
+    minIntervalMs: number = 10000,
   ): Promise<void> {
     const songId = song.id;
     const albumId = song.albumInfo?.id;
@@ -146,7 +146,7 @@ export class SongRepositoryService {
     const lastIncrement = this.lastIncrementMap[songId] || 0;
     if (now - lastIncrement < minIntervalMs) {
       console.log(
-        `⏱️ Anti-spam: pas d'incrément pour ${songId} pour le moment`
+        `⏱️ Anti-spam: pas d'incrément pour ${songId} pour le moment`,
       );
       return;
     }
@@ -184,7 +184,7 @@ export class SongRepositoryService {
       console.log(
         `🎧 +1 écoute pour "${songs[songIndex].title}" (${currentCount} → ${
           currentCount + 1
-        })`
+        })`,
       );
     } catch (error) {
       console.error("❌ Erreur lors de l'incrémentation du compteur :", error);

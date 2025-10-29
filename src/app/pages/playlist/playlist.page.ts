@@ -44,10 +44,10 @@ export class PlaylistPage implements OnInit {
   private modalSubscription: Subscription;
   constructor(
     private route: ActivatedRoute,
-    private modalStateService: ModalStateService
+    private modalStateService: ModalStateService,
   ) {
     this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
+      (value) => (this.isModalOpen = value),
     );
   }
 

@@ -8,7 +8,7 @@ export const selectSortState = createFeatureSelector<SortState>('sort');
 export const selectSortForPage = (page: string) =>
   createSelector(
     selectSortState,
-    (state) => state[page as keyof SortState] || null
+    (state) => state[page as keyof SortState] || null,
   );
 
 // 3️⃣ Exemple d’un selector générique : obtenir la clé et la direction

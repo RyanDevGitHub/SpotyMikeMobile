@@ -45,5 +45,5 @@ export const artistsReducer = createReducer(
   on(loadArtistsFailure, (state, { error }) => {
     console.error('[Reducer] loadArtistsFailure - error:', error);
     return { ...state, loading: false, loaded: false, error };
-  })
+  }),
 );

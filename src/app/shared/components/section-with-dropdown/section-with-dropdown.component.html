@@ -8,20 +8,20 @@
   <ion-content [scrollY]>
     <ion-list>
       @for (item of items; track $index) {
-      <ion-row>
-        <ion-col>
-          @if (component === 'playlist-container') {
-          <app-playlist-container
-            nbSong="{{ item.songs.length }}"
-            playlistName="{{ item.title }}"
-            cover="{{ item.cover }}"
-            playlistId="{{ item.id }}"
-          ></app-playlist-container>
-          }@else if(component === 'music-container'){
-          <app-music-container [song]="item"> </app-music-container>
-          }
-        </ion-col>
-      </ion-row>
+        <ion-row>
+          <ion-col>
+            @if (component === "playlist-container") {
+              <app-playlist-container
+                nbSong="{{ item.songs.length }}"
+                playlistName="{{ item.title }}"
+                cover="{{ item.cover }}"
+                playlistId="{{ item.id }}"
+              ></app-playlist-container>
+            } @else if (component === "music-container") {
+              <app-music-container [song]="item"> </app-music-container>
+            }
+          </ion-col>
+        </ion-row>
       }
     </ion-list>
   </ion-content>

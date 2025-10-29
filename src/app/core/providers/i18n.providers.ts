@@ -14,5 +14,5 @@ export const i18nProviders = importProvidersFrom(
       useFactory: HttpLoaderFactory,
       deps: [HttpClient],
     },
-  })
+  }),
 );

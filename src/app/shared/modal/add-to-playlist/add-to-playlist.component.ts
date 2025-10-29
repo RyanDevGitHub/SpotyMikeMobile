@@ -63,7 +63,7 @@ export class AddToPlaylistComponent implements OnInit {
 
   constructor(
     private modalCtrl: ModalController,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
   ) {}
   ionViewWillEnter() {
     console.log('ION VIEW WILL ENTER 🎵:', this.song); // ici la prop est bien dispo
@@ -84,7 +84,7 @@ export class AddToPlaylistComponent implements OnInit {
     const selected = this.playlists.filter((p) => p.selected);
     console.log(
       '✅ Playlists cochées:',
-      selected.map((p) => p.id)
+      selected.map((p) => p.id),
     );
   }
 
@@ -97,7 +97,7 @@ export class AddToPlaylistComponent implements OnInit {
       const alreadyExists = playlist.songs?.some((s) => s.id === this.song.id);
       if (!alreadyExists) {
         this.store.dispatch(
-          addSongToPlaylist({ playlistId: playlist.id, song: this.song })
+          addSongToPlaylist({ playlistId: playlist.id, song: this.song }),
         );
       }
     }
@@ -110,7 +110,7 @@ export class AddToPlaylistComponent implements OnInit {
           removeSongFromPlaylist({
             playlistId: playlist.id,
             songId: this.song.id,
-          })
+          }),
         );
       }
     }

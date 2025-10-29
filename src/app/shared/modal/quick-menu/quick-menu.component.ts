@@ -63,7 +63,7 @@ export class QuickMenuComponent implements OnInit {
   user$ = this.authFacade.user$;
   constructor(
     private animationCtrl: AnimationController,
-    private authFacade: AuthFacade
+    private authFacade: AuthFacade,
   ) {}
   private modalCtl = inject(ModalController);
   private router = inject(Router);

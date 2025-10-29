@@ -54,5 +54,5 @@ export const sortReducer = createReducer(
   on(SortActions.resetSort, (state, { page }) => ({
     ...state,
     [page]: null,
-  }))
+  })),
 );

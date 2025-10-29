@@ -76,7 +76,7 @@ export class SearchPage implements OnInit {
 
   constructor(private modalStateService: ModalStateService) {
     this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
+      (value) => (this.isModalOpen = value),
     );
   }
 
@@ -90,8 +90,8 @@ export class SearchPage implements OnInit {
       switchMap((term) =>
         this.store
           .select(selectSearchResults(term))
-          .pipe(map((results) => results.songs || []))
-      )
+          .pipe(map((results) => results.songs || [])),
+      ),
     );
 
     this.albums$ = this.searchTerm$.pipe(
@@ -100,8 +100,8 @@ export class SearchPage implements OnInit {
       switchMap((term) =>
         this.store
           .select(selectSearchResults(term))
-          .pipe(map((results) => results.albums || []))
-      )
+          .pipe(map((results) => results.albums || [])),
+      ),
     );
 
     this.artists$ = this.searchTerm$.pipe(
@@ -110,8 +110,8 @@ export class SearchPage implements OnInit {
       switchMap((term) =>
         this.store
           .select(selectSearchResults(term))
-          .pipe(map((results) => results.artists || []))
-      )
+          .pipe(map((results) => results.artists || [])),
+      ),
     );
   }
 

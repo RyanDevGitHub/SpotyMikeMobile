@@ -34,7 +34,7 @@ import { selectSortedFavorites } from 'src/app/core/store/selector/favorites.sel
 import { toSignal } from '@angular/core/rxjs-interop';
 import { IUser } from 'src/app/core/interfaces/user';
 import { MusicContainerComponent } from 'src/app/shared/components/containers/music-container/music-container.component';
-import { AlbumContainerComponent } from "src/app/shared/components/containers/album-container/album-container.component";
+import { AlbumContainerComponent } from 'src/app/shared/components/containers/album-container/album-container.component';
 
 @Component({
   selector: 'app-favorie',
@@ -59,8 +59,8 @@ import { AlbumContainerComponent } from "src/app/shared/components/containers/al
     SongOptionComponent,
     HeaderCategoryComponent,
     MusicContainerComponent,
-    AlbumContainerComponent
-],
+    AlbumContainerComponent,
+  ],
 })
 export class FavoriePage implements OnDestroy {
   private modalCtrl = inject(ModalController);
@@ -68,16 +68,16 @@ export class FavoriePage implements OnDestroy {
   private storeUser = inject(Store<IUser[]>);
   public isModalOpen: boolean;
   private modalSubscription = inject(ModalStateService).modalOpen$.subscribe(
-    (value) => (this.isModalOpen = value)
+    (value) => (this.isModalOpen = value),
   );
 
   // ⚡ Utilisation de toSignal pour connecter l'observable NgRx au template
   public favoriteSongs = toSignal(
-    this.store.select(selectSortedFavorites).pipe(map((f) => f.songs))
+    this.store.select(selectSortedFavorites).pipe(map((f) => f.songs)),
   );
 
   public favoriteAlbums = toSignal(
-    this.store.select(selectSortedFavorites).pipe(map((f) => f.albums))
+    this.store.select(selectSortedFavorites).pipe(map((f) => f.albums)),
   );
   user$ = this.storeUser.select(selectUser);
 

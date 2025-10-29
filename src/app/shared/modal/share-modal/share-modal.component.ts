@@ -30,9 +30,7 @@ import {
     IonGrid,
   ],
 })
-export class ShareModalComponent implements OnInit {
+export class ShareModalComponent {
   constructor() {}
   @Input() id: string;
-
-  ngOnInit() {}
 }

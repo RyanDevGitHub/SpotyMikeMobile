@@ -12,7 +12,7 @@ import {
   styleUrls: ['./lyrics-box.component.scss'],
   imports: [IonItemDivider, IonLabel, IonContent],
 })
-export class LyricsBoxComponent {
+export class LyricsBoxComponent implements OnInit {
   @Input() lyrics: string;
   formattedLyrics: string;
   constructor() {}

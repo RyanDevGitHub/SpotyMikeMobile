@@ -14,7 +14,7 @@ const { selectAll, selectEntities, selectIds, selectTotal } =
 
 // Sélecteurs spécifiques
 export const selectAllSongs = createSelector(selectMusicState, (state) =>
-  state ? adapter.getSelectors().selectAll(state) : []
+  state ? adapter.getSelectors().selectAll(state) : [],
 );
 
 export const selectLastPlayedSongs = createSelector(selectAllSongs, (songs) => {
@@ -24,7 +24,7 @@ export const selectLastPlayedSongs = createSelector(selectAllSongs, (songs) => {
 
 export const selectSongEntities = createSelector(
   selectMusicState,
-  selectEntities
+  selectEntities,
 );
 export const selectSongIds = createSelector(selectMusicState, selectIds);
 export const selectTotalSongs = createSelector(selectMusicState, selectTotal);
@@ -32,11 +32,11 @@ export const selectTotalSongs = createSelector(selectMusicState, selectTotal);
 // Sélecteurs pour charger l'état de la musique
 export const selectLoading = createSelector(
   selectMusicState,
-  (state) => state.loading
+  (state) => state.loading,
 );
 export const selectError = createSelector(
   selectMusicState,
-  (state) => state.error
+  (state) => state.error,
 );
 
 export const debugSelectAllSongs = createSelector(selectAllSongs, (songs) => {
@@ -70,16 +70,16 @@ export const selectFilteredAndSortedSongsByGenre = (genre: string) =>
         case 'artist':
           return sort.direction === 'asc'
             ? (a.artistInfo?.firstName || '').localeCompare(
-                b.artistInfo?.firstName || ''
+                b.artistInfo?.firstName || '',
               )
             : (b.artistInfo?.firstName || '').localeCompare(
-                a.artistInfo?.firstName || ''
+                a.artistInfo?.firstName || '',
               );
         case 'album':
           return sort.direction === 'asc'
             ? (a.albumInfo?.title || '').localeCompare(b.albumInfo?.title || '')
             : (b.albumInfo?.title || '').localeCompare(
-                a.albumInfo?.title || ''
+                a.albumInfo?.title || '',
               );
         default:
           return 0;
@@ -110,7 +110,7 @@ export const selectTopSongsByListeningCount = createSelector(
     return songs
       .sort((a, b) => Number(b.listeningCount) - Number(a.listeningCount)) // convertir en nombre pour trier
       .slice(0, 5); // top 5 chansons
-  }
+  },
 );
 
 export const selectSortedTopSongs = createSelector(
@@ -136,16 +136,16 @@ export const selectSortedTopSongs = createSelector(
         case 'artist':
           return sort.direction === 'asc'
             ? (a.artistInfo?.firstName || '').localeCompare(
-                b.artistInfo?.firstName || ''
+                b.artistInfo?.firstName || '',
               )
             : (b.artistInfo?.firstName || '').localeCompare(
-                a.artistInfo?.firstName || ''
+                a.artistInfo?.firstName || '',
               );
         case 'album':
           return sort.direction === 'asc'
             ? (a.albumInfo?.title || '').localeCompare(b.albumInfo?.title || '')
             : (b.albumInfo?.title || '').localeCompare(
-                a.albumInfo?.title || ''
+                a.albumInfo?.title || '',
               );
         case 'listeningCount':
           return sort.direction === 'asc'
@@ -158,7 +158,7 @@ export const selectSortedTopSongs = createSelector(
 
     // Top 5 chansons
     return sorted.slice(0, 5);
-  }
+  },
 );
 
 export const selectLastSongsByUser = createSelector(
@@ -172,22 +172,22 @@ export const selectLastSongsByUser = createSelector(
     return user.lastsplayeds
       .map((songId) => songs.find((song) => song.id === songId))
       .filter((song): song is ISong => song !== undefined); // Filtrer et garantir le type
-  }
+  },
 );
 
 export const selectSongsBySearchTerm = (searchTerm: string) =>
   createSelector(selectAllSongs, (songs) => {
     console.log(
       '[Selector] selectSongsBySearchTerm: Songs before filtering:',
-      songs
+      songs,
     ); // Avant filtrage
     const lowerCaseTerm = searchTerm.toLowerCase();
     const filteredSongs = songs.filter((song) =>
-      song.title.toLowerCase().includes(lowerCaseTerm)
+      song.title.toLowerCase().includes(lowerCaseTerm),
     );
     console.log(
       '[Selector] selectSongsBySearchTerm: Filtered songs:',
-      filteredSongs
+      filteredSongs,
     ); // Après filtrage
     return filteredSongs;
   });
@@ -203,7 +203,7 @@ export const selectFavoriteSongsByUser = createSelector(
     return user.favorites.songs
       .map((songId) => songs.find((song) => song.id === songId))
       .filter((song): song is ISong => song !== undefined);
-  }
+  },
 );
 
 export const selectSortedLastPlayedSongs = createSelector(
@@ -225,16 +225,16 @@ export const selectSortedLastPlayedSongs = createSelector(
         case 'artist':
           return sort.direction === 'asc'
             ? (a.artistInfo?.firstName || '').localeCompare(
-                b.artistInfo?.firstName || ''
+                b.artistInfo?.firstName || '',
               )
             : (b.artistInfo?.firstName || '').localeCompare(
-                a.artistInfo?.firstName || ''
+                a.artistInfo?.firstName || '',
               );
         case 'album':
           return sort.direction === 'asc'
             ? (a.albumInfo?.title || '').localeCompare(b.albumInfo?.title || '')
             : (b.albumInfo?.title || '').localeCompare(
-                a.albumInfo?.title || ''
+                a.albumInfo?.title || '',
               );
         default:
           return 0;
@@ -243,5 +243,5 @@ export const selectSortedLastPlayedSongs = createSelector(
 
     console.log('📝 LastPlayedSongs après tri:', sorted, 'avec sort:', sort);
     return sorted;
-  }
+  },
 );

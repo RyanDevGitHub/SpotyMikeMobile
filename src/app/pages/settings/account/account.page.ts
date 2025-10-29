@@ -24,8 +24,6 @@ import { HeaderSettingComponent } from 'src/app/shared/components/headers/header
     HeaderSettingComponent,
   ],
 })
-export class AccountPage implements OnInit {
+export class AccountPage {
   constructor() {}
-
-  ngOnInit() {}
 }

@@ -1,22 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 
+import { from, of } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { ArtistsRepository } from '../../services/repositories/artists-repository.service';
 import {
   loadArtists,
-  loadArtistsSuccess,
   loadArtistsFailure,
+  loadArtistsSuccess,
 } from '../action/artist.action';
-import {
-  catchError,
-  filter,
-  map,
-  switchMap,
-  tap,
-  withLatestFrom,
-} from 'rxjs/operators';
-import { from, of } from 'rxjs';
-import { ArtistsRepository } from '../../services/repositories/artists-repository.service';
-import { selectArtistsLoaded } from '../selector/artist.selector';
 
 @Injectable()
 export class ArtistsEffects {

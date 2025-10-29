@@ -2,10 +2,10 @@
   <ion-toolbar>
     <!-- Bouton de retour (aligné à gauche) -->
     @if (this.backButton) {
-    <app-back-button
-      slot="start"
-      class="ion-padding-vertical"
-    ></app-back-button>
+      <app-back-button
+        slot="start"
+        class="ion-padding-vertical"
+      ></app-back-button>
     }
 
     <!-- Titre centré -->
@@ -13,11 +13,11 @@
 
     <!-- Filtre (aligné à droite) -->
     @if (filter) {
-    <app-filter-option
-      [songs]="songs"
-      slot="end"
-      [page]="page"
-    ></app-filter-option>
+      <app-filter-option
+        [songs]="songs"
+        slot="end"
+        [page]="page"
+      ></app-filter-option>
     }
   </ion-toolbar>
 </ion-header>

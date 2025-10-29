@@ -34,6 +34,7 @@ import { ISong } from 'src/app/core/interfaces/song';
 
 import { Subscription } from 'rxjs';
 import { MusicServiceService } from 'src/app/core/services/music-service.service';
+import { CapacitorMusicControls } from 'capacitor-music-controls-plugin';
 
 @Component({
   selector: 'app-music-nav-bar',
@@ -47,110 +48,91 @@ export class MusicNavBarComponent implements OnInit, OnDestroy, OnChanges {
   @Input() music: ISong;
   @Output() nextSong = new EventEmitter<void>();
 
-  private musicsList: ISong[] = [];
-
-  isPlaying: boolean = true;
+  isPlaying: boolean = false;
   currentTime: number = 0;
   duration: number = 0;
+
   buttonFillShuffle: string = '';
   buttonColorShuffle: string = '';
   buttonFillLoop: string = '';
   buttonColorLoop: string = '';
+  buttonFillAfter: string = '';
   buttonColorAfter: string = '';
   buttonColorPrev: string = '';
-  buttonFillAfter: string = '';
   buttonFillPrev: string = '';
-  private indexMusicList = 0;
+
   private isPlayingSubscription: Subscription;
   private currentTimeSubscription: Subscription;
-  constructor(private audioService: MusicServiceService) {}
 
   currentPlaybackMode: PlaybackMode = PlaybackMode.Default;
 
+  constructor(private audioService: MusicServiceService) {}
+
   async ngOnInit() {
-    addIcons({
-      playOutline,
-      playSkipBackOutline,
-      playSkipForwardOutline,
-      repeatOutline,
-      shuffleOutline,
-      pauseOutline,
-    });
-    if (!this.audioService.isPlaying()) {
-      this.audioService.play(this.music.url);
+    // Démarrer la lecture si aucune chanson n'est en cours
+    if (!this.audioService.isPlayingNow() && this.music?.url) {
+      // Utiliser loadAndPlay (asynchrone)
+      await this.audioService.loadAndPlay(this.music);
     }
     this.isPlayingSubscription = this.audioService.isPlaying$.subscribe(
-      (isPlaying) => {
-        this.isPlaying = isPlaying;
-      }
+      (isPlaying) => (this.isPlaying = isPlaying),
     );
 
     this.currentTimeSubscription = this.audioService
-      .getCurrentTime()
-      .subscribe((currentTime) => {
-        this.currentTime = currentTime;
-      });
+      .getCurrentTime$()
+      .subscribe((time) => (this.currentTime = time));
 
-    this.duration = await this.audioService.getDuration();
-    console.log(this.indexMusicList);
-  }
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['music'] && this.music) {
-      // this.musicsList = [this.musicPrev, this.music, this.musicAfter];
-    }
-  }
-  playMusic() {
-    if (!this.audioService.isPlaying()) {
-      this.audioService.play(this.music.url);
-    } else {
-      this.audioService.resume();
-    }
+    // Récupérer la durée de la chanson
+    this.audioService.getDuration().then((d) => (this.duration = d));
   }
 
-  pauseMusic() {
-    if (this.audioService.isPlaying()) {
-      this.audioService.pause();
+  async ngOnChanges(changes: SimpleChanges) {
+    if (changes['music'] && changes['music'].currentValue) {
+      // 👈 Utiliser loadAndPlay, car l'API du service a changé
+      await this.audioService.loadAndPlay(this.music);
+      this.currentPlaybackMode = PlaybackMode.Default;
+      this.resetButtons();
     }
+  }
+  ngOnDestroy() {
+    this.isPlayingSubscription.unsubscribe();
+    this.currentTimeSubscription.unsubscribe();
   }
 
   togglePlayPause() {
-    if (this.isPlaying) {
-      this.audioService.pause();
+    if (this.isPlaying) this.pauseMusic();
+    else this.playMusic();
+  }
+
+  async playMusic() {
+    if (!this.audioService.isPlayingNow()) {
+      await this.audioService.loadAndPlay(this.music);
     } else {
-      this.audioService.resume();
-    }
-    this.isPlaying = !this.isPlaying;
-  }
-
-  async playPrevMusic() {
-    this.nextSong.emit();
-  }
-
-  async playAfterMusic() {
-    this.nextSong.emit();
-  }
-
-  formatTime(time: number): string {
-    if (!isNaN(time)) {
-      const minutes = Math.floor(time / 60);
-      const seconds = Math.floor(time % 60);
-      return `${this.pad(minutes)}:${this.pad(seconds)}`;
-    } else {
-      return '00:00';
+      await this.audioService.resume(); // Utilisation de la nouvelle méthode resume
     }
   }
 
-  pad(num: number): string {
-    return num < 10 ? '0' + num : num.toString();
+  async pauseMusic() {
+    if (this.audioService.isPlayingNow()) {
+      await this.audioService.pause();
+    }
   }
 
-  seekMusic(event: any) {
-    const newValue = event.detail.value;
-    this.audioService.seek(newValue);
+  playPrevMusic() {
+    this.nextSong.emit();
+  }
+
+  playAfterMusic() {
+    this.nextSong.emit();
+  }
+
+  async seekMusic(event: any) {
+    const newTime = event.detail.value;
+    await this.audioService.seek(newTime); // Utilisation de la méthode asynchrone
   }
 
   randomPlaylist() {
-    if (this.currentPlaybackMode != PlaybackMode.Shuffle) {
+    if (this.currentPlaybackMode !== PlaybackMode.Shuffle) {
       this.currentPlaybackMode = PlaybackMode.Shuffle;
       this.buttonColorShuffle = 'success';
       this.buttonFillShuffle = 'solid';
@@ -162,7 +144,7 @@ export class MusicNavBarComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   loopPlaylist() {
-    if (this.currentPlaybackMode != PlaybackMode.Loop) {
+    if (this.currentPlaybackMode !== PlaybackMode.Loop) {
       this.currentPlaybackMode = PlaybackMode.Loop;
       this.buttonColorLoop = 'success';
       this.buttonFillLoop = 'solid';
@@ -173,8 +155,27 @@ export class MusicNavBarComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  ngOnDestroy(): void {
-    this.isPlayingSubscription.unsubscribe();
-    this.currentTimeSubscription.unsubscribe();
+  formatTime(time: number): string {
+    if (!isNaN(time)) {
+      const minutes = Math.floor(time / 60);
+      const seconds = Math.floor(time % 60);
+      return `${this.pad(minutes)}:${this.pad(seconds)}`;
+    }
+    return '00:00';
+  }
+
+  pad(num: number): string {
+    return num < 10 ? '0' + num : num.toString();
+  }
+
+  private resetButtons() {
+    this.buttonColorLoop = '';
+    this.buttonFillLoop = '';
+    this.buttonColorShuffle = '';
+    this.buttonFillShuffle = '';
+    this.buttonColorPrev = '';
+    this.buttonFillPrev = '';
+    this.buttonColorAfter = '';
+    this.buttonFillAfter = '';
   }
 }

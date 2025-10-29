@@ -11,7 +11,7 @@ import { IUser } from '../../interfaces/user';
 export class AuthFacade {
   user$: Observable<IUser | null> = this.store.select(UserSelectors.selectUser);
   isLoading$: Observable<boolean> = this.store.select(
-    UserSelectors.selectLoading
+    UserSelectors.selectLoading,
   );
 
   constructor(private store: Store) {}

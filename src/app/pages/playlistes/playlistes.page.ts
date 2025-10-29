@@ -28,7 +28,7 @@ import { AppState } from '@capacitor/app';
 import { selectUserPlaylists } from 'src/app/core/store/selector/user.selector';
 import { loadUser } from 'src/app/core/store/action/user.action';
 import { Router } from '@angular/router';
-import { PlaylistContainerComponent } from "src/app/shared/components/containers/playlist-container/playlist-container.component";
+import { PlaylistContainerComponent } from 'src/app/shared/components/containers/playlist-container/playlist-container.component';
 
 @Component({
   selector: 'app-playlistes',
@@ -55,8 +55,8 @@ import { PlaylistContainerComponent } from "src/app/shared/components/containers
     SongOptionComponent,
     HeaderCategoryComponent,
     AsyncPipe,
-    PlaylistContainerComponent
-],
+    PlaylistContainerComponent,
+  ],
 })
 export class PlaylistesPage implements OnInit, OnDestroy {
   public isModalOpen = false;
@@ -65,10 +65,10 @@ export class PlaylistesPage implements OnInit, OnDestroy {
   private router = inject(Router);
   constructor(
     private modalCtrl: ModalController,
-    private modalStateService: ModalStateService
+    private modalStateService: ModalStateService,
   ) {
     this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
+      (value) => (this.isModalOpen = value),
     );
   }
   public listPlaylistes = this.store.select(selectUserPlaylists);
@@ -80,7 +80,7 @@ export class PlaylistesPage implements OnInit, OnDestroy {
     });
   }
 
-  async openPlaylist(id:string) {
+  async openPlaylist(id: string) {
     this.router.navigate(['/home/playlist/' + id]);
   }
   ngOnDestroy() {

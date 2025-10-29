@@ -24,8 +24,6 @@ import { HeaderSettingComponent } from 'src/app/shared/components/headers/header
     HeaderSettingComponent,
   ],
 })
-export class NotificationPage implements OnInit {
+export class NotificationPage {
   constructor() {}
-
-  ngOnInit() {}
 }

@@ -9,8 +9,8 @@ describe('HeaderCategoryComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ HeaderCategoryComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [HeaderCategoryComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HeaderCategoryComponent);

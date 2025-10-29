@@ -9,8 +9,8 @@ describe('ShareModalComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ShareModalComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [ShareModalComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ShareModalComponent);

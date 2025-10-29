@@ -31,7 +31,7 @@ export const routes: Routes = [
         path: 'play-song',
         loadComponent: () =>
           import('./shared/modal/play-song/play-song.page').then(
-            (m) => m.PlaySongPage
+            (m) => m.PlaySongPage,
           ),
       },
       {
@@ -60,7 +60,7 @@ export const routes: Routes = [
         path: 'account',
         loadComponent: () =>
           import('./pages/account/account/account.page').then(
-            (m) => m.AccountPage
+            (m) => m.AccountPage,
           ),
       },
       {
@@ -72,7 +72,7 @@ export const routes: Routes = [
         path: 'artist-page/:id',
         loadComponent: () =>
           import('./pages/artist-page/artist-page.page').then(
-            (m) => m.ArtistPagePage
+            (m) => m.ArtistPagePage,
           ),
       },
       {
@@ -84,35 +84,35 @@ export const routes: Routes = [
         path: 'edit-profile',
         loadComponent: () =>
           import('./pages/edit-profile/edit-profile.page').then(
-            (m) => m.EditProfilPage
+            (m) => m.EditProfilPage,
           ),
       },
       {
         path: 'settings-menu',
         loadComponent: () =>
           import('./pages/settings-menu/settings-menu.page').then(
-            (m) => m.SettingsMenuPage
+            (m) => m.SettingsMenuPage,
           ),
       },
       {
         path: 'account',
         loadComponent: () =>
           import('./pages/settings/account/account.page').then(
-            (m) => m.AccountPage
+            (m) => m.AccountPage,
           ),
       },
       {
         path: 'languages',
         loadComponent: () =>
           import('./pages/settings/languages/languages.page').then(
-            (m) => m.LanguagesPage
+            (m) => m.LanguagesPage,
           ),
       },
       {
         path: 'notification',
         loadComponent: () =>
           import('./pages/settings/notification/notification.page').then(
-            (m) => m.NotificationPage
+            (m) => m.NotificationPage,
           ),
       },
       {
@@ -129,28 +129,28 @@ export const routes: Routes = [
         path: 'last-played',
         loadComponent: () =>
           import('./pages/last-played/last-played.page').then(
-            (m) => m.LastPlayedPage
+            (m) => m.LastPlayedPage,
           ),
       },
       {
         path: 'top-songs',
         loadComponent: () =>
           import('./pages/top-songs/top-songs.page').then(
-            (m) => m.TopSongsPage
+            (m) => m.TopSongsPage,
           ),
       },
       {
         path: 'music-genre',
         loadComponent: () =>
           import('./pages/music-genre/music-genre.page').then(
-            (m) => m.MusicGenrePage
+            (m) => m.MusicGenrePage,
           ),
       },
       {
         path: 'song-management',
         loadComponent: () =>
           import('./pages/song-management/song-management.page').then(
-            (m) => m.SongManagementPage
+            (m) => m.SongManagementPage,
           ),
       },
     ],

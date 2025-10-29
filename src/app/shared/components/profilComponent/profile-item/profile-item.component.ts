@@ -20,10 +20,8 @@ import { AsyncPipe } from '@angular/common';
   standalone: true,
   imports: [IonRow, IonGrid, IonAvatar, IonCol, IonText, AsyncPipe],
 })
-export class ProfileItemComponent implements OnInit {
+export class ProfileItemComponent {
   store = inject(Store<AppState>);
   user$ = this.store.select(selectUser);
   constructor() {}
-
-  ngOnInit() {}
 }

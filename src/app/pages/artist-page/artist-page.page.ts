@@ -96,7 +96,7 @@ export class ArtistPagePage implements OnInit {
 
   constructor(private modalStateService: ModalStateService) {
     this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
+      (value) => (this.isModalOpen = value),
     );
   }
 
@@ -112,31 +112,31 @@ export class ArtistPagePage implements OnInit {
           .select(selectArtistData(this.artistId))
           .pipe(
             tap((data) =>
-              console.log('[ArtistPage] Full data from selector:', data)
+              console.log('[ArtistPage] Full data from selector:', data),
             ),
-            shareReplay(1) // ✅ garde la dernière valeur en cache
+            shareReplay(1), // ✅ garde la dernière valeur en cache
           );
 
         // On garde les observables pour le template
         this.artist$ = artistData$.pipe(
           map((data) => data.artist),
           filter((artist): artist is IArtist => artist !== null),
-          shareReplay(1)
+          shareReplay(1),
         );
 
         this.songList$ = artistData$.pipe(
           map((data) => data.songs),
-          shareReplay(1)
+          shareReplay(1),
         );
 
         this.albumList$ = artistData$.pipe(
           map((data) => data.albums),
-          shareReplay(1)
+          shareReplay(1),
         );
 
         this.lastAlbumCover$ = artistData$.pipe(
           map((data) => data.lastAlbumCover),
-          shareReplay(1)
+          shareReplay(1),
         );
 
         // 🔎 Debug direct via abonnement
@@ -166,7 +166,7 @@ export class ArtistPagePage implements OnInit {
       const randomAlbumComp = albumArray[randomIndex];
       console.log(
         '[ArtistPage] Redirecting to random album:',
-        randomAlbumComp.album
+        randomAlbumComp.album,
       );
       randomAlbumComp.redirectToAlbum(); // navigation vers l'album
     }

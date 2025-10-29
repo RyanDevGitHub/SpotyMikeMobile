@@ -15,7 +15,10 @@ import { Subscription } from 'rxjs';
 import { ModalStateService } from 'src/app/core/services/modal-state.service';
 import { AppState } from '@capacitor/app';
 import { Store } from '@ngrx/store';
-import { selectSortedTopSongs, selectTopSongsByListeningCount } from 'src/app/core/store/selector/song.selector';
+import {
+  selectSortedTopSongs,
+  selectTopSongsByListeningCount,
+} from 'src/app/core/store/selector/song.selector';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -43,7 +46,7 @@ export class TopSongsPage implements OnInit {
 
   constructor(private modalStateService: ModalStateService) {
     this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
+      (value) => (this.isModalOpen = value),
     );
   }
 

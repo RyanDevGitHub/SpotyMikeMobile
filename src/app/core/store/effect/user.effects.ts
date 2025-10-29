@@ -53,7 +53,7 @@ export class UserEffects {
     private actions$: Actions,
     private localStorageService: LocalStorageService,
     private userRepositoryService: UserRepositoryService,
-    private authFacade: AuthFacade
+    private authFacade: AuthFacade,
   ) {}
 
   loadUser$ = createEffect(() =>
@@ -76,23 +76,25 @@ export class UserEffects {
                   console.log('[Effect] Falling back to local user:', idUser);
                   // Fallback : utiliser l'utilisateur local
                   return of(
-                    loadUserFailure({ error: error.message || 'Unknown error' })
+                    loadUserFailure({
+                      error: error.message || 'Unknown error',
+                    }),
                   );
-                })
+                }),
               );
             } else {
               console.log('[Effect] No local user found');
               return of(
-                loadUserFailure({ error: 'No user found in local storage' })
+                loadUserFailure({ error: 'No user found in local storage' }),
               );
             }
           }),
           catchError((error) =>
-            of(loadUserFailure({ error: error.message || 'Unknown error' }))
-          )
-        )
-      )
-    )
+            of(loadUserFailure({ error: error.message || 'Unknown error' })),
+          ),
+        ),
+      ),
+    ),
   );
 
   addLastSongUser$ = createEffect(() =>
@@ -108,7 +110,7 @@ export class UserEffects {
         console.log('[Effect] User found in store:', user.email);
 
         return from(
-          this.userRepositoryService.addToLastPlayed(user.id, songId)
+          this.userRepositoryService.addToLastPlayed(user.id, songId),
         ).pipe(
           map((updatedUser) => {
             console.log('[Effect] LastSongPlayed updated in DB:', updatedUser);
@@ -117,14 +119,14 @@ export class UserEffects {
           catchError((error) => {
             console.error(
               '[Effect] Error updating LastSongPlayed in DB:',
-              error
+              error,
             );
             // fallback -> on garde l'user actuel
             return of(addLastSongUserSuccess({ updatedUser: user }));
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   updateUser$ = createEffect(() =>
@@ -138,7 +140,7 @@ export class UserEffects {
 
         // 1️⃣ Mettre à jour le user dans Firestore
         return from(
-          this.userRepositoryService.updateUser(userId, changes)
+          this.userRepositoryService.updateUser(userId, changes),
         ).pipe(
           // 2️⃣ Après update, récupérer le user complet
           switchMap(() => from(this.userRepositoryService.getUserById(userId))),
@@ -146,7 +148,7 @@ export class UserEffects {
           map((fullUserDb) => {
             console.log(
               '[Effect] User updated successfully in DB:',
-              fullUserDb
+              fullUserDb,
             );
             const fullUser: IUser = {
               id: fullUserDb.id!,
@@ -169,12 +171,12 @@ export class UserEffects {
           catchError((error) => {
             console.error('[Effect] Error updating user:', error);
             return of(
-              updateUserFailure({ error: error.message || 'Unknown error' })
+              updateUserFailure({ error: error.message || 'Unknown error' }),
             );
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
 
   // ---- LOGIN ----
@@ -194,10 +196,10 @@ export class UserEffects {
             }
           }),
 
-          catchError((error) => of(loginFailure({ error: error.message })))
-        )
-      )
-    )
+          catchError((error) => of(loginFailure({ error: error.message }))),
+        ),
+      ),
+    ),
   );
 
   // Redirection après succès du login
@@ -213,9 +215,9 @@ export class UserEffects {
             this.localStorageService.setItem('idUser', user.id);
           }
           this.router.navigate(['/home/home']);
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   // ---- LOGOUT ----
@@ -232,10 +234,10 @@ export class UserEffects {
             this.router.navigate(['/auth/login']);
           }),
           map(() => logoutSuccess()),
-          catchError((error) => of(logoutFailure({ error: error.message })))
-        )
-      )
-    )
+          catchError((error) => of(logoutFailure({ error: error.message }))),
+        ),
+      ),
+    ),
   );
 
   createPlaylist$ = createEffect(() =>
@@ -259,28 +261,28 @@ export class UserEffects {
               'title:',
               title,
               'songId:',
-              song.id
+              song.id,
             );
             return from(
               this.userRepositoryService.createPlaylist(userId, title, {
                 idSong: song.id,
-              })
+              }),
             );
           }),
           tap((playlist) =>
-            console.log('🎵 Playlist reçue du repo:', playlist)
+            console.log('🎵 Playlist reçue du repo:', playlist),
           ),
           map((playlist) => createPlaylistSuccess({ playlist })),
           catchError((error) => {
             console.error(
               '❌ Erreur dans createPlaylist Effect:',
-              error.message
+              error.message,
             );
             return of(createPlaylistFailure({ error: error.message }));
-          })
-        )
-      )
-    )
+          }),
+        ),
+      ),
+    ),
   );
 
   addSongToPlaylist$ = createEffect(() =>
@@ -305,18 +307,18 @@ export class UserEffects {
             return from(
               this.userRepositoryService.addSongToPlaylist(userId, playlistId, {
                 idSong: song.id,
-              })
+              }),
             );
           }),
           map((updatedPlaylist) =>
-            addSongToPlaylistSuccess({ playlist: updatedPlaylist })
+            addSongToPlaylistSuccess({ playlist: updatedPlaylist }),
           ),
           catchError((error) =>
-            of(addSongToPlaylistFailure({ error: error.message }))
-          )
+            of(addSongToPlaylistFailure({ error: error.message })),
+          ),
         );
-      })
-    )
+      }),
+    ),
   );
   removeSongFromPlaylist$ = createEffect(() =>
     this.actions$.pipe(
@@ -342,18 +344,18 @@ export class UserEffects {
               this.userRepositoryService.removeSongFromPlaylist(
                 userId,
                 playlistId,
-                songId
-              )
+                songId,
+              ),
             );
           }),
           map((updatedPlaylist) =>
-            removeSongFromPlaylistSuccess({ playlistId, updatedPlaylist })
+            removeSongFromPlaylistSuccess({ playlistId, updatedPlaylist }),
           ),
           catchError((error) =>
-            of(removeSongFromPlaylistFailure({ error: error.message }))
-          )
+            of(removeSongFromPlaylistFailure({ error: error.message })),
+          ),
         );
-      })
-    )
+      }),
+    ),
   );
 }

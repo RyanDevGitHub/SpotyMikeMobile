@@ -42,13 +42,13 @@
       <label class="file-label">Select Genre</label>
       <div class="chips-container">
         @for (genre of genres; track $index) {
-        <ion-chip
-          [color]="selectedGenre === genre ? 'primary' : 'medium'"
-          (click)="selectGenre(genre)"
-          class="genre-chip"
-        >
-          <ion-label>{{ genre }}</ion-label>
-        </ion-chip>
+          <ion-chip
+            [color]="selectedGenre === genre ? 'primary' : 'medium'"
+            (click)="selectGenre(genre)"
+            class="genre-chip"
+          >
+            <ion-label>{{ genre }}</ion-label>
+          </ion-chip>
         }
       </div>
     </div>

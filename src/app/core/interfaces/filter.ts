@@ -1,4 +1,4 @@
 export interface IFilter {
-    name:string,
-    activate:boolean
+  name: string;
+  activate: boolean;
 }

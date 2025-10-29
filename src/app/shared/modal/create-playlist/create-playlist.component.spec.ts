@@ -9,8 +9,8 @@ describe('CreatePlaylistComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ CreatePlaylistComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [CreatePlaylistComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CreatePlaylistComponent);

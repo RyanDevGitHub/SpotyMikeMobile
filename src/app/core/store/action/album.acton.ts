@@ -5,9 +5,9 @@ import { IAlbum } from '../../interfaces/album';
 export const loadAlbums = createAction('[Album] Load Albums');
 export const loadAlbumsSuccess = createAction(
   '[Album] Load Albums Success',
-  props<{ albums: IAlbum[] }>()
+  props<{ albums: IAlbum[] }>(),
 );
 export const loadAlbumsFailure = createAction(
   '[Album] Load Albums Failure',
-  props<{ error: string }>()
+  props<{ error: string }>(),
 );

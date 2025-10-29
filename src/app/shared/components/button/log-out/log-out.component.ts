@@ -15,7 +15,7 @@ import { logout } from 'src/app/core/store/action/user.action';
 export class LogOutComponent {
   store = inject(Store<AppState>);
   constructor() {}
-  
+
   logOut() {
     this.store.dispatch(logout());
   }

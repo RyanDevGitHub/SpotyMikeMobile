@@ -51,7 +51,7 @@ export class ArtistsRepository {
       });
 
       const artists = (await Promise.all(artistDocsPromises)).filter(
-        (a): a is IArtist => a !== null
+        (a): a is IArtist => a !== null,
       );
 
       console.log('[Repository] ✅ Loaded artists:', artists.length);

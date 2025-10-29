@@ -24,7 +24,10 @@ import { AppState } from '@capacitor/app';
 @Injectable()
 export class SongEffects {
   private storeSnapshot: AppState;
-  constructor(private actions$: Actions, private store: Store<AppState>) {
+  constructor(
+    private actions$: Actions,
+    private store: Store<AppState>,
+  ) {
     this.store.subscribe((state) => {
       this.storeSnapshot = state;
     });
@@ -37,8 +40,8 @@ export class SongEffects {
         .select(selectAllArtistInfos)
         .pipe(
           tap((artists) =>
-            console.log('[Effect] Artists from selectAllArtistInfos:', artists)
-          )
+            console.log('[Effect] Artists from selectAllArtistInfos:', artists),
+          ),
         ),
     ]).pipe(
       filter(([albums, artists]) => albums.length > 0 && artists.length > 0),
@@ -49,7 +52,7 @@ export class SongEffects {
               artists.find((a) => a.userId === song.artistId) || null;
             console.log(
               `[Effect] Mapping song "${song.title}" (artistId: ${song.artistId}) -> artistInfo:`,
-              artistInfo
+              artistInfo,
             );
 
             return {
@@ -64,12 +67,12 @@ export class SongEffects {
               artistInfo,
               createAt: song.createAt as Date,
             } as ISong;
-          })
+          }),
         );
 
         console.log('[Effect] Derived songs with artists:', songs);
         return loadSongSuccess({ songs });
-      })
-    )
+      }),
+    ),
   );
 }

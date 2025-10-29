@@ -9,8 +9,8 @@ describe('UserMenuComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ UserMenuComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [UserMenuComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UserMenuComponent);

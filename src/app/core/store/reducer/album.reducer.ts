@@ -46,5 +46,5 @@ export const albumReducer = createReducer(
       loading: false,
       error,
     };
-  })
+  }),
 );

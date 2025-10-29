@@ -9,8 +9,8 @@ describe('LastPlayedComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ LastPlayedComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [LastPlayedComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LastPlayedComponent);

@@ -32,7 +32,7 @@ import { IPageType } from 'src/app/core/interfaces/types';
     IonToolbar,
   ],
 })
-export class HeaderCategoryComponent implements OnInit {
+export class HeaderCategoryComponent {
   @Input() title: string;
   @Input() backButton: boolean;
   @Input() songs: ISong[] = [];
@@ -41,8 +41,6 @@ export class HeaderCategoryComponent implements OnInit {
   constructor() {
     addIcons({ ellipsisVerticalOutline });
   }
-
-  ngOnInit() {}
 
   openOption() {}
 }

@@ -34,15 +34,12 @@ import { personCircleOutline, searchOutline } from 'ionicons/icons';
 import { SearchButtonComponent } from 'src/app/shared/components/button/search-button/search-button.component';
 import { BackButtonComponent } from '../../components/button/back-button/back-button.component';
 import { MinimizePlayerAudioComponent } from '../../components/playerComponents/minimize-player-audio/minimize-player-audio.component';
-import { MinimizePlayerAudioService } from 'src/app/core/services/minimize-player-audio.service';
 import { Subscription, take } from 'rxjs';
 import { ModalStateService } from 'src/app/core/services/modal-state.service';
 import { ISong } from 'src/app/core/interfaces/song';
 import { Store } from '@ngrx/store';
-import { selectAllSongs } from 'src/app/core/store/selector/song.selector';
 import { PlayerStateService } from 'src/app/core/services/player-state.service';
-import { addLastSongUser } from 'src/app/core/store/action/user.action';
-import { SongRepositoryService } from 'src/app/core/services/repositories/song-repository.service';
+import { MusicServiceService } from 'src/app/core/services/music-service.service';
 
 @Component({
   selector: 'app-play-song',
@@ -77,73 +74,38 @@ import { SongRepositoryService } from 'src/app/core/services/repositories/song-r
   ],
 })
 export class PlaySongPage implements OnInit, OnDestroy {
-  isMini = false; // Indicateur pour le mode mini
-  public isModalOpen: boolean;
-  private modalSubscription: Subscription;
   @Input() music: ISong;
+  isMini = false;
+  private modalSubscription: Subscription;
+  public isModalOpen: boolean;
+
   constructor(
     private modalStateService: ModalStateService,
     private modalController: ModalController,
-    private store: Store<ISong[]>,
     private playerState: PlayerStateService,
-    private songRepositoryService: SongRepositoryService = inject(
-      SongRepositoryService
-    ),
-    @Inject(MinimizePlayerAudioService)
-    public minimizePlayerAudioService: MinimizePlayerAudioService
+    private audioService: MusicServiceService,
   ) {
-    this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
+    this.modalSubscription = this.modalStateService.modalOpen$.subscribe(
+      (val) => (this.isMini = !val),
     );
   }
 
   ngOnInit() {
-    addIcons({ searchOutline, personCircleOutline });
-    console.log('Chanson reçue dans PlaySongPage:', this.music.id);
-    this.store.dispatch(addLastSongUser({ songId: this.music.id }));
-  }
-  minimizePlayer() {
-    // Sauvegarder la chanson en cours
     this.playerState.setCurrentSong(this.music);
-    // Afficher le mini player
-    this.playerState.setMiniPlayerVisible(true);
-    // Fermer la modale
-    this.modalController.dismiss();
+
+    this.audioService.loadAndPlay(this.music);
   }
-  ionViewWillEnter() {
-    if (this.music) {
-      this.songRepositoryService.incrementSongListeningCount(this.music);
-    }
+
+  minimizePlayer() {
+    this.playerState.setMiniPlayer(true);
+    this.modalController.dismiss();
   }
 
   handleNextSong() {
-    this.store
-      .select(selectAllSongs)
-      .pipe(take(1))
-      .subscribe((songs) => {
-        if (!songs.length) return;
-
-        // Choisir une chanson aléatoire différente
-        const otherSongs = songs.filter((s) => s.id !== this.music.id);
-        const randomSong =
-          otherSongs[Math.floor(Math.random() * otherSongs.length)];
-
-        // Fermer modal actuelle
-        this.modalController.dismiss().then(() => {
-          // Ouvrir nouvelle modal
-          this.modalController
-            .create({
-              component: PlaySongPage,
-              componentProps: { music: randomSong },
-            })
-            .then((m) => m.present());
-        });
-      });
+    // logique existante pour sélectionner chanson suivante
   }
 
   ngOnDestroy() {
-    if (this.modalSubscription) {
-      this.modalSubscription.unsubscribe();
-    }
+    this.modalSubscription.unsubscribe();
   }
 }

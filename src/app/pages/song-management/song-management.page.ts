@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit, OnDestroy } from '@angular/core';
 import { HeaderSettingComponent } from 'src/app/shared/components/headers/header-setting/header-setting.component';
 import {
   IonCol,
@@ -39,7 +39,7 @@ import { ModalStateService } from 'src/app/core/services/modal-state.service';
     MusicContainerComponent,
   ],
 })
-export class SongManagementPage implements OnInit {
+export class SongManagementPage implements OnInit, OnDestroy {
   songs: ISong[] = [];
   store = inject(Store<AppState>);
   modalStateService = inject(ModalStateService);
@@ -48,7 +48,7 @@ export class SongManagementPage implements OnInit {
   private modalSubscription: Subscription;
   constructor(private modalController: ModalController) {
     this.modalSubscription = this.modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
+      (value) => (this.isModalOpen = value),
     );
   }
 

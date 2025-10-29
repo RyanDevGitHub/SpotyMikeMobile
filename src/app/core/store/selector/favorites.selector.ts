@@ -14,7 +14,7 @@ export const selectFavoriteSongs = createSelector(
   (state) => {
     console.log('[Selector] selectFavoriteSongs →', state.songs);
     return state.songs;
-  }
+  },
 );
 
 export const selectFavoriteAlbums = createSelector(
@@ -22,7 +22,7 @@ export const selectFavoriteAlbums = createSelector(
   (state) => {
     console.log('[Selector] selectFavoriteAlbums →', state.albums);
     return state.albums;
-  }
+  },
 );
 
 // ⚙️ Loading & Error
@@ -31,7 +31,7 @@ export const selectFavoritesLoading = createSelector(
   (state) => {
     console.log('[Selector] selectFavoritesLoading →', state.loading);
     return state.loading;
-  }
+  },
 );
 
 export const selectFavoritesError = createSelector(
@@ -39,7 +39,7 @@ export const selectFavoritesError = createSelector(
   (state) => {
     console.log('[Selector] selectFavoritesError →', state.error);
     return state.error;
-  }
+  },
 );
 
 // 🎧 Savoir si une chanson est favorite
@@ -66,7 +66,7 @@ export const selectAllFavorites = createSelector(
     const favorites = { songs, albums };
     console.log('[Selector] selectAllFavorites →', favorites);
     return favorites;
-  }
+  },
 );
 
 // 🔠 Tri des favoris selon le sortState
@@ -91,17 +91,17 @@ export const selectSortedFavorites = createSelector(
         case 'artist':
           return sort.direction === 'asc'
             ? (a.artistInfo?.firstName || '').localeCompare(
-                b.artistInfo?.firstName || ''
+                b.artistInfo?.firstName || '',
               )
             : (b.artistInfo?.firstName || '').localeCompare(
-                a.artistInfo?.firstName || ''
+                a.artistInfo?.firstName || '',
               );
 
         case 'album':
           return sort.direction === 'asc'
             ? (a.albumInfo?.title || '').localeCompare(b.albumInfo?.title || '')
             : (b.albumInfo?.title || '').localeCompare(
-                a.albumInfo?.title || ''
+                a.albumInfo?.title || '',
               );
 
         default:
@@ -117,5 +117,5 @@ export const selectSortedFavorites = createSelector(
       songs: sorted.filter((item): item is ISong => 'artistInfo' in item),
       albums: sorted.filter((item): item is IAlbum => !('artistInfo' in item)),
     };
-  }
+  },
 );

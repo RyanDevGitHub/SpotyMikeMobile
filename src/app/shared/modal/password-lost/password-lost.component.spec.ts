@@ -9,8 +9,8 @@ describe('PasswordLostComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ PasswordLostComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [PasswordLostComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PasswordLostComponent);

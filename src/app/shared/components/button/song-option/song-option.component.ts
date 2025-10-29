@@ -56,7 +56,7 @@ import { ISong } from 'src/app/core/interfaces/song';
 export class SongOptionComponent {
   constructor(
     private modalStateService: ModalStateService,
-    private router: Router
+    private router: Router,
   ) {}
   @ViewChild(IonModal) modalRef!: IonModal;
   @Input() id: string;

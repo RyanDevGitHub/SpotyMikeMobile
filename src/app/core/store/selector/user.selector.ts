@@ -18,30 +18,30 @@ export const selectUser = createSelector(selectUserState, (state) => {
 // Sélecteur pour vérifier si un chargement est en cours
 export const selectUserLoading = createSelector(
   selectUserState,
-  (state) => state.loading
+  (state) => state.loading,
 );
 
 // Sélecteur pour récupérer les éventuelles erreurs
 export const selectUserError = createSelector(
   selectUserState,
-  (state) => state.error
+  (state) => state.error,
 );
 export const selectAuthToken = createSelector(
   selectUserState,
-  (userState) => userState.token
+  (userState) => userState.token,
 );
 export const selectUserId = createSelector(
   selectUserState,
-  (userState) => userState.user?.id ?? null
+  (userState) => userState.user?.id ?? null,
 );
 // Sélecteurs pour charger l'état de la musique
 export const selectLoading = createSelector(
   selectUserState,
-  (state) => state.loading
+  (state) => state.loading,
 );
 export const selectError = createSelector(
   selectUserState,
-  (state) => state.error
+  (state) => state.error,
 );
 
 export const selectUserPlaylists = createSelector(
@@ -60,5 +60,5 @@ export const selectUserPlaylists = createSelector(
         songs, // maintenant TypeScript sait que c'est IMusic[]
       };
     });
-  }
+  },
 );

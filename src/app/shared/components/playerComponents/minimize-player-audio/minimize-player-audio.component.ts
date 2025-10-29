@@ -7,12 +7,13 @@ import {
   Input,
 } from '@angular/core';
 import { createGesture } from '@ionic/angular';
-import { MinimizePlayerAudioService } from 'src/app/core/services/minimize-player-audio.service';
+
 import { MusicServiceService } from 'src/app/core/services/music-service.service';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { MusicNavBarComponent } from '../music-nav-bar/music-nav-bar.component';
 import { ISong } from 'src/app/core/interfaces/song';
+import { PlayerStateService } from 'src/app/core/services/player-state.service';
 
 @Component({
   selector: 'app-minimize-player-audio',
@@ -24,17 +25,17 @@ import { ISong } from 'src/app/core/interfaces/song';
 export class MinimizePlayerAudioComponent implements OnInit {
   @Input() music: ISong | null = null;
 
-  audio!: HTMLAudioElement;
+  // audio!: HTMLAudioElement;
   isPlaying = false;
 
   private musicService = inject(MusicServiceService);
-  private playerService = inject(MinimizePlayerAudioService);
+  private playerService = inject(PlayerStateService);
 
   @ViewChild('miniPlayer', { static: true }) miniPlayer!: ElementRef;
 
   ngOnInit() {
     this.initSwipeGesture();
-    this.audio.preload = 'metadata';
+    // this.audio.preload = 'metadata';
   }
 
   initSwipeGesture() {
@@ -51,7 +52,7 @@ export class MinimizePlayerAudioComponent implements OnInit {
           this.miniPlayer.nativeElement.style.transform =
             ev.deltaX > 0 ? 'translateX(100%)' : 'translateX(-100%)';
           setTimeout(() => {
-            this.playerService.hideMiniPlayer(); // 🔹 Supprime du DOM
+            this.playerService.setMiniPlayer(false); // 🔹 Supprime du DOM
           }, 300);
         } else {
           this.miniPlayer.nativeElement.style.transition = '0.2s ease-out';

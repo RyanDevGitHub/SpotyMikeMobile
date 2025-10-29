@@ -9,8 +9,8 @@ describe('MusicNavBarComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MusicNavBarComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [MusicNavBarComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MusicNavBarComponent);

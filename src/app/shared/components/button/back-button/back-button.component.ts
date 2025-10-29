@@ -39,7 +39,7 @@ export class BackButtonComponent implements OnInit {
   constructor(
     private modalCtrl: ModalController,
     private platform: Platform,
-    private _location: Location
+    private _location: Location,
   ) {
     this.platform.backButton.subscribeWithPriority(10, () => {
       console.log('Handler was called!');

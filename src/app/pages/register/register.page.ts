@@ -1,10 +1,5 @@
-import { ERoleUser, IUserDataBase } from './../../core/interfaces/user';
-import { AuthentificationService } from './../../core/services/authentification.service';
-import { IPlaylist } from 'src/app/core/interfaces/playlistes';
-import { IonImg } from '@ionic/angular/standalone';
-import { Router } from '@angular/router';
-import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -12,27 +7,31 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Camera, CameraResultType } from '@capacitor/camera';
 import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonGrid,
-  IonRow,
+  IonAvatar,
+  IonButton,
   IonCol,
-  IonList,
+  IonContent,
+  IonGrid,
+  IonHeader,
+  IonImg,
   IonInput,
   IonItem,
-  IonText,
-  IonButton,
-  IonToggle,
+  IonList,
+  IonRow,
   IonSelect,
   IonSelectOption,
-  IonAvatar,
+  IonText,
+  IonTitle,
+  IonToggle,
+  IonToolbar,
 } from '@ionic/angular/standalone';
 import { LocalStorageService } from 'src/app/core/services/local-strorage.service';
 import { BackButtonComponent } from 'src/app/shared/components/button/back-button/back-button.component';
-import { Camera, CameraResultType } from '@capacitor/camera';
+import { ERoleUser, IUserDataBase } from './../../core/interfaces/user';
+import { AuthentificationService } from './../../core/services/authentification.service';
 
 @Component({
   selector: 'app-register',
@@ -267,8 +266,8 @@ export class RegisterPage implements OnInit {
       )
         return false;
     }
-    if (this.getFormControl('email')?.value)
-      this.getFormControl(input)?.setValue(this.getFormControl('email')?.value);
+    // if (this.getFormControl('email')?.value)
+    //   this.getFormControl(input)?.setValue(this.getFormControl('email')?.value);
     if (this.getFormControl(input)?.valid && this.getFormControl(input)?.value)
       return false;
     if (input === 'avatar') return false;
@@ -277,9 +276,9 @@ export class RegisterPage implements OnInit {
   }
 
   handleChange(e: any) {
-    this.getFormControl(this.input[this.step].formeControlName)?.setValue(
-      e.detail.value
-    );
+    // this.getFormControl(this.input[this.step].formeControlName)?.setValue(
+    //   e.detail.value
+    // );
   }
 
   returnToLoginPage() {

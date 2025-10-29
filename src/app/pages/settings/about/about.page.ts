@@ -33,10 +33,8 @@ import { environment } from 'src/environments/environment';
     HeaderSettingComponent,
   ],
 })
-export class AboutPage implements OnInit {
+export class AboutPage {
   version = environment.version;
 
   constructor() {}
-
-  ngOnInit() {}
 }

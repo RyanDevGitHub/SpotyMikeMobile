@@ -162,7 +162,7 @@ export const userReducer = createReducer(
       user: {
         ...state.user,
         playlists: state.user.playlists.map((pl) =>
-          pl.id === playlist.id ? playlist : pl
+          pl.id === playlist.id ? playlist : pl,
         ),
       },
       loading: false,
@@ -176,7 +176,7 @@ export const userReducer = createReducer(
 
       console.log(
         '[Reducer] Suppression chanson de la playlist',
-        updatedPlaylist
+        updatedPlaylist,
       );
 
       return {
@@ -184,18 +184,18 @@ export const userReducer = createReducer(
         user: {
           ...state.user,
           playlists: state.user.playlists.map((pl) =>
-            pl.id === playlistId ? updatedPlaylist : pl
+            pl.id === playlistId ? updatedPlaylist : pl,
           ),
         },
         loading: false,
         error: null,
       };
-    }
+    },
   ),
 
   on(ActionUser.removeSongFromPlaylistFailure, (state, { error }) => ({
     ...state,
     loading: false,
     error,
-  }))
+  })),
 );

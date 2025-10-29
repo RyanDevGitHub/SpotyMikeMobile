@@ -1,75 +1,225 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core'; // Retrait de Inject et InjectionToken
 import { EAuthPage } from '../models/refData';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { HttpClient } from '@angular/common/http';
-import { from, Observable, of, switchMap } from 'rxjs';
+import {
+  catchError,
+  defer,
+  EMPTY,
+  from,
+  map,
+  Observable,
+  of,
+  switchMap,
+} from 'rxjs';
 import { LoginRequestError, LoginRequestSuccess } from '../interfaces/login';
 import { UserRepositoryService } from './repositories/user-repository.service';
-import { GoogleAuthProvider, UserCredential } from 'firebase/auth';
 import { IToken } from '../interfaces/user';
+// Import du jeton d'injection depuis le fichier dédié
+import { FirebaseAuthToken } from './firebase-auth.token';
+
+import {
+  Auth,
+  GoogleAuthProvider,
+  signInWithCredential,
+  UserCredential,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth';
+import { SocialLogin } from '@capgo/capacitor-social-login';
+import { getAuth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private serverUrl = 'http://localhost:3000'; // URL de ton serveur Node.js
+  private serverUrl = 'http://localhost:3000';
+  WEB_CLIENT_ID =
+    '823395277840-be9l5id933b1rk6e12dnoj9p9n92v2n4.apps.googleusercontent.com'; // Injection via le jeton explicite qui est configuré dans main.ts
+  private auth: Auth = inject(FirebaseAuthToken);
 
   constructor(
-    private afAuth: AngularFireAuth,
     private http: HttpClient,
-    private userService: UserRepositoryService
-  ) {}
+    private userService: UserRepositoryService,
+  ) {
+    // this.checkRedirectStatus();
+  }
+
   getPageAuth() {
     return of(EAuthPage.Login);
   }
 
+  // Créez une nouvelle méthode pour encapsuler l'abonnement
+  // private checkRedirectStatus(): void {
+  //   this.handleRedirectResult().subscribe({
+  //     next: (result) => {
+  //       if (result && result.type === 'success') {
+  //         console.log(
+  //           '--- AUTO-GESTION : Connexion par redirection réussie et finalisée ---'
+  //         );
+  //         // ICI, vous devez router l'utilisateur hors de la page de login
+  //         // Si vous injectez le Router dans le AuthService, faites-le ici :
+  //         // this.router.navigate(['/home']);
+  //       }
+  //     },
+  //     error: (err) => {
+  //       console.error(
+  //         '--- AUTO-GESTION : Échec de la vérification de redirection ---',
+  //         err
+  //       );
+  //     },
+  //   });
+  // }
+
   async signIn(email: string, password: string): Promise<string> {
-    const userCredential = await this.afAuth.signInWithEmailAndPassword(
+    const userCredential = await signInWithEmailAndPassword(
+      this.auth,
       email,
-      password
+      password,
     );
     return userCredential.user?.getIdToken() ?? '';
   }
-  signInWithGoogle(): Observable<LoginRequestSuccess | LoginRequestError> {
-    const provider = new GoogleAuthProvider();
 
-    return from(this.afAuth.signInWithPopup(provider)).pipe(
-      switchMap((userCredential) => {
-        const firebaseUser = userCredential.user;
-        if (!firebaseUser) {
-          return of({
-            type: 'error',
-            message: 'Google login failed',
-          } as LoginRequestError);
-        }
+  // signInWithGoogle(
+  //   useRedirect?: boolean
+  // ): Observable<LoginRequestSuccess | LoginRequestError> {
+  //   console.log('--- Service : Entrée dans signInWithGoogle ---');
 
-        // Récupération du token Firebase sans await
-        return from(firebaseUser.getIdToken()).pipe(
-          switchMap((idToken) => {
-            const tokenObj: IToken = { token: idToken };
-        
+  //   // L'opérateur 'from' doit recevoir la Promise RÉSULTANTE
+  //   return from(
+  //     (async () => {
+  //       // 1. Définition de la fonction async
 
-            // Création / récupération du user dans Firestore
-            return this.userService.getOrCreateUser(firebaseUser).pipe(
-              switchMap((user) =>
-                of({
-                  type: 'success',
-                  user,
-                  token: tokenObj,
-                  error: false,
-                } as LoginRequestSuccess)
-              )
-            );
-          })
-        );
-      })
-    );
-  }
+  //       // ✅ Le code va s'exécuter et le log devrait s'afficher
+  //       const isNative =
+  //         (window as any)?.Capacitor?.isNativePlatform?.() ?? false;
+  //       console.log('isNative platform:', isNative);
+
+  //       if (isNative) {
+  //         try {
+  //           const res = await SocialLogin.login({
+  //             provider: 'google',
+  //             options: {
+  //               scopes: ['email', 'profile'],
+  //             },
+  //           });
+  //           const googleUser = res.result as { idToken: string };
+
+  //           if (!googleUser.idToken) {
+  //             throw new Error('Google ID Token missing from native response.');
+  //           }
+
+  //           const credential = GoogleAuthProvider.credential(
+  //             googleUser.idToken
+  //           );
+
+  //           return await signInWithCredential(this.auth, credential);
+  //         } catch (err: any) {
+  //           throw new Error(
+  //             `Native Google login failed: ${err.message || 'Unknown error'}`
+  //           );
+  //         }
+  //       } else {
+  //         const provider = new GoogleAuthProvider();
+  //         const auth = getAuth();
+  //         try {
+  //           // Await and return the UserCredential so every code path returns a value
+  //           const result = await signInWithPopup(auth, provider);
+  //           return result;
+  //         } catch (error: any) {
+  //           // Normalize the error by throwing so the outer from(...) promise rejects and is handled by catchError
+  //           throw new Error(
+  //             `Web Google login failed: ${error?.message || 'Unknown error'}`
+  //           );
+  //         }
+  //       }
+  //       // Note: Il est crucial que tous les chemins de code retournent ou lèvent une erreur.
+  //     })() // 2. L'appel immédiat : retourne la Promise au 'from'
+  //   ).pipe(
+  //     switchMap((userCredential) => this.handleCredential(userCredential ?? null)),
+  //     catchError((err: any) => {
+  //       console.error(err);
+  //       return of({
+  //         type: 'error',
+  //         message: err.message || 'Google login failed',
+  //       } as LoginRequestError);
+  //     })
+  //   );
+  // }
+
+  // handleRedirectResult(): Observable<LoginRequestSuccess | LoginRequestError> {
+  //   const auth = getAuth();
+
+  //   return from(getRedirectResult(auth)).pipe(
+  //     // --- ÉTAPE 1 : Récupération du résultat de la redirection ---
+  //     switchMap((userCredential: UserCredential | null) => {
+  //       // ⭐ LOG 1 : Indique si un résultat a été trouvé
+  //       console.log(
+  //         'REDIRECTION CHECK: Résultat de getRedirectResult:',
+  //         !!userCredential
+  //       );
+
+  //       if (userCredential) {
+  //         console.log(
+  //           'SUCCESS: Redirection Firebase détectée. Tentative de gestion des identifiants.'
+  //         );
+
+  //         // ⭐ LOG 2 : Affiche le token ID (ou une partie)
+  //         const idToken = (userCredential.user as any)?.accessToken || 'N/A';
+  //         console.log(
+  //           'REDIRECTION TOKEN ID (partial):',
+  //           idToken.substring(0, 10) + '...'
+  //         );
+
+  //         return this.handleCredential(userCredential);
+  //       }
+
+  //       // ⭐ LOG 3 : Si pas de résultat de redirection, on passe
+  //       console.log('REDIRECTION CHECK: Aucune donnée de redirection trouvée.');
+  //       return EMPTY;
+  //     })
+  //     // ... (catchError reste inchangé)
+  //   );
+  // }
+
+  // private handleCredential(
+  //   userCredential: UserCredential | null
+  // ): Observable<LoginRequestSuccess | LoginRequestError> {
+  //   const firebaseUser = userCredential?.user ?? null;
+  //   if (!firebaseUser) {
+  //     return of({
+  //       type: 'error',
+  //       message: 'Google login failed',
+  //     } as LoginRequestError);
+  //   }
+
+  //   return from(firebaseUser.getIdToken()).pipe(
+  //     switchMap((idToken) => {
+  //       const tokenObj: IToken = { token: idToken };
+
+  //       return this.userService.getOrCreateUser(firebaseUser).pipe(
+  //         map(
+  //           (user) =>
+  //             ({
+  //               type: 'success',
+  //               user,
+  //               token: tokenObj,
+  //               error: false,
+  //             } as LoginRequestSuccess)
+  //         )
+  //       );
+  //     })
+  //   );
+  // }
 
   async signUp(email: string, password: string): Promise<string> {
-    const userCredential = await this.afAuth.createUserWithEmailAndPassword(
+    const userCredential = await createUserWithEmailAndPassword(
+      this.auth,
       email,
-      password
+      password,
     );
     return userCredential.user?.getIdToken() ?? '';
   }
@@ -81,6 +231,6 @@ export class AuthService {
   }
 
   async signOut(): Promise<void> {
-    await this.afAuth.signOut();
+    await signOut(this.auth);
   }
 }

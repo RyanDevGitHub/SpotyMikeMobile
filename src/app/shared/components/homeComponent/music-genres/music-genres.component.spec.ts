@@ -9,8 +9,8 @@ describe('MusicGenresComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MusicGenresComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [MusicGenresComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MusicGenresComponent);

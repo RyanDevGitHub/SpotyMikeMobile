@@ -18,7 +18,7 @@ export class MusicContainerVerticalComponent {
   modalStateService: ModalStateService;
   constructor(
     private modalCtrl: ModalController,
-    modalStateService: ModalStateService
+    modalStateService: ModalStateService,
   ) {}
 
   async openPlayer() {

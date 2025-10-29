@@ -1,4 +1,3 @@
-
 import {
   debugSelectAllSongs,
   selectLastSongsByUser,
@@ -41,7 +40,7 @@ import { IUser } from 'src/app/core/interfaces/user';
 import { selectUser } from 'src/app/core/store/selector/user.selector';
 import { loadAlbums } from 'src/app/core/store/action/album.acton';
 import { loadArtists } from 'src/app/core/store/action/artist.action';
-
+import * as MusicControls from 'capacitor-music-controls-plugin';
 @Component({
   selector: 'app-home-home',
   templateUrl: './home.page.html',
@@ -65,25 +64,27 @@ export class HomePage implements OnInit, OnDestroy {
   private modalSubscription: Subscription;
 
   topsSongs$: Observable<ISong[]> = this.store.select(
-    selectTopSongsByListeningCount
+    selectTopSongsByListeningCount,
   );
   lastPlayedSongs$: Observable<ISong[]> = this.store.select(
-    selectLastSongsByUser
+    selectLastSongsByUser,
   );
   firstTopSong$: Observable<ISong | undefined> = this.topsSongs$.pipe(
-    map((songs) => (songs.length > 0 ? songs[0] : undefined))
+    map((songs) => (songs.length > 0 ? songs[0] : undefined)),
   );
   user: IUser | null;
   constructor(private modalStateService: ModalStateService) {
     addIcons({ book, home });
     this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
+      (value) => (this.isModalOpen = value),
     );
   }
 
   ngOnInit() {
     this.store.dispatch(loadArtists());
     this.store.dispatch(loadUser());
+    console.log('TEST MUSIC CONTROLS');
+    console.log(MusicControls);
   }
 
   ngOnDestroy() {

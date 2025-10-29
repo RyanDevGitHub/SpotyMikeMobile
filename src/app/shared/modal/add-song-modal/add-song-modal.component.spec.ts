@@ -9,8 +9,8 @@ describe('AddSongModalComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ AddSongModalComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [AddSongModalComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AddSongModalComponent);

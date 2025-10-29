@@ -72,7 +72,7 @@ export class FilterModalComponent implements OnInit {
       };
 
       this.filters.forEach(
-        (f) => (f.activate = f.name === activeKeyToName[sort.key])
+        (f) => (f.activate = f.name === activeKeyToName[sort.key]),
       );
     });
   }
@@ -104,7 +104,7 @@ export class FilterModalComponent implements OnInit {
           | 'Titre'
           | 'Artist'
           | 'Album',
-      })
+      }),
     );
   }
 }

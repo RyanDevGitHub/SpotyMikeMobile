@@ -32,7 +32,7 @@ export const musicReducer = createReducer(
         loading: true,
         error: null,
       }
-    )
+    ),
   ),
   on(ActionSOngs.loadSongSuccess, (state, { songs }) => {
     console.log('[Reducer] Updating state with songs:', songs);
@@ -47,8 +47,8 @@ export const musicReducer = createReducer(
         loading: false,
         error,
       }
-    )
-  )
+    ),
+  ),
 );
 
 // Générer les sélecteurs

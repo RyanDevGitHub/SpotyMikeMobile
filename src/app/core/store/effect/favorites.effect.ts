@@ -1,31 +1,13 @@
-import { FavoritesService } from './../../services/favoris.service';
-import {
-  addFavoriteSong,
-  removeFavoriteSong,
-  removeFavoriteAlbum,
-} from './../action/favorites.actions';
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { FavoritesService } from './../../services/favoris.service';
 
-import * as FavoritesActions from '../action/favorites.actions';
-import {
-  catchError,
-  filter,
-  from,
-  map,
-  mergeMap,
-  of,
-  tap,
-  withLatestFrom,
-} from 'rxjs';
-import { ISong } from '../../interfaces/song';
-import { selectArtistsLoaded } from '../selector/artist.selector';
 import { Store } from '@ngrx/store';
-import { loadAlbumsSuccess } from '../action/album.acton';
-import { selectUser } from '../selector/user.selector';
-import { IUser } from '../../interfaces/user';
+import { catchError, from, map, mergeMap, of, withLatestFrom } from 'rxjs';
+import * as FavoritesActions from '../action/favorites.actions';
+import { loadSongSuccess } from '../action/song.action';
 import { FavoritesState } from '../reducer/favorite.reducer';
-import { loadSongFailure, loadSongSuccess } from '../action/song.action';
+import { selectUser } from '../selector/user.selector';
 
 @Injectable()
 export class FavoritesEffects {

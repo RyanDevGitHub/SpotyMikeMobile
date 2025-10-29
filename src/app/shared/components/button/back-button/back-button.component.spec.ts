@@ -9,8 +9,8 @@ describe('BackButtonComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ BackButtonComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [BackButtonComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BackButtonComponent);

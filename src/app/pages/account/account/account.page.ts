@@ -1,6 +1,6 @@
 import { LocalStorageService } from 'src/app/core/services/local-strorage.service';
 import { ProfilInfoComponent } from '../../../shared/components/profilComponent/profil-info/profil-info.component';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -54,7 +54,7 @@ import {
     AsyncPipe,
   ],
 })
-export class AccountPage {
+export class AccountPage implements OnDestroy {
   public isModalOpen: boolean;
   private modalSubscription: Subscription;
   private localStorageService = inject(LocalStorageService);
@@ -63,10 +63,10 @@ export class AccountPage {
   items = this.store.select(selectUserPlaylists);
   constructor(
     private router: Router,
-    private modalStateService: ModalStateService
+    private modalStateService: ModalStateService,
   ) {
     this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
+      (value) => (this.isModalOpen = value),
     );
   }
 

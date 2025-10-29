@@ -9,11 +9,10 @@ import { IonButton, IonCol, IonGrid, IonRow } from '@ionic/angular/standalone';
   standalone: true,
   imports: [IonGrid, SeeAllComponent, IonCol, IonRow, IonButton],
 })
-export class MusicGenresComponent implements OnInit {
+export class MusicGenresComponent {
   selectedGenre: string = 'All';
   constructor() {}
 
-  ngOnInit() {}
   selectGenre(genre: string) {
     this.selectedGenre = genre;
   }

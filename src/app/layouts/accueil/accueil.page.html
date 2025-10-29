@@ -1,7 +1,7 @@
 <ion-grid fixed class="main-grid">
   <ion-row class="tabs-row">
     <ion-tabs id="ion-tabs">
-      @if(minimizePlayerAudioService.isMiniPlayerVisible()){
+      @if(this.miniPlayerVisible$ | async){
       <!-- <ion-tab-bar slot="bottom" class="mini-player"> -->
       <app-minimize-player-audio [music]="currentSong$ | async">
       </app-minimize-player-audio>

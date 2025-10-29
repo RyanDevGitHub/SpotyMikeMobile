@@ -60,7 +60,7 @@ export class EditProfilPage implements OnInit {
 
   constructor(
     private loadingCtrl: LoadingController,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
   ) {}
 
   ngOnInit() {
@@ -68,7 +68,7 @@ export class EditProfilPage implements OnInit {
     this.user$
       .pipe(
         take(1),
-        filter((user): user is IUser => !!user)
+        filter((user): user is IUser => !!user),
       )
       .subscribe((user) => {
         this.firstName = user.firstName ?? '';
@@ -98,7 +98,7 @@ export class EditProfilPage implements OnInit {
 
       // 2️⃣ Dispatch action pour update
       this.store.dispatch(
-        updateUser({ userId: user.id, changes: updatedData })
+        updateUser({ userId: user.id, changes: updatedData }),
       );
 
       // 3️⃣ Ecouter le succès / échec via store
@@ -106,7 +106,7 @@ export class EditProfilPage implements OnInit {
         .select(selectUserState) // Crée un selector pour loading/error si tu n'as pas
         .pipe(
           filter((state) => !state.loading), // Quand le loading devient false
-          take(1)
+          take(1),
         )
         .subscribe(async (state) => {
           await loading.dismiss(); // Masquer le loader

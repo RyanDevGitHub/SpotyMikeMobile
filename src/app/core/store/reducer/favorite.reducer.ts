@@ -60,5 +60,5 @@ export const favoritesReducer = createReducer(
     ...state,
     loading: false,
     error,
-  }))
+  })),
 );

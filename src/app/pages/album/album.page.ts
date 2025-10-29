@@ -70,10 +70,10 @@ export class AlbumPage implements OnInit {
   constructor(
     private modalStateService: ModalStateService,
     private store: Store<AppState>,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {
     this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (val) => (this.isModalOpen = val)
+      (val) => (this.isModalOpen = val),
     );
   }
 

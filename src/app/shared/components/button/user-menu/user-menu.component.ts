@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { addIcons } from 'ionicons';
 import { personCircleOutline } from 'ionicons/icons';
-import{IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonIcon } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-user-menu',
@@ -10,14 +10,12 @@ import{IonContent, IonIcon } from '@ionic/angular/standalone';
   standalone: true,
   imports: [IonIcon, IonContent],
 })
-export class UserMenuComponent  implements OnInit {
-
-  constructor() { }
+export class UserMenuComponent implements OnInit {
+  constructor() {}
 
   ngOnInit() {
     addIcons({
-      personCircleOutline
+      personCircleOutline,
     });
   }
-
 }

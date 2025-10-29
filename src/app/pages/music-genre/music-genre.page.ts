@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, inject } from '@angular/core';
+import { Component, OnInit, Inject, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -56,7 +56,7 @@ import { MusicContainerComponent } from 'src/app/shared/components/containers/mu
     MusicContainerComponent,
   ],
 })
-export class MusicGenrePage implements OnInit {
+export class MusicGenrePage implements OnInit, OnDestroy {
   genre: SongGenre;
   // route = inject(ActivatedRoute)
   public isModalOpen: boolean;
@@ -66,10 +66,10 @@ export class MusicGenrePage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private modalCtrl: ModalController,
-    private modalStateService: ModalStateService
+    private modalStateService: ModalStateService,
   ) {
     this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
+      (value) => (this.isModalOpen = value),
     );
   }
 

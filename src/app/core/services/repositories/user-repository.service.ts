@@ -1,7 +1,7 @@
-import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { LocalStorageService } from 'src/app/core/services/local-strorage.service';
 import { inject, Injectable } from '@angular/core';
-import { initializeApp } from 'firebase/app';
+
+// IMPORTS FIREBASE V9
 import {
   addDoc,
   arrayUnion,
@@ -11,12 +11,13 @@ import {
   FirestoreDataConverter,
   getDoc,
   getDocs,
-  getFirestore,
   query,
   setDoc,
   updateDoc,
   where,
+  DocumentData,
 } from 'firebase/firestore';
+import { StorageReference, ref, getDownloadURL } from 'firebase/storage'; // Nouveau pour Storage
 import { environment } from 'src/environments/environment';
 import {
   ERoleUser,
@@ -25,47 +26,67 @@ import {
   IUserUpdateDataBase,
 } from '../../interfaces/user';
 import { Observable, from, map, of, switchMap } from 'rxjs';
-import { AngularFirestore, DocumentData } from '@angular/fire/compat/firestore';
-import { IPlaylist, IPlaylistRaw, ISongRef } from '../../interfaces/playlistes';
+import {
+  // Type pour l'injection
+  Storage,
+} from '@angular/fire/storage';
+import { FirebaseApp } from '@angular/fire/app';
+
+// RETIRER : AngularFirestore, AngularFireStorage, DocumentData (redondant)
+import { IPlaylistRaw, ISongRef } from '../../interfaces/playlistes';
+import { Firestore } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserRepositoryService {
-  app = initializeApp(environment.firebaseConfig);
+  // Injection des services de base au lieu de les initialiser ici
+  // L'initialisation se fait une seule fois dans main.ts
+  db: Firestore = inject(Firestore); // Injecte le service Firestore V9
+  storage: Storage = inject(Storage); // Injecte le service Storage V9
 
-  // Initialize Cloud Firestore and get a reference to the service
-  db = getFirestore(this.app);
+  // Utilisation de l'app de base pour d'autres usages si nécessaire
+  // Note: Firestore et Storage sont déjà liés à l'app via provide...
+  app: FirebaseApp = inject(FirebaseApp);
 
   private usersCollection = collection(this.db, environment.collection.users);
   localStorageService: LocalStorageService = inject(LocalStorageService);
-  constructor(
-    private firestore: AngularFirestore,
-    private storage: AngularFireStorage
-  ) {}
+  // CORRECTION : Le constructeur est vide car nous utilisons `inject`
+  constructor() {}
+  // Ancienne injection supprimée : private firestore: AngularFirestore, private storage: AngularFireStorage
 
+  // ... (le reste de la classe suit)
+  // Méthode entièrement réécrite en Promesses/Observables V9
   getOrCreateUser(firebaseUser: any): Observable<IUser> {
-    const userRef = this.firestore.collection('Users').doc(firebaseUser.uid);
+    // 1. Référence au document Firestore
+    const userRef = doc(this.db, 'Users', firebaseUser.uid);
 
-    return userRef.get().pipe(
-      switchMap((doc) => {
-        if (doc.exists) {
-          const user = doc.data() as IUserDataBase;
+    // 2. Tente de récupérer l'utilisateur (Firestore V9 - getDoc)
+    return from(getDoc(userRef)).pipe(
+      switchMap((docSnap) => {
+        if (docSnap.exists()) {
+          // Utilisateur trouvé
+          const user = docSnap.data() as IUserDataBase;
           return of(user);
         } else {
+          // Utilisateur non trouvé, créer l'utilisateur
           const displayName = firebaseUser.displayName ?? '';
           const nameParts = displayName.split(' ');
 
-          // Ici on récupère l'avatar par défaut en Observable
-          const defaultAvatar$ = from(
-            this.storage.ref('avatar/user.png').getDownloadURL().toPromise()
+          // 3. Récupère l'URL de l'avatar par défaut (Storage V9)
+          const storageRef: StorageReference = ref(
+            this.storage,
+            'avatar/user.png',
           );
+
+          // from(getDownloadURL(...)) transforme la promesse en Observable
+          const defaultAvatar$ = from(getDownloadURL(storageRef));
 
           return defaultAvatar$.pipe(
             switchMap((defaultAvatarUrl) => {
               const user: IUserDataBase = {
                 id: firebaseUser.uid,
-                avatar: defaultAvatarUrl, // ← avatar par défaut
+                avatar: defaultAvatarUrl,
                 firstName: nameParts[0] ?? '',
                 lastName: nameParts.slice(1).join(' ') ?? '',
                 password: '',
@@ -79,20 +100,22 @@ export class UserRepositoryService {
                 role: ERoleUser.User,
               };
 
-              // Enregistrer dans Firestore
-              userRef.set(user);
-
-              // Stockage local
-              this.localStorageService.setItem('token', {
-                token: firebaseUser.stsTokenManager?.accessToken ?? '',
-              });
-              this.localStorageService.setItem('idUser', user.id);
-
-              return of(user);
-            })
+              // 4. Enregistrer dans Firestore (V9 - setDoc)
+              // from(setDoc(...)) transforme la promesse en Observable (pour chaîner le switchMap)
+              return from(setDoc(userRef, user)).pipe(
+                map(() => {
+                  // Stockage local
+                  this.localStorageService.setItem('token', {
+                    token: firebaseUser.stsTokenManager?.accessToken ?? '',
+                  });
+                  this.localStorageService.setItem('idUser', user.id);
+                  return user;
+                }),
+              );
+            }),
           );
         }
-      })
+      }),
     );
   }
 
@@ -115,7 +138,7 @@ export class UserRepositoryService {
     // Ajouter l'utilisateur à la collection "Users"
     const userRef = await addDoc(
       collection(this.db, environment.collection.users),
-      userData
+      userData,
     );
 
     // Ajouter les informations de l'artiste si disponibles
@@ -154,7 +177,7 @@ export class UserRepositoryService {
   async setUserField(
     UserId: string | undefined,
     fieldName: string,
-    value: any
+    value: any,
   ): Promise<void> {
     const usersCollection = collection(this.db, 'Users');
     const q = query(usersCollection, where('id', '==', UserId));
@@ -175,8 +198,8 @@ export class UserRepositoryService {
     const querySnapshotPromise = await getDocs(
       query(
         collection(this.db, environment.collection.users),
-        where(fieldName, '==', value)
-      )
+        where(fieldName, '==', value),
+      ),
     );
     if (!querySnapshotPromise.empty) {
       return querySnapshotPromise.docs[0].data();
@@ -187,7 +210,7 @@ export class UserRepositoryService {
 
   async addToLastPlayed(
     userId: string | undefined,
-    songId: string
+    songId: string,
   ): Promise<IUserDataBase> {
     if (!userId) {
       throw new Error('User ID is undefined');
@@ -216,7 +239,7 @@ export class UserRepositoryService {
   // get Users collection
   async getUsersCollection() {
     const querySnapshot = await getDocs(
-      collection(this.db, environment.collection.users)
+      collection(this.db, environment.collection.users),
     );
     return querySnapshot.docs.map((doc) => doc.data());
   }
@@ -225,23 +248,23 @@ export class UserRepositoryService {
   async getSousCollection(
     collectionName: string,
     documentId: string,
-    sousCollectionName: string
+    sousCollectionName: string,
   ) {
     const querySnapshot = await getDocs(
-      collection(this.db, collectionName, documentId, sousCollectionName)
+      collection(this.db, collectionName, documentId, sousCollectionName),
     );
     return querySnapshot.docs.map((doc) => doc.data());
   }
 
   async updateUser(
     userId: string,
-    updates: Partial<IUserUpdateDataBase>
+    updates: Partial<IUserUpdateDataBase>,
   ): Promise<void> {
     const q = query(
       collection(this.db, environment.collection.users).withConverter(
-        this.userConverter
+        this.userConverter,
       ),
-      where('id', '==', userId)
+      where('id', '==', userId),
     );
 
     const querySnap = await getDocs(q);
@@ -260,7 +283,7 @@ export class UserRepositoryService {
   async createPlaylist(
     userId: string,
     title: string,
-    song: ISongRef
+    song: ISongRef,
   ): Promise<IPlaylistRaw> {
     console.log('🏗️ Repository createPlaylist appelé avec:', {
       userId,
@@ -270,9 +293,9 @@ export class UserRepositoryService {
 
     const q = query(
       collection(this.db, environment.collection.users).withConverter(
-        this.userConverter
+        this.userConverter,
       ),
-      where('id', '==', userId)
+      where('id', '==', userId),
     );
 
     const querySnap = await getDocs(q);
@@ -305,7 +328,7 @@ export class UserRepositoryService {
   async deleteUser(userId: string): Promise<void> {
     const q = query(
       collection(this.db, environment.collection.users),
-      where('id', '==', userId)
+      where('id', '==', userId),
     );
 
     const querySnap = await getDocs(q);
@@ -322,25 +345,25 @@ export class UserRepositoryService {
   async addSongToPlaylist(
     userId: string,
     playlistId: string,
-    song: ISongRef
+    song: ISongRef,
   ): Promise<IPlaylistRaw> {
     console.log(
       `[addSongToPlaylist] Called with userId=${userId}, playlistId=${playlistId}, song=`,
-      song
+      song,
     );
 
     const q = query(
       collection(this.db, environment.collection.users).withConverter(
-        this.userConverter
+        this.userConverter,
       ),
-      where('id', '==', userId)
+      where('id', '==', userId),
     );
 
     const querySnap = await getDocs(q);
 
     if (querySnap.empty) {
       console.error(
-        `[addSongToPlaylist] Utilisateur avec id=${userId} non trouvé`
+        `[addSongToPlaylist] Utilisateur avec id=${userId} non trouvé`,
       );
       throw new Error(`Utilisateur avec id=${userId} non trouvé`);
     }
@@ -356,7 +379,7 @@ export class UserRepositoryService {
 
     if (playlistIndex === -1) {
       console.error(
-        `[addSongToPlaylist] Playlist avec id=${playlistId} non trouvée`
+        `[addSongToPlaylist] Playlist avec id=${playlistId} non trouvée`,
       );
       throw new Error(`Playlist avec id=${playlistId} non trouvée`);
     }
@@ -384,17 +407,17 @@ export class UserRepositoryService {
   async removeSongFromPlaylist(
     userId: string,
     playlistId: string,
-    songId: string
+    songId: string,
   ): Promise<IPlaylistRaw> {
     console.log(
-      `[removeSongFromPlaylist] Called with userId=${userId}, playlistId=${playlistId}, songId=${songId}`
+      `[removeSongFromPlaylist] Called with userId=${userId}, playlistId=${playlistId}, songId=${songId}`,
     );
 
     const q = query(
       collection(this.db, environment.collection.users).withConverter(
-        this.userConverter
+        this.userConverter,
       ),
-      where('id', '==', userId)
+      where('id', '==', userId),
     );
 
     const querySnap = await getDocs(q);
@@ -415,7 +438,7 @@ export class UserRepositoryService {
 
     const playlist = playlists[playlistIndex];
     const updatedSongs = (playlist.songs || []).filter(
-      (s) => s.idSong !== songId
+      (s) => s.idSong !== songId,
     );
 
     const updatedPlaylist: IPlaylistRaw = {
@@ -429,7 +452,7 @@ export class UserRepositoryService {
     await updateDoc(docRef, { playlists: updatedPlaylists });
 
     console.log(
-      `🗑️ [removeSongFromPlaylist] Song ${songId} removed from playlist ${playlistId}`
+      `🗑️ [removeSongFromPlaylist] Song ${songId} removed from playlist ${playlistId}`,
     );
     return updatedPlaylist;
   }
@@ -438,7 +461,7 @@ export class UserRepositoryService {
   async deleteUserByField(fieldName: string, value: string): Promise<void> {
     const q = query(
       collection(this.db, environment.collection.users),
-      where(fieldName, '==', value)
+      where(fieldName, '==', value),
     );
 
     const querySnap = await getDocs(q);
@@ -453,7 +476,7 @@ export class UserRepositoryService {
     }
 
     console.log(
-      `✅ Success: User(s) with ${fieldName}=${value} deleted from ${environment.collection.users} collection.`
+      `✅ Success: User(s) with ${fieldName}=${value} deleted from ${environment.collection.users} collection.`,
     );
   }
 

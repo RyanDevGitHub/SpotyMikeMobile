@@ -8,6 +8,12 @@ import {
   IonRow,
   ModalController,
   createAnimation,
+  IonToolbar,
+  IonHeader,
+  IonContent,
+  IonTitle,
+  IonButtons,
+  IonMenuButton,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { flashOutline, searchOutline } from 'ionicons/icons';
@@ -19,16 +25,27 @@ import { Router } from '@angular/router';
   templateUrl: './search-bar.component.html',
   standalone: true,
   styleUrls: ['./search-bar.component.scss'],
-  imports: [IonGrid, IonRow, IonCol, IonButton, IonIcon],
+  imports: [
+    IonButtons,
+    IonTitle,
+    IonContent,
+    IonHeader,
+    IonToolbar,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonButton,
+    IonIcon,
+    IonMenuButton,
+  ],
 })
-export class SearchBarComponent implements OnInit {
+export class SearchBarComponent {
   constructor(private animationCtrl: AnimationController) {
     addIcons({ flashOutline, searchOutline });
   }
 
   private modalCtl = inject(ModalController);
   private router = inject(Router);
-  ngOnInit() {}
 
   async openQuickMenu() {
     const modal = await this.modalCtl.create({

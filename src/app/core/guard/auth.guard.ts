@@ -12,7 +12,9 @@ export const authGuard: CanActivateFn = (route, state) => {
   const store = inject(Store<AppState>);
 
   return (async () => {
-    const selectorToken = await firstValueFrom(store.select(selectAuthToken).pipe(take(1)));
+    const selectorToken = await firstValueFrom(
+      store.select(selectAuthToken).pipe(take(1)),
+    );
     if (selectorToken) {
       return true;
     }

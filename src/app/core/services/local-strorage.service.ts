@@ -6,7 +6,9 @@ interface ICache {
 }
 type serializable = object | Object;
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class LocalStorageService {
   private cache: ICache;
 

@@ -9,8 +9,8 @@ describe('MinimizePlayerAudioComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MinimizePlayerAudioComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [MinimizePlayerAudioComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MinimizePlayerAudioComponent);

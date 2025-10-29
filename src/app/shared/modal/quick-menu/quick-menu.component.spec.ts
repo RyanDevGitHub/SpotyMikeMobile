@@ -9,8 +9,8 @@ describe('QuickMenuComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ QuickMenuComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [QuickMenuComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(QuickMenuComponent);
