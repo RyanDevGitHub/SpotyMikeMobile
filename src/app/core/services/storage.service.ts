@@ -1,15 +1,14 @@
-import { Storage } from './../../../../node_modules/@angular/fire/storage/storage.d';
-import { Injectable } from '@angular/core';
-
+import { inject, Injectable } from '@angular/core';
 // IMPORTS MODERNES
 import {
-  ref,
-  uploadBytesResumable,
   getDownloadURL,
+  ref,
   StorageReference,
+  uploadBytesResumable,
 } from 'firebase/storage';
-import { inject } from '@angular/core';
-import { finalize, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
+
+import { Storage } from './../../../../node_modules/@angular/fire/storage/storage.d';
 
 @Injectable({
   providedIn: 'root',

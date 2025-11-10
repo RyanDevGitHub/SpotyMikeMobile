@@ -1,29 +1,29 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
+  IonAvatar,
+  IonBackButton,
+  IonButton,
+  IonButtons,
+  IonCol,
   IonContent,
+  IonGrid,
   IonHeader,
+  IonIcon,
+  IonImg,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonModal,
+  IonRow,
+  IonText,
   IonTitle,
   IonToolbar,
-  IonButtons,
-  IonBackButton,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonIcon,
-  IonText,
-  IonModal,
-  IonButton,
-  IonList,
-  IonItem,
-  IonAvatar,
-  IonImg,
-  IonLabel,
 } from '@ionic/angular/standalone';
-import { HeaderSettingComponent } from 'src/app/shared/components/headers/header-setting/header-setting.component';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
+import { HeaderSettingComponent } from 'src/app/shared/components/headers/header-setting/header-setting.component';
 
 @Component({
   selector: 'app-languages',

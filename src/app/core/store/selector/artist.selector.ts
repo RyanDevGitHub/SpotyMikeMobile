@@ -1,33 +1,35 @@
-import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { ArtistsState } from '../reducer/artist.reducer';
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+
 import { IArtistInfo } from '../../interfaces/artist';
+import { ArtistsState } from '../reducer/artist.reducer';
+import { selectAllSongs } from './song.selector';
 
 export const selectArtistsState =
   createFeatureSelector<ArtistsState>('artists');
 
 export const selectAllArtists = createSelector(
   selectArtistsState,
-  (state) => state.artists,
+  (state) => state.artists
 );
 
 export const selectArtistById = (id: string) =>
   createSelector(selectArtistsState, (state) =>
-    state.artists.find((artist) => artist.id === id),
+    state.artists.find((artist) => artist.id === id)
   );
 
 export const selectArtistsLoading = createSelector(
   selectArtistsState,
-  (state) => state.loading,
+  (state) => state.loading
 );
 
 export const selectArtistsLoaded = createSelector(
   selectArtistsState,
-  (state) => state.loaded,
+  (state) => state.loaded
 );
 
 export const selectArtistsError = createSelector(
   selectArtistsState,
-  (state) => state.error,
+  (state) => state.error
 );
 
 export const selectAllArtistInfos = createSelector(
@@ -42,5 +44,10 @@ export const selectAllArtistInfos = createSelector(
     }));
     console.log('[Selector] All ArtistInfos:', infos); // <-- log pour vérifier
     return infos;
-  },
+  }
 );
+
+export const selectSongsByArtistId = (artistId: string) =>
+  createSelector(selectAllSongs, (songs) => {
+    return songs.filter((song) => song.artistId === artistId);
+  });

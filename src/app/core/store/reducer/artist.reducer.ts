@@ -1,9 +1,10 @@
-import { IArtist } from '../../interfaces/user';
 import { createReducer, on } from '@ngrx/store';
+
+import { IArtist } from '../../interfaces/user';
 import {
   loadArtists,
-  loadArtistsSuccess,
   loadArtistsFailure,
+  loadArtistsSuccess,
 } from '../action/artist.action';
 
 export interface ArtistsState {

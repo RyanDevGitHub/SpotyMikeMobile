@@ -1,17 +1,15 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { AppState } from '@capacitor/app';
 import {
   IonAvatar,
-  IonText,
   IonCol,
   IonGrid,
   IonRow,
+  IonText,
 } from '@ionic/angular/standalone';
 import { Store } from '@ngrx/store';
-import { filter, Observable, take } from 'rxjs';
-import { IUser } from 'src/app/core/interfaces/user';
 import { selectUser } from 'src/app/core/store/selector/user.selector';
-import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-profile-item',

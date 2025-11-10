@@ -1,6 +1,5 @@
-import { IAlbum, IAlbumInfo } from './album';
+import { IAlbumInfo } from './album';
 import { IArtistInfo } from './artist';
-import { IArtist, IUser } from './user';
 
 export interface ISong {
   cover: string;
@@ -35,6 +34,7 @@ export enum PlaybackMode {
   Default = 'default',
   Shuffle = 'shuffle',
   Loop = 'loop',
+  LoopOne = 'loop-one',
 }
 
 export enum SongGenre {

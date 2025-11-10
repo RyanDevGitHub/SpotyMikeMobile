@@ -1,18 +1,11 @@
-import {
-  EntityState,
-  EntityAdapter,
-  createEntityAdapter,
-  Dictionary,
-} from '@ngrx/entity';
-
 import { createReducer, on } from '@ngrx/store';
-import * as ActionSOngs from '../action/song.action';
+
+import { IToken, IUser } from '../../interfaces/user';
 import * as ActionUser from '../action/user.action';
-import { ERoleUser, IUser } from '../../interfaces/user';
 
 export interface UserState {
   user: IUser | null; // Un seul utilisateur
-  token: string | null; // Le token d'authentification
+  token: string | null | IToken; // Le token d'authentification
   loading: boolean; // Indique si un chargement est en cours
   error: string | null; // Stocke les erreurs
 }
@@ -22,6 +15,24 @@ export const initialState: UserState = {
   token: null,
   loading: false,
   error: null,
+};
+const normalizeError = (error: unknown): string => {
+  if (typeof error === 'string') {
+    return error;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (
+    error &&
+    typeof error === 'object' &&
+    'message' in error &&
+    typeof error.message === 'string'
+  ) {
+    return error.message;
+  }
+  // Fallback si l'erreur est un objet non conventionnel
+  return 'Une erreur inconnue est survenue.';
 };
 
 export const userReducer = createReducer(
@@ -113,7 +124,7 @@ export const userReducer = createReducer(
   on(ActionUser.loginSuccess, (state, { user, token }) => ({
     ...state,
     user,
-    token: user?.id ?? null,
+    token: token ?? null,
     loading: false,
     error: null,
   })),
@@ -196,6 +207,6 @@ export const userReducer = createReducer(
   on(ActionUser.removeSongFromPlaylistFailure, (state, { error }) => ({
     ...state,
     loading: false,
-    error,
+    error: normalizeError(error),
   })),
 );

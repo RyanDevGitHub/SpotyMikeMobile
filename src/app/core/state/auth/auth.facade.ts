@@ -1,11 +1,11 @@
-import { selectUser } from 'src/app/core/store/selector/user.selector';
 // core/state/auth/auth.facade.ts
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+
+import { IUser } from '../../interfaces/user';
 import * as UserActions from '../../store/action/user.action';
 import * as UserSelectors from '../../store/selector/user.selector';
-import { IUser } from '../../interfaces/user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthFacade {

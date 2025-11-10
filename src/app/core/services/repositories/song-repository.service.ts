@@ -1,23 +1,23 @@
-import { UserRepositoryService } from './user-repository.service';
-import { loadSongsFromAlbums } from '../../store/action/song.action';
 import { inject, Injectable } from '@angular/core';
+import { AppState } from '@capacitor/app';
+import { Store } from '@ngrx/store';
 import { initializeApp } from 'firebase/app';
 import {
-  getFirestore,
+  addDoc,
   collection,
-  getDocs,
   doc,
   getDoc,
-  addDoc,
+  getDocs,
+  getFirestore,
   updateDoc,
 } from 'firebase/firestore';
-
 import { environment } from 'src/environments/environment';
-import { ISong } from '../../interfaces/song';
-import { IAlbum } from '../../interfaces/album';
 import { v4 as uuidv4 } from 'uuid';
-import { Store } from '@ngrx/store';
-import { AppState } from '@capacitor/app';
+
+import { IArtistInfo } from '../../interfaces/artist';
+import { ISong } from '../../interfaces/song';
+import { loadSongsFromAlbums } from '../../store/action/song.action';
+import { UserRepositoryService } from './user-repository.service';
 
 @Injectable({
   providedIn: 'root',
@@ -56,10 +56,11 @@ export class SongRepositoryService {
     // Ajouter artistInfo
     const songsWithArtistInfo = await Promise.all(
       songs.map(async (song) => {
-        const artistInfo = await this.userRepositoryService.getUsersByField(
-          'id',
-          song.artistId,
-        );
+        const artistInfo =
+          await this.userRepositoryService.getUsersByField<IArtistInfo>( // 👈 Spécification du type T
+            'id',
+            song.artistId,
+          );
         return { ...song, artistInfo };
       }),
     );
@@ -162,7 +163,7 @@ export class SongRepositoryService {
 
       const albumData = albumSnap.data();
       const songs = albumData['songs'] || [];
-      const songIndex = songs.findIndex((s: any) => s.id === songId);
+      const songIndex = songs.findIndex((s: ISong) => s.id === songId);
       if (songIndex === -1) {
         console.warn(`⚠️ Chanson ${songId} introuvable dans l'album`);
         return;

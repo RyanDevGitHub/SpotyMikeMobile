@@ -1,4 +1,4 @@
-export interface Isetting {
+export interface ISetting {
   name: string;
   redirect: string;
 }

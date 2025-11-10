@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IFavorite } from '../interfaces/favorites';
-import { IAlbum } from '../interfaces/album';
+import { Store } from '@ngrx/store';
 import {
   BehaviorSubject,
   combineLatest,
@@ -11,12 +10,12 @@ import {
   switchMap,
   take,
 } from 'rxjs';
-import { ISong } from '../interfaces/song';
-import { UserRepositoryService } from './repositories/user-repository.service';
-import { Store } from '@ngrx/store';
 
+import { IAlbum } from '../interfaces/album';
+import { ISong } from '../interfaces/song';
 import { selectAllAlbums } from '../store/selector/album.selector';
 import { selectAllSongs } from '../store/selector/song.selector';
+import { UserRepositoryService } from './repositories/user-repository.service';
 
 @Injectable({ providedIn: 'root' })
 export class FavoritesService {

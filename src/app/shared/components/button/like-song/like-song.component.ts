@@ -1,38 +1,23 @@
-import { addIcons } from 'ionicons';
-import {
-  Component,
-  ElementRef,
-  inject,
-  Input,
-  OnInit,
-  Renderer2,
-} from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
-import { heart, heartOutline } from 'ionicons/icons';
-
-import { IFavorite } from 'src/app/core/interfaces/favorites';
-import { ISong } from 'src/app/core/interfaces/song';
-import { AppState } from '@capacitor/app';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Store } from '@ngrx/store';
-import {
-  isFavoriteSong,
-  selectAllFavorites,
-  selectFavoriteSongs,
-} from 'src/app/core/store/selector/favorites.selector';
+import { addIcons } from 'ionicons';
+import { heart, heartOutline } from 'ionicons/icons';
+import { IAlbum } from 'src/app/core/interfaces/album';
+import { ISong } from 'src/app/core/interfaces/song';
+import { IUser } from 'src/app/core/interfaces/user';
+import { FavoritesService } from 'src/app/core/services/favoris.service';
 import {
   addFavoriteAlbum,
   addFavoriteSong,
   removeFavoriteAlbum,
   removeFavoriteSong,
 } from 'src/app/core/store/action/favorites.actions';
-import { selectAllSongs } from 'src/app/core/store/selector/song.selector';
-import { Observable, take } from 'rxjs';
-import { IUser } from 'src/app/core/interfaces/user';
-import { selectUser } from 'src/app/core/store/selector/user.selector';
-import { IAlbum } from 'src/app/core/interfaces/album';
+import { AppState } from 'src/app/core/store/app.state';
 import { selectAllAlbums } from 'src/app/core/store/selector/album.selector';
-import { FavoritesService } from 'src/app/core/services/favoris.service';
+import { selectAllFavorites } from 'src/app/core/store/selector/favorites.selector';
+import { selectAllSongs } from 'src/app/core/store/selector/song.selector';
+import { selectUser } from 'src/app/core/store/selector/user.selector';
 
 @Component({
   selector: 'app-like-song',
@@ -55,7 +40,7 @@ export class LikeSongComponent implements OnInit {
   private user: IUser | null = null;
 
   constructor(
-    private store: Store<any>,
+    private store: Store<AppState>,
     private storeUser: Store<IUser[]>,
     private favorisService: FavoritesService,
   ) {}

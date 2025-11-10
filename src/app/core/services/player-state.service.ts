@@ -1,7 +1,7 @@
-import { MinimizePlayerAudioComponent } from './../../shared/components/playerComponents/minimize-player-audio/minimize-player-audio.component';
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { ISong } from 'src/app/core/interfaces/song';
+
 import { MusicServiceService } from './music-service.service';
 
 // @Injectable({ providedIn: 'root' })

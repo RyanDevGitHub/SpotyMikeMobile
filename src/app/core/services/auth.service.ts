@@ -1,36 +1,23 @@
-import { inject, Injectable } from '@angular/core'; // Retrait de Inject et InjectionToken
-import { EAuthPage } from '../models/refData';
 import { HttpClient } from '@angular/common/http';
-import {
-  catchError,
-  defer,
-  EMPTY,
-  from,
-  map,
-  Observable,
-  of,
-  switchMap,
-} from 'rxjs';
-import { LoginRequestError, LoginRequestSuccess } from '../interfaces/login';
-import { UserRepositoryService } from './repositories/user-repository.service';
-import { IToken } from '../interfaces/user';
-// Import du jeton d'injection depuis le fichier dédié
-import { FirebaseAuthToken } from './firebase-auth.token';
-
+import { inject, Injectable } from '@angular/core'; // Retrait de Inject et InjectionToken
 import {
   Auth,
-  GoogleAuthProvider,
-  signInWithCredential,
-  UserCredential,
-  signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  getAuth,
+  onAuthStateChanged,
+  signInWithCustomToken,
+  signInWithEmailAndPassword,
   signOut,
+  User,
 } from 'firebase/auth';
-import { SocialLogin } from '@capgo/capacitor-social-login';
-import { getAuth } from '@angular/fire/auth';
+// Import du jeton d'injection depuis le fichier dédié
+import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import { from, Observable, of } from 'rxjs';
+
+import { IUserDataBase } from '../interfaces/user';
+import { EAuthPage } from '../models/refData';
+import { FirebaseAuthToken } from './firebase-auth.token';
+import { UserRepositoryService } from './repositories/user-repository.service';
 
 @Injectable({
   providedIn: 'root',
@@ -40,16 +27,53 @@ export class AuthService {
   WEB_CLIENT_ID =
     '823395277840-be9l5id933b1rk6e12dnoj9p9n92v2n4.apps.googleusercontent.com'; // Injection via le jeton explicite qui est configuré dans main.ts
   private auth: Auth = inject(FirebaseAuthToken);
-
+  public user$: Observable<User | null>;
+  public authState$ = new Observable<User | null>((subscriber) => {
+    onAuthStateChanged(this.auth, subscriber);
+  });
   constructor(
     private http: HttpClient,
-    private userService: UserRepositoryService,
+    private userService: UserRepositoryService
   ) {
-    // this.checkRedirectStatus();
+    this.user$ = new Observable<User | null>((subscriber) => {
+      // Firebase lit la session du Local Storage et vérifie si le token est valide.
+      // S'il est expiré, il utilise le Refresh Token (invisible) pour en obtenir un nouveau.
+      onAuthStateChanged(this.auth, (user) => {
+        subscriber.next(user);
+      });
+    });
   }
 
+  getToken(forceRefresh: boolean = false): Observable<string | null> {
+    const auth = getAuth(); // Obtenez l'instance Auth
+    const user = auth.currentUser;
+
+    if (!user) {
+      // Retourne un Observable de null si l'utilisateur n'est pas connecté
+      return of(null);
+    }
+
+    // Convertit la Promise de getIdToken en Observable
+    return from(user.getIdToken(forceRefresh));
+  }
   getPageAuth() {
     return of(EAuthPage.Login);
+  }
+
+  getUserData(uid: string): Observable<IUserDataBase> {
+    console.log('[Auth] Fetching Firestore user document for uid:', uid);
+
+    const userDocRef = doc(getFirestore(), 'Users', uid);
+
+    const docPromise = getDoc(userDocRef).then((docSnapshot) => {
+      if (docSnapshot.exists()) {
+        console.log('[Auth] Firestore document found:', docSnapshot.data());
+        return docSnapshot.data() as IUserDataBase;
+      }
+      throw new Error('User document not found in Firestore.');
+    });
+
+    return from(docPromise);
   }
 
   // Créez une nouvelle méthode pour encapsuler l'abonnement
@@ -78,9 +102,25 @@ export class AuthService {
     const userCredential = await signInWithEmailAndPassword(
       this.auth,
       email,
-      password,
+      password
     );
     return userCredential.user?.getIdToken() ?? '';
+  }
+
+  signInWithStoredToken(jwtToken: string): Observable<User> {
+    console.log('[Auth] Signing in with stored token:', jwtToken);
+
+    const signInPromise = signInWithCustomToken(this.auth, jwtToken).then(
+      (userCredential) => {
+        console.log(
+          '[Auth] Firebase signIn success, user:',
+          userCredential.user
+        );
+        return userCredential.user;
+      }
+    );
+
+    return from(signInPromise);
   }
 
   // signInWithGoogle(
@@ -219,12 +259,12 @@ export class AuthService {
     const userCredential = await createUserWithEmailAndPassword(
       this.auth,
       email,
-      password,
+      password
     );
     return userCredential.user?.getIdToken() ?? '';
   }
 
-  async verifyToken(idToken: string): Promise<Observable<Object>> {
+  async verifyToken(idToken: string): Promise<Observable<object>> {
     return await this.http.post(`http://localhost:3000/verify-token`, {
       idToken,
     });

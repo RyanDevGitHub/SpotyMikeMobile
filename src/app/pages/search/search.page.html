@@ -24,12 +24,15 @@
           | async); track $index) {
           <ion-row>
             <ion-col size="12"
-              ><app-music-container [song]="song"></app-music-container>
+              ><app-music-container
+                [openWith]="playContext"
+                [song]="song"
+              ></app-music-container>
             </ion-col>
           </ion-row>
 
-          } } @if (listPlaylistes.length > 0) { @for (playlist of
-          listPlaylistes; track playlist) {
+          } } @if (listPlaylists.length > 0) { @for (playlist of
+          listPlaylists; track playlist) {
           <ion-row>
             <ion-col size="12"
               ><app-playlist-container
@@ -40,12 +43,12 @@
               ></app-playlist-container
             ></ion-col>
           </ion-row>
-          } }@if (listPlaylistes.length === 0 && (songs$|async)?.length === 0 &&
+          } }@if (listPlaylists.length === 0 && (songs$|async)?.length === 0 &&
           artistLists.length === 0){
           <ion-row class="empty-result">
             <ion-col size="12">
               <ion-text class="ion-text-center">
-                <h1>Ecoutez la musique que vous aimez</h1>
+                <h1>Écoutez la musique que vous aimez</h1>
                 <h4>Artistes,titres,playlist et bien plus encore</h4>
               </ion-text></ion-col
             >

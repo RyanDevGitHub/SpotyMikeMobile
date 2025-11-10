@@ -1,15 +1,18 @@
+import { Component, inject, OnInit } from '@angular/core';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
+import { SocialLogin } from '@capgo/capacitor-social-login';
+import { IonApp, IonRouterOutlet, Platform } from '@ionic/angular/standalone'; // <-- Importez Platform et ses composants standalone
+import { Store, StoreModule } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
+import { environment } from 'src/environments/environment';
+
 import { AuthService } from './core/services/auth.service';
 import { MusicServiceService } from './core/services/music-service.service';
+import { initializeAuth } from './core/store/action/user.action';
+import { AppState } from './core/store/app.state';
 import { musicReducer } from './core/store/reducer/song.reducer';
-import { Component, OnInit, inject } from '@angular/core';
-import { IonApp, IonRouterOutlet, Platform } from '@ionic/angular/standalone'; // <-- Importez Platform et ses composants standalone
-import { TranslateService } from '@ngx-translate/core';
-import { StoreModule } from '@ngrx/store';
-import { SocialLogin } from '@capgo/capacitor-social-login';
-import { environment } from 'src/environments/environment';
-import { StatusBar, Style } from '@capacitor/status-bar';
-import { Capacitor } from '@capacitor/core';
-import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 
 @Component({
   selector: 'app-root',
@@ -19,11 +22,12 @@ import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 })
 export class AppComponent implements OnInit {
   private translate = inject(TranslateService);
+  store = inject(Store<AppState>);
   // Injectez Platform ici
   constructor(
     private audioService: MusicServiceService,
     private platform: Platform, // <-- Ajout de l'injection de Platform
-    private authService: AuthService,
+    private authService: AuthService
   ) {}
 
   // Logique déplacée/modifiée
@@ -46,13 +50,13 @@ export class AppComponent implements OnInit {
   async logStatusBarInfo() {
     try {
       // 1. Utilisez 'await' pour attendre que la Promise se résolve.
-      const info = await StatusBar.getInfo();
+      // const info = await StatusBar.getInfo();
       await StatusBar.setBackgroundColor({ color: '#000000' });
       await StatusBar.setStyle({ style: Style.Light });
       await EdgeToEdge.enable();
       // 2. Maintenant, 'info' est de type StatusBarInfo (et non une Promise).
       console.log('Informations de la Status Bar :');
-      console.log(info);
+      // console.log(info);
 
       // Vous pouvez accéder à ses propriétés :
       // console.log("Hauteur de la Status Bar:", info.height);
@@ -61,24 +65,24 @@ export class AppComponent implements OnInit {
     }
   }
   ngOnInit(): void {
-    // Les traductions et autres initialisations non dépendantes de la plateforme native restent ici
+    console.log('[App] ngOnInit triggered');
     this.translate.use('fr_FR');
     this.translate.setDefaultLang('fr_FR');
     this.initializeSocialLogin();
+
     this.platform.ready().then(() => {
+      console.log('[App] Platform ready');
+
       if (Capacitor.isPluginAvailable('StatusBar')) {
         this.setStatusBarStyleDark();
         this.logStatusBarInfo();
-        // Demande au WebView de ne PAS chevaucher la barre de statut.
-        // Cela force le contenu de l'application à s'afficher en dessous de la barre de statut.
-        // StatusBar.setOverlaysWebView({ overlay: false });
-        // StatusBar.setStyle({ style: Style.Dark });
-
-        // Optionnel : vous pouvez aussi définir le style de la barre de statut
-        // StatusBar.setStyle({ style: Style.Default });
       }
     });
-    // Si StoreModule n'est pas déjà configuré via app.config.ts ou ailleurs, vous pouvez le laisser ici
+
+    console.log('[App] Dispatching initializeAuth');
+    this.store.dispatch(initializeAuth());
+
+    console.log('[App] StoreModule configuration (if needed)');
     StoreModule.forRoot({ music: musicReducer });
   }
 }

@@ -1,8 +1,5 @@
-import { AuthService } from './auth.service';
-import { IToken, IUserDataBase } from './../interfaces/user';
-import { Firebase } from './firebase.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { FirebaseError } from 'firebase/app';
 import {
   catchError,
   from,
@@ -12,9 +9,11 @@ import {
   switchMap,
   throwError,
 } from 'rxjs';
-import { environment } from 'src/environments/environment';
+
 import { LoginRequestError, LoginRequestSuccess } from '../interfaces/login';
-import { FirebaseError } from 'firebase/app';
+import { IToken, IUserDataBase } from './../interfaces/user';
+import { AuthService } from './auth.service';
+import { Firebase } from './firebase.service';
 import { UserRepositoryService } from './repositories/user-repository.service';
 
 @Injectable({
@@ -33,11 +32,12 @@ export class AuthentificationService {
 
   login(
     email: string,
-    password: string,
+    password: string
   ): Observable<LoginRequestSuccess | LoginRequestError> {
     console.log(`LOGIN: Tentative de connexion pour l'email: ${email}`);
     return this.firestore.getDocumentByField('Users', 'email', email).pipe(
-      switchMap((user) => {
+      switchMap((data) => {
+        const user = data as IUserDataBase;
         // Utilisateur non trouvé
         if (!user) {
           console.warn(`LOGIN: Échec - Utilisateur non trouvé pour ${email}`);
@@ -46,16 +46,20 @@ export class AuthentificationService {
 
         if (user.password !== password) {
           console.warn(`LOGIN: Échec - Mauvais mot de passe pour ${email}`);
+          console.warn(user.password);
+          console.warn(
+            `LOGIN: Échec - Mot de passe fourni: ${password} mot de passe attendu: ${user.password}`
+          );
           return of({ message: 'Invalid credentials' } as LoginRequestError);
         }
 
         console.log(
-          'LOGIN: Utilisateur trouvé. Tentative de signIn Firebase...',
+          'LOGIN: Utilisateur trouvé. Tentative de signIn Firebase...'
         ); // Login correct → convertir Promise signIn en Observable
         return from(this.auth.signIn(email, password)).pipe(
           switchMap((myToken) => {
             console.log(
-              'LOGIN: signIn Firebase réussi. Tentative de vérifier le token...',
+              'LOGIN: signIn Firebase réussi. Tentative de vérifier le token...'
             );
             return from(this.auth.verifyToken(myToken)).pipe(
               map((myVerifyToken) => {
@@ -68,18 +72,18 @@ export class AuthentificationService {
                   token: this.token,
                   user: user,
                 } as LoginRequestSuccess;
-              }),
+              })
             );
-          }),
+          })
         );
       }),
       catchError((error) => {
         console.error(
           'LOGIN: ERREUR CRITIQUE DANS LE FLUX DE CONNEXION:',
-          error,
+          error
         ); // Timeout ou autre erreur réseau
         return throwError(() => new Error('NETWORK_ERROR'));
-      }),
+      })
     );
   }
 
@@ -129,7 +133,7 @@ export class AuthentificationService {
         user.id = userCredential;
         if (user.artiste?.firstName) user.artiste.id = userCredential;
         console.log(
-          "REGISTER: Création de l'utilisateur dans la base de données...",
+          "REGISTER: Création de l'utilisateur dans la base de données..."
         );
         this.userRepository.createUser(user);
       })
@@ -137,12 +141,12 @@ export class AuthentificationService {
         console.error('REGISTER: Erreur Firebase capturée.');
         if (error.code === 'auth/email-already-in-use') {
           console.error(
-            "REGISTER: L'adresse email est déjà utilisée par un autre compte.",
+            "REGISTER: L'adresse email est déjà utilisée par un autre compte."
           );
         } else {
           console.error(
             "REGISTER: Erreur d'inscription détaillée:",
-            error.message,
+            error.message
           );
         }
       });

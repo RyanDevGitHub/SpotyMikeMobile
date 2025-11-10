@@ -1,52 +1,27 @@
-import { IonIcon, IonText } from '@ionic/angular/standalone';
-import { Component, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import {
-  IonAvatar,
-  IonButton,
-  IonButtons,
   IonCol,
-  IonContent,
   IonGrid,
-  IonHeader,
-  IonInput,
-  IonItem,
-  IonModal,
+  IonIcon,
   IonRow,
-  IonTitle,
-  IonToolbar,
+  IonText,
 } from '@ionic/angular/standalone';
-import { IFilter } from 'src/app/core/interfaces/filter';
+import { Store } from '@ngrx/store';
 import { addIcons } from 'ionicons';
 import { checkmarkDoneOutline } from 'ionicons/icons';
+import { IFilter } from 'src/app/core/interfaces/filter';
 import { ISong } from 'src/app/core/interfaces/song';
-import { EventEmitter } from '@angular/core';
-import { Store } from '@ngrx/store';
-import * as SortActions from '../../../core/store/action/sort.action';
-import { selectSortState } from 'src/app/core/store/selector/sort.selectors';
 import { IPageType } from 'src/app/core/interfaces/types';
+import { selectSortState } from 'src/app/core/store/selector/sort.selectors';
+
+import * as SortActions from '../../../core/store/action/sort.action';
 
 @Component({
   selector: 'app-filter-modal',
   templateUrl: './filter-modal.component.html',
   styleUrls: ['./filter-modal.component.scss'],
   standalone: true,
-  imports: [
-    IonModal,
-    IonGrid,
-    IonCol,
-    IonRow,
-    IonAvatar,
-    IonContent,
-    IonTitle,
-    IonButtons,
-    IonToolbar,
-    IonButton,
-    IonHeader,
-    IonItem,
-    IonInput,
-    IonText,
-    IonIcon,
-  ],
+  imports: [IonGrid, IonCol, IonRow, IonText, IonIcon],
 })
 export class FilterModalComponent implements OnInit {
   @Input() songs: ISong[] = []; // Les chansons à trier // Page sur laquelle appliquer le tri
@@ -85,13 +60,13 @@ export class FilterModalComponent implements OnInit {
     this.filters[filterIndex].activate = true;
 
     // Mapping pour transformer le nom affiché en clé du store
-    const mapping: Record<string, SortActions.SortKey> = {
-      Titre: 'title',
-      Artist: 'artist',
-      Album: 'album',
-    };
+    // const mapping: Record<string, SortActions.SortKey> = {
+    //   Titre: 'title',
+    //   Artist: 'artist',
+    //   Album: 'album',
+    // };
 
-    const key = mapping[this.filters[filterIndex].name] || 'title';
+    // const key = mapping[this.filters[filterIndex].name] || 'title';
     console.log('🚀 Dispatch de l’action SortActions.changeSort', {
       page: this.page,
       criterion: this.filters[filterIndex].name,

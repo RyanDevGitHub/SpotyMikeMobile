@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { EditProfilPage } from './edit-profile.page';
 
 describe('EditProfilPage', () => {

@@ -1,21 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import {
+  AbstractControl,
   FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Camera, CameraResultType } from '@capacitor/camera';
 import {
-  IonAvatar,
   IonButton,
   IonCol,
   IonContent,
   IonGrid,
-  IonHeader,
   IonImg,
   IonInput,
   IonItem,
@@ -24,13 +24,12 @@ import {
   IonSelect,
   IonSelectOption,
   IonText,
-  IonTitle,
   IonToggle,
-  IonToolbar,
 } from '@ionic/angular/standalone';
-import { LocalStorageService } from 'src/app/core/services/local-strorage.service';
+import { LocalStorageService } from 'src/app/core/services/local-storage.service';
 import { BackButtonComponent } from 'src/app/shared/components/button/back-button/back-button.component';
-import { ERoleUser, IUserDataBase } from './../../core/interfaces/user';
+
+import { ERoleUser, ICover, IUserDataBase } from './../../core/interfaces/user';
 import { AuthentificationService } from './../../core/services/authentification.service';
 
 @Component({
@@ -44,9 +43,6 @@ import { AuthentificationService } from './../../core/services/authentification.
     IonRow,
     IonGrid,
     IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
     CommonModule,
     FormsModule,
     IonList,
@@ -59,7 +55,6 @@ import { AuthentificationService } from './../../core/services/authentification.
     IonToggle,
     IonSelect,
     IonSelectOption,
-    IonAvatar,
     IonImg,
   ],
 })
@@ -71,7 +66,7 @@ export class RegisterPage implements OnInit {
   step: number;
   form: FormGroup;
   public checkedToggle: boolean = false;
-  avatar: any = {
+  avatar: ICover = {
     src: 'https://ionicframework.com/docs/img/demos/avatar.svg',
   };
   user: IUserDataBase = {
@@ -94,7 +89,7 @@ export class RegisterPage implements OnInit {
       subscribers: [''],
     },
     playlists: [],
-    lastsplayeds: [],
+    lastsPlayed: [],
     created_at: '',
   };
   input = [
@@ -274,8 +269,9 @@ export class RegisterPage implements OnInit {
 
     return true;
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleChange(e: any) {
+    console.log('Selected value:', e.detail.value);
     // this.getFormControl(this.input[this.step].formeControlName)?.setValue(
     //   e.detail.value
     // );
@@ -312,6 +308,7 @@ export class RegisterPage implements OnInit {
       const value: string = this.form.get(
         this.input[this.step].formeControlName
       )?.value;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       this.user[userProperty] = value as any;
       console.log(this.user[userProperty]);
       console.log(this.user);
@@ -348,15 +345,16 @@ export class RegisterPage implements OnInit {
 
   minimumAgeValidator(minAge: number) {
     return (
-      control: import('@angular/forms').AbstractControl
-    ): { [key: string]: any } | null => {
+      control: AbstractControl // Simplification de l'import Angular
+      // ✅ CORRECTION : Utilisation de ValidationErrors (le type standard d'Angular) ou votre interface
+    ): ValidationErrors | null => {
       if (control.value) {
         const today = new Date();
+        // Le type de la valeur doit être converti en Date (ou géré via une garde de type)
         const birthDate = new Date(control.value);
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDiff = today.getMonth() - birthDate.getMonth();
 
-        // Si le mois de naissance est plus tard dans l'année que le mois actuel, nous devons diminuer l'âge de 1.
         if (
           monthDiff < 0 ||
           (monthDiff === 0 && today.getDate() < birthDate.getDate())
@@ -365,10 +363,17 @@ export class RegisterPage implements OnInit {
         }
 
         if (age < minAge) {
-          return { minimumAge: { requiredAge: minAge, actualAge: age } };
+          // Le type de retour doit correspondre à ValidationErrors (qui accepte [key: string]: any)
+          // Mais nous retournons un objet dont la structure est connue.
+          return {
+            minimumAge: { requiredAge: minAge, actualAge: age },
+          } as ValidationErrors;
         }
+
         if (age > 100) {
-          return { maximumAge: { requiredAge: 100, actualAge: age } };
+          return {
+            maximumAge: { requiredAge: 100, actualAge: age },
+          } as ValidationErrors;
         }
       }
       return null;
@@ -386,13 +391,18 @@ export class RegisterPage implements OnInit {
     // You can access the original file using image.path, which can be
     // passed to the Filesystem API to read the raw data of the image,
     // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
-    var imageUrl = image.webPath;
+    const imageUrl = image.webPath;
 
-    // Can be set to the src of an image now
-    this.avatar.src = imageUrl;
+    if (imageUrl) {
+      // Dans ce bloc, TypeScript sait que imageUrl est de type 'string'
+      if (this.avatar.src) {
+        this.avatar.src = imageUrl;
+      }
+    }
   }
 
   registerUser(data: IUserDataBase) {
+    console.log('Registering user with data:', data);
     //ajouter la date de creation du user
     const dateNow = new Date();
     this.user.created_at = dateNow.toDateString();

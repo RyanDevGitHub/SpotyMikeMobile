@@ -1,26 +1,27 @@
-import { Component, inject, Input, OnInit, OnDestroy } from '@angular/core';
-import { HeaderSettingComponent } from 'src/app/shared/components/headers/header-setting/header-setting.component';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { AppState } from '@capacitor/app';
 import {
-  IonCol,
-  IonGrid,
-  IonRow,
-  IonContent,
-  IonList,
   InfiniteScrollCustomEvent,
   IonButton,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonList,
+  IonRow,
   ModalController,
-  IonButtons,
 } from '@ionic/angular/standalone';
-import { HeaderCategoryComponent } from '../../shared/components/headers/header-category/header-category.component';
-import { SectionWithDropdownComponent } from 'src/app/shared/components/section-with-dropdown/section-with-dropdown.component';
-import { MusicContainerComponent } from 'src/app/shared/components/containers/music-container/music-container.component';
-import { ISong } from 'src/app/core/interfaces/song';
-import { AppState } from '@capacitor/app';
 import { Store } from '@ngrx/store';
-import { debugSelectAllSongs } from 'src/app/core/store/selector/song.selector';
 import { Subject, Subscription, takeUntil } from 'rxjs';
-import { AddSongModalComponent } from 'src/app/shared/modal/add-song-modal/add-song-modal.component';
+import {
+  PlayContext,
+  PlayPageType,
+} from 'src/app/core/interfaces/play-page-type';
+import { ISong } from 'src/app/core/interfaces/song';
 import { ModalStateService } from 'src/app/core/services/modal-state.service';
+import { debugSelectAllSongs } from 'src/app/core/store/selector/song.selector';
+import { MusicContainerComponent } from 'src/app/shared/components/containers/music-container/music-container.component';
+import { HeaderSettingComponent } from 'src/app/shared/components/headers/header-setting/header-setting.component';
+import { AddSongModalComponent } from 'src/app/shared/modal/add-song-modal/add-song-modal.component';
 
 @Component({
   selector: 'app-song-management',
@@ -35,7 +36,6 @@ import { ModalStateService } from 'src/app/core/services/modal-state.service';
     IonGrid,
     IonCol,
     IonRow,
-    HeaderCategoryComponent,
     MusicContainerComponent,
   ],
 })
@@ -45,11 +45,14 @@ export class SongManagementPage implements OnInit, OnDestroy {
   modalStateService = inject(ModalStateService);
   private unsubscribe$ = new Subject<void>();
   public isModalOpen: boolean;
+  public pageType = PlayPageType.Independently;
+  public playContext: PlayContext;
   private modalSubscription: Subscription;
   constructor(private modalController: ModalController) {
     this.modalSubscription = this.modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value),
+      (value) => (this.isModalOpen = value)
     );
+    this.playContext = { type: this.pageType };
   }
 
   ngOnInit() {
@@ -64,12 +67,12 @@ export class SongManagementPage implements OnInit, OnDestroy {
           this.songs = songs;
         },
         error: (err) => {
-          // console.error('[DEBUG] Error in subscription:', err);
+          console.error('[DEBUG] Error in subscription:', err);
         },
       });
   }
 
-  onIonInfinite(ev: any) {
+  onIonInfinite(ev: InfiniteScrollCustomEvent) {
     setTimeout(() => {
       (ev as InfiniteScrollCustomEvent).target.complete();
     }, 5000);

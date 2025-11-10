@@ -1,6 +1,7 @@
+import { createAction, props } from '@ngrx/store';
+
 import { IAlbum } from '../../interfaces/album';
 import { ISong } from '../../interfaces/song';
-import { createAction, props } from '@ngrx/store';
 import { FavoritesState } from '../reducer/favorite.reducer';
 
 // Songs
@@ -38,5 +39,5 @@ export const loadFavoritesSuccess = createAction(
 
 export const loadFavoritesFailure = createAction(
   '[Favorites] Load Favorites Failure',
-  props<{ error: any }>(),
+  props<{ error: unknown }>(),
 );

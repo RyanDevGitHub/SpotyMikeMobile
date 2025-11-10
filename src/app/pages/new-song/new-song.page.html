@@ -5,8 +5,9 @@
 ></app-header-category>
 <ion-content>
   <app-display-item
+    [playContext]="playContext"
     [class.modal-open]="isModalOpen"
-    [playlists]="listPlaylistes"
+    [playlists]="listPlaylists"
     [songList]="songs"
   ></app-display-item>
 </ion-content>

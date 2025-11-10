@@ -1,10 +1,11 @@
 import { createSelector } from '@ngrx/store';
-import { selectAllSongs } from './song.selector';
-import { selectAllAlbums } from './album.selector';
-import { ISong } from '../../interfaces/song';
+
 import { IAlbum } from '../../interfaces/album';
-import { selectAllArtists } from './artist.selector';
+import { ISong } from '../../interfaces/song';
 import { IArtist } from '../../interfaces/user';
+import { selectAllAlbums } from './album.selector';
+import { selectAllArtists } from './artist.selector';
+import { selectAllSongs } from './song.selector';
 
 export const selectSearchResults = (searchTerm: string) =>
   createSelector(

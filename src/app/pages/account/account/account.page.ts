@@ -1,34 +1,27 @@
-import { LocalStorageService } from 'src/app/core/services/local-strorage.service';
-import { ProfilInfoComponent } from '../../../shared/components/profilComponent/profil-info/profil-info.component';
-import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonGrid,
-  IonCol,
-  IonRow,
-  IonAvatar,
-  IonText,
-  IonButton,
-} from '@ionic/angular/standalone';
-import { SectionWithDropdownComponent } from 'src/app/shared/components/section-with-dropdown/section-with-dropdown.component';
 import { Router } from '@angular/router';
-import { IPlaylist } from 'src/app/core/interfaces/playlistes';
-import { ModalStateService } from 'src/app/core/services/modal-state.service';
-import { Subscription } from 'rxjs';
-import { HeaderCategoryComponent } from 'src/app/shared/components/headers/header-category/header-category.component';
-import { IUser } from 'src/app/core/interfaces/user';
 import { AppState } from '@capacitor/app';
+import {
+  IonButton,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonRow,
+} from '@ionic/angular/standalone';
 import { Store } from '@ngrx/store';
-import { loadUser } from 'src/app/core/store/action/user.action';
+import { Subscription } from 'rxjs';
+import { LocalStorageService } from 'src/app/core/services/local-storage.service';
+import { ModalStateService } from 'src/app/core/services/modal-state.service';
 import {
   selectUser,
   selectUserPlaylists,
 } from 'src/app/core/store/selector/user.selector';
+import { HeaderCategoryComponent } from 'src/app/shared/components/headers/header-category/header-category.component';
+import { SectionWithDropdownComponent } from 'src/app/shared/components/section-with-dropdown/section-with-dropdown.component';
+
+import { ProfilInfoComponent } from '../../../shared/components/profilComponent/profil-info/profil-info.component';
 
 @Component({
   selector: 'app-account',
@@ -37,13 +30,8 @@ import {
   standalone: true,
   imports: [
     IonButton,
-    IonText,
-    IonAvatar,
     IonGrid,
     IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
     CommonModule,
     FormsModule,
     IonCol,

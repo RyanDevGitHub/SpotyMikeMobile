@@ -1,8 +1,8 @@
-import { map } from 'rxjs';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
+
+import { ISong } from '../../interfaces/song';
 import { AppState } from '../app.state';
 import { UserState } from '../reducer/user.reducer';
-import { ISong } from '../../interfaces/song';
 
 export const selectSongsEntities = (state: AppState) => state.music.entities;
 

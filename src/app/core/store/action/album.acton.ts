@@ -1,5 +1,6 @@
 // core/store/actions/album.actions.ts
 import { createAction, props } from '@ngrx/store';
+
 import { IAlbum } from '../../interfaces/album';
 
 export const loadAlbums = createAction('[Album] Load Albums');

@@ -8,14 +8,14 @@
   <ion-row>
     <div class="scroll-container">
       @for (song of items; track song) {
-        <app-music-container-vertical
-          [song]="song"
-        ></app-music-container-vertical>
-      }
-      @if (items && items.length === 0) {
-        <ion-row>
-          <ion-col>No songs available.</ion-col>
-        </ion-row>
+      <app-music-container-vertical
+        [pageType]="pageType"
+        [song]="song"
+      ></app-music-container-vertical>
+      } @if (items && items.length === 0) {
+      <ion-row>
+        <ion-col>No songs available.</ion-col>
+      </ion-row>
       }
     </div>
   </ion-row>

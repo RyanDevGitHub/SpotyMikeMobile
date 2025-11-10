@@ -1,13 +1,19 @@
+import { Component, inject, Input } from '@angular/core';
+import {
+  IonCol,
+  IonImg,
+  IonRow,
+  ModalController,
+} from '@ionic/angular/standalone';
+import { PlayContext } from 'src/app/core/interfaces/play-page-type';
+import { ISong } from 'src/app/core/interfaces/song';
+import { formatDuration } from 'src/app/core/services/utils/utils'; // 👈 import de ta fonction
+
 import { ModalStateService } from '../../../../core/services/modal-state.service';
-import { SongOptionComponent } from '../../button/song-option/song-option.component';
-import { Component, inject, Input, OnInit } from '@angular/core';
-import { IonCol, ModalController, IonContent } from '@ionic/angular/standalone';
-import { IonImg, IonRow } from '@ionic/angular/standalone';
 import { PlaySongPage } from '../../../modal/play-song/play-song.page';
 import { LikeSongComponent } from '../../button/like-song/like-song.component';
 import { ShareSongComponent } from '../../button/share-song/share-song.component';
-import { ISong } from 'src/app/core/interfaces/song';
-import { formatDuration } from 'src/app/core/services/utils/utils'; // 👈 import de ta fonction
+import { SongOptionComponent } from '../../button/song-option/song-option.component';
 
 @Component({
   selector: 'app-music-container',
@@ -15,11 +21,9 @@ import { formatDuration } from 'src/app/core/services/utils/utils'; // 👈 impo
   styleUrls: ['./music-container.component.scss'],
   standalone: true,
   imports: [
-    IonContent,
     IonRow,
     IonImg,
     SongOptionComponent,
-    PlaySongPage,
     LikeSongComponent,
     ShareSongComponent,
     IonCol,
@@ -36,12 +40,14 @@ export class MusicContainerComponent {
   // @Input() id: string;
   // @Input() url: string;
   @Input() song: ISong;
+  @Input() openWith: PlayContext;
 
   async openPlayer() {
     const modal = await this.modalCtrl.create({
       component: PlaySongPage,
       componentProps: {
         music: this.song,
+        openWith: this.openWith,
       },
     });
     modal.present();

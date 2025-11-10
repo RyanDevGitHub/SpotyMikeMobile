@@ -1,10 +1,17 @@
 import { AsyncPipe } from '@angular/common';
-import { MinimizePlayerAudioComponent } from '../../shared/components/playerComponents/minimize-player-audio/minimize-player-audio.component';
 import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
-import { IonGrid, IonIcon, IonRow } from '@ionic/angular/standalone';
-import { IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
+import {
+  IonGrid,
+  IonIcon,
+  IonRow,
+  IonTabBar,
+  IonTabButton,
+  IonTabs,
+} from '@ionic/angular/standalone';
 import { MusicServiceService } from 'src/app/core/services/music-service.service';
 import { PlayerStateService } from 'src/app/core/services/player-state.service';
+
+import { MinimizePlayerAudioComponent } from '../../shared/components/playerComponents/minimize-player-audio/minimize-player-audio.component';
 
 @Component({
   selector: 'app-accueil',
@@ -30,6 +37,6 @@ export class AccueilPage {
 
   constructor(
     @Inject(MusicServiceService) public audioService: MusicServiceService,
-    private playerState: PlayerStateService,
+    private playerState: PlayerStateService
   ) {}
 }

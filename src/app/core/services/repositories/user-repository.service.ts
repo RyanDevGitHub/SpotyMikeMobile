@@ -1,6 +1,10 @@
-import { LocalStorageService } from 'src/app/core/services/local-strorage.service';
 import { inject, Injectable } from '@angular/core';
-
+import { FirebaseApp } from '@angular/fire/app';
+import { Firestore } from '@angular/fire/firestore';
+import {
+  // Type pour l'injection
+  Storage,
+} from '@angular/fire/storage';
 // IMPORTS FIREBASE V9
 import {
   addDoc,
@@ -8,6 +12,8 @@ import {
   collection,
   deleteDoc,
   doc,
+  DocumentData,
+  FieldValue,
   FirestoreDataConverter,
   getDoc,
   getDocs,
@@ -15,26 +21,21 @@ import {
   setDoc,
   updateDoc,
   where,
-  DocumentData,
 } from 'firebase/firestore';
-import { StorageReference, ref, getDownloadURL } from 'firebase/storage'; // Nouveau pour Storage
+import { getDownloadURL, ref, StorageReference } from 'firebase/storage'; // Nouveau pour Storage
+import { from, map, Observable, of, switchMap } from 'rxjs';
+import { LocalStorageService } from 'src/app/core/services/local-storage.service';
 import { environment } from 'src/environments/environment';
+
+// RETIRER : AngularFirestore, AngularFireStorage, DocumentData (redondant)
+import { IPlaylistRaw, ISongRef } from '../../interfaces/playlists';
 import {
   ERoleUser,
+  IFirebaseUser,
   IUser,
   IUserDataBase,
   IUserUpdateDataBase,
 } from '../../interfaces/user';
-import { Observable, from, map, of, switchMap } from 'rxjs';
-import {
-  // Type pour l'injection
-  Storage,
-} from '@angular/fire/storage';
-import { FirebaseApp } from '@angular/fire/app';
-
-// RETIRER : AngularFirestore, AngularFireStorage, DocumentData (redondant)
-import { IPlaylistRaw, ISongRef } from '../../interfaces/playlistes';
-import { Firestore } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root',
@@ -57,7 +58,8 @@ export class UserRepositoryService {
 
   // ... (le reste de la classe suit)
   // Méthode entièrement réécrite en Promesses/Observables V9
-  getOrCreateUser(firebaseUser: any): Observable<IUser> {
+
+  getOrCreateUser(firebaseUser: IFirebaseUser): Observable<IUser> {
     // 1. Référence au document Firestore
     const userRef = doc(this.db, 'Users', firebaseUser.uid);
 
@@ -76,7 +78,7 @@ export class UserRepositoryService {
           // 3. Récupère l'URL de l'avatar par défaut (Storage V9)
           const storageRef: StorageReference = ref(
             this.storage,
-            'avatar/user.png',
+            'avatar/user.png'
           );
 
           // from(getDownloadURL(...)) transforme la promesse en Observable
@@ -92,10 +94,10 @@ export class UserRepositoryService {
                 password: '',
                 email: firebaseUser.email ?? '',
                 tel: '',
-                sexe: 'non-defini',
+                sexe: 'non-défini',
                 favorites: { songs: [], albums: [] },
                 playlists: [],
-                lastsplayeds: [],
+                lastsPlayed: [],
                 created_at: new Date().toISOString(),
                 role: ERoleUser.User,
               };
@@ -105,17 +107,23 @@ export class UserRepositoryService {
               return from(setDoc(userRef, user)).pipe(
                 map(() => {
                   // Stockage local
+                  console.log(
+                    'UserRepository: Nouvel utilisateur créé dans Firestore',
+                    firebaseUser.stsTokenManager?.accessToken
+                  );
                   this.localStorageService.setItem('token', {
                     token: firebaseUser.stsTokenManager?.accessToken ?? '',
                   });
-                  this.localStorageService.setItem('idUser', user.id);
+                  this.localStorageService.setItem('idUser', {
+                    idUser: user.id,
+                  });
                   return user;
-                }),
+                })
               );
-            }),
+            })
           );
         }
-      }),
+      })
     );
   }
 
@@ -131,14 +139,14 @@ export class UserRepositoryService {
       sexe: user.sexe,
       role: user.role,
       favorites: user.favorites || [],
-      lastsplayeds: user.lastsplayeds || [],
+      lastsPlayed: user.lastsPlayed || [],
       created_at: user.created_at,
     };
 
     // Ajouter l'utilisateur à la collection "Users"
     const userRef = await addDoc(
       collection(this.db, environment.collection.users),
-      userData,
+      userData
     );
 
     // Ajouter les informations de l'artiste si disponibles
@@ -177,7 +185,7 @@ export class UserRepositoryService {
   async setUserField(
     UserId: string | undefined,
     fieldName: string,
-    value: any,
+    value: object | string | number | boolean | FieldValue
   ): Promise<void> {
     const usersCollection = collection(this.db, 'Users');
     const q = query(usersCollection, where('id', '==', UserId));
@@ -194,15 +202,21 @@ export class UserRepositoryService {
       // console.warn('[DEBUG] Aucun utilisateur trouvé avec field ID:', UserId);
     }
   }
-  async getUsersByField(fieldName: string, value: string): Promise<any | null> {
+  async getUsersByField<T extends DocumentData>( // T est le type attendu
+    fieldName: string,
+    value: string
+    // ✅ Le type de retour est Promise<T | null>
+  ): Promise<T | null> {
     const querySnapshotPromise = await getDocs(
       query(
         collection(this.db, environment.collection.users),
-        where(fieldName, '==', value),
-      ),
+        where(fieldName, '==', value)
+      )
     );
+
     if (!querySnapshotPromise.empty) {
-      return querySnapshotPromise.docs[0].data();
+      // 👈 Assertion interne : On assure à TypeScript que DocumentData est de type T
+      return querySnapshotPromise.docs[0].data() as T;
     } else {
       return null;
     }
@@ -210,14 +224,14 @@ export class UserRepositoryService {
 
   async addToLastPlayed(
     userId: string | undefined,
-    songId: string,
+    songId: string
   ): Promise<IUserDataBase> {
     if (!userId) {
       throw new Error('User ID is undefined');
     }
 
     // Mettre à jour le champ favorites avec arrayUnion
-    await this.updateUser(userId, { lastsplayeds: arrayUnion(songId) });
+    await this.updateUser(userId, { lastsPlayed: arrayUnion(songId) });
 
     // console.log(`[DEBUG] Song ajoutée aux lastplayeds : ${songId}`);
 
@@ -239,7 +253,7 @@ export class UserRepositoryService {
   // get Users collection
   async getUsersCollection() {
     const querySnapshot = await getDocs(
-      collection(this.db, environment.collection.users),
+      collection(this.db, environment.collection.users)
     );
     return querySnapshot.docs.map((doc) => doc.data());
   }
@@ -248,23 +262,23 @@ export class UserRepositoryService {
   async getSousCollection(
     collectionName: string,
     documentId: string,
-    sousCollectionName: string,
+    sousCollectionName: string
   ) {
     const querySnapshot = await getDocs(
-      collection(this.db, collectionName, documentId, sousCollectionName),
+      collection(this.db, collectionName, documentId, sousCollectionName)
     );
     return querySnapshot.docs.map((doc) => doc.data());
   }
 
   async updateUser(
     userId: string,
-    updates: Partial<IUserUpdateDataBase>,
+    updates: Partial<IUserUpdateDataBase>
   ): Promise<void> {
     const q = query(
       collection(this.db, environment.collection.users).withConverter(
-        this.userConverter,
+        this.userConverter
       ),
-      where('id', '==', userId),
+      where('id', '==', userId)
     );
 
     const querySnap = await getDocs(q);
@@ -283,7 +297,7 @@ export class UserRepositoryService {
   async createPlaylist(
     userId: string,
     title: string,
-    song: ISongRef,
+    song: ISongRef
   ): Promise<IPlaylistRaw> {
     console.log('🏗️ Repository createPlaylist appelé avec:', {
       userId,
@@ -293,9 +307,9 @@ export class UserRepositoryService {
 
     const q = query(
       collection(this.db, environment.collection.users).withConverter(
-        this.userConverter,
+        this.userConverter
       ),
-      where('id', '==', userId),
+      where('id', '==', userId)
     );
 
     const querySnap = await getDocs(q);
@@ -328,7 +342,7 @@ export class UserRepositoryService {
   async deleteUser(userId: string): Promise<void> {
     const q = query(
       collection(this.db, environment.collection.users),
-      where('id', '==', userId),
+      where('id', '==', userId)
     );
 
     const querySnap = await getDocs(q);
@@ -345,25 +359,25 @@ export class UserRepositoryService {
   async addSongToPlaylist(
     userId: string,
     playlistId: string,
-    song: ISongRef,
+    song: ISongRef
   ): Promise<IPlaylistRaw> {
     console.log(
       `[addSongToPlaylist] Called with userId=${userId}, playlistId=${playlistId}, song=`,
-      song,
+      song
     );
 
     const q = query(
       collection(this.db, environment.collection.users).withConverter(
-        this.userConverter,
+        this.userConverter
       ),
-      where('id', '==', userId),
+      where('id', '==', userId)
     );
 
     const querySnap = await getDocs(q);
 
     if (querySnap.empty) {
       console.error(
-        `[addSongToPlaylist] Utilisateur avec id=${userId} non trouvé`,
+        `[addSongToPlaylist] Utilisateur avec id=${userId} non trouvé`
       );
       throw new Error(`Utilisateur avec id=${userId} non trouvé`);
     }
@@ -379,7 +393,7 @@ export class UserRepositoryService {
 
     if (playlistIndex === -1) {
       console.error(
-        `[addSongToPlaylist] Playlist avec id=${playlistId} non trouvée`,
+        `[addSongToPlaylist] Playlist avec id=${playlistId} non trouvée`
       );
       throw new Error(`Playlist avec id=${playlistId} non trouvée`);
     }
@@ -407,17 +421,17 @@ export class UserRepositoryService {
   async removeSongFromPlaylist(
     userId: string,
     playlistId: string,
-    songId: string,
+    songId: string
   ): Promise<IPlaylistRaw> {
     console.log(
-      `[removeSongFromPlaylist] Called with userId=${userId}, playlistId=${playlistId}, songId=${songId}`,
+      `[removeSongFromPlaylist] Called with userId=${userId}, playlistId=${playlistId}, songId=${songId}`
     );
 
     const q = query(
       collection(this.db, environment.collection.users).withConverter(
-        this.userConverter,
+        this.userConverter
       ),
-      where('id', '==', userId),
+      where('id', '==', userId)
     );
 
     const querySnap = await getDocs(q);
@@ -438,7 +452,7 @@ export class UserRepositoryService {
 
     const playlist = playlists[playlistIndex];
     const updatedSongs = (playlist.songs || []).filter(
-      (s) => s.idSong !== songId,
+      (s) => s.idSong !== songId
     );
 
     const updatedPlaylist: IPlaylistRaw = {
@@ -452,7 +466,7 @@ export class UserRepositoryService {
     await updateDoc(docRef, { playlists: updatedPlaylists });
 
     console.log(
-      `🗑️ [removeSongFromPlaylist] Song ${songId} removed from playlist ${playlistId}`,
+      `🗑️ [removeSongFromPlaylist] Song ${songId} removed from playlist ${playlistId}`
     );
     return updatedPlaylist;
   }
@@ -461,7 +475,7 @@ export class UserRepositoryService {
   async deleteUserByField(fieldName: string, value: string): Promise<void> {
     const q = query(
       collection(this.db, environment.collection.users),
-      where(fieldName, '==', value),
+      where(fieldName, '==', value)
     );
 
     const querySnap = await getDocs(q);
@@ -476,7 +490,7 @@ export class UserRepositoryService {
     }
 
     console.log(
-      `✅ Success: User(s) with ${fieldName}=${value} deleted from ${environment.collection.users} collection.`,
+      `✅ Success: User(s) with ${fieldName}=${value} deleted from ${environment.collection.users} collection.`
     );
   }
 

@@ -1,4 +1,5 @@
 import { createAction, props } from '@ngrx/store';
+
 import { IArtist } from '../../interfaces/user';
 
 export const loadArtists = createAction('[Artists] Load Artists');

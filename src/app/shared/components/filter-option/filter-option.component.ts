@@ -1,17 +1,11 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
-import {
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonIcon,
-  IonTitle,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { Component, inject, Input, OnInit } from '@angular/core';
+import { IonButton, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { ellipsisVerticalOutline } from 'ionicons/icons';
-import { FilterModalComponent } from '../../modal/filter-modal/filter-modal.component';
 import { ISong } from 'src/app/core/interfaces/song';
 import { IPageType } from 'src/app/core/interfaces/types';
+
+import { FilterModalComponent } from '../../modal/filter-modal/filter-modal.component';
 
 @Component({
   selector: 'app-filter-option',

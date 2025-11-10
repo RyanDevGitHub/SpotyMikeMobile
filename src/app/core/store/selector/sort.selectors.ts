@@ -1,4 +1,5 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
+
 import { SortState } from '../reducer/sort.reducer';
 
 // 1️⃣ Sélectionner la feature 'sort' dans le store global

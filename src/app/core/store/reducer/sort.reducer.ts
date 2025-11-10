@@ -1,4 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
+
 import * as SortActions from '../action/sort.action';
 
 export interface SortState {

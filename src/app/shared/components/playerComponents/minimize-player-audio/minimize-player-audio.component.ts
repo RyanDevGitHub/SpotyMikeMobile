@@ -1,19 +1,18 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   ElementRef,
-  ViewChild,
   inject,
-  OnInit,
   Input,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
-import { createGesture } from '@ionic/angular';
-
-import { MusicServiceService } from 'src/app/core/services/music-service.service';
-import { IonicModule } from '@ionic/angular';
-import { CommonModule } from '@angular/common';
-import { MusicNavBarComponent } from '../music-nav-bar/music-nav-bar.component';
+import { createGesture, IonicModule } from '@ionic/angular';
 import { ISong } from 'src/app/core/interfaces/song';
+import { MusicServiceService } from 'src/app/core/services/music-service.service';
 import { PlayerStateService } from 'src/app/core/services/player-state.service';
+
+import { MusicNavBarComponent } from '../music-nav-bar/music-nav-bar.component';
 
 @Component({
   selector: 'app-minimize-player-audio',
@@ -35,7 +34,7 @@ export class MinimizePlayerAudioComponent implements OnInit {
 
   ngOnInit() {
     this.initSwipeGesture();
-    // this.audio.preload = 'metadata';
+    console.log(this.musicService.currentSong$);
   }
 
   initSwipeGesture() {

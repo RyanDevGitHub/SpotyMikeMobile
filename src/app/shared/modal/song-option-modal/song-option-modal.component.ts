@@ -1,7 +1,6 @@
-import { IAlbum } from './../../../core/interfaces/album';
-import { Store } from '@ngrx/store';
-import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AppState } from '@capacitor/app';
 import {
   IonCol,
   IonGrid,
@@ -11,11 +10,11 @@ import {
   IonText,
   ModalController,
 } from '@ionic/angular/standalone';
+import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
 import { ISong } from 'src/app/core/interfaces/song';
 import { ModalStateService } from 'src/app/core/services/modal-state.service';
-import { AppState } from '@capacitor/app';
-import { selectAlbumBySong } from 'src/app/core/store/selector/album.selector';
-import { Observable } from 'rxjs';
+
 import { AddToPlaylistComponent } from '../add-to-playlist/add-to-playlist.component';
 
 @Component({
@@ -31,8 +30,14 @@ export class SongOptionModalComponent implements OnInit, OnDestroy {
   @Input() song: ISong;
   private router = inject(Router);
   store = inject(Store<AppState>);
+  public isModalOpen: boolean;
+  private modalSubscription: Subscription;
 
-  constructor() {}
+  constructor() {
+    this.modalSubscription = this.modalStateService.modalOpen$.subscribe(
+      (value) => (this.isModalOpen = value),
+    );
+  }
 
   ngOnInit() {
     console.log(this.song);

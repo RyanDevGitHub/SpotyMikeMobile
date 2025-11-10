@@ -1,13 +1,14 @@
-import { ISong } from '../../interfaces/song';
 import { createReducer, on } from '@ngrx/store';
-import * as FavoritesActions from '../action/favorites.actions';
+
 import { IAlbum } from '../../interfaces/album';
+import { ISong } from '../../interfaces/song';
+import * as FavoritesActions from '../action/favorites.actions';
 
 export interface FavoritesState {
   songs: ISong[]; // IDs des chansons favorites
   albums: IAlbum[]; // IDs des albums favorites
   loading: boolean;
-  error: any;
+  error: unknown;
 }
 
 export const initialState: FavoritesState = {

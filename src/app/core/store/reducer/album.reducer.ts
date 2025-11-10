@@ -1,4 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
+
 import { IAlbum } from '../../interfaces/album';
 import {
   loadAlbums,

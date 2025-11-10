@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { FavoritesService } from './../../services/favoris.service';
-
 import { Store } from '@ngrx/store';
 import { catchError, from, map, mergeMap, of, withLatestFrom } from 'rxjs';
+
 import * as FavoritesActions from '../action/favorites.actions';
 import { loadSongSuccess } from '../action/song.action';
 import { FavoritesState } from '../reducer/favorite.reducer';
 import { selectUser } from '../selector/user.selector';
+import { FavoritesService } from './../../services/favoris.service';
 
 @Injectable()
 export class FavoritesEffects {
   constructor(
     private actions$: Actions,
     private favoritesService: FavoritesService,
-    private store: Store // 👈 injection du sto
+    private store: Store, // 👈 injection du sto
   ) {}
 
   // 🔹 Charger les favoris (songs + albums complets)
@@ -36,11 +36,11 @@ export class FavoritesEffects {
             });
           }),
           catchError((error) =>
-            of(FavoritesActions.loadFavoritesFailure({ error }))
-          )
-        )
-      )
-    )
+            of(FavoritesActions.loadFavoritesFailure({ error })),
+          ),
+        ),
+      ),
+    ),
   );
 
   loadFavoritesAfterSongs$ = createEffect(() =>
@@ -50,8 +50,8 @@ export class FavoritesEffects {
       map(([_, user]) => {
         if (!user?.id) return { type: 'NO_USER' }; // sécurité
         return FavoritesActions.loadFavorites({ userId: user.id });
-      })
-    )
+      }),
+    ),
   );
 
   // ➕ Ajouter une chanson aux favoris
@@ -63,11 +63,11 @@ export class FavoritesEffects {
           // Recharge la liste à jour
           map(() => FavoritesActions.loadFavorites({ userId })),
           catchError((error) =>
-            of(FavoritesActions.loadFavoritesFailure({ error }))
-          )
-        )
-      )
-    )
+            of(FavoritesActions.loadFavoritesFailure({ error })),
+          ),
+        ),
+      ),
+    ),
   );
 
   // ❌ Retirer une chanson des favoris
@@ -78,11 +78,11 @@ export class FavoritesEffects {
         from(this.favoritesService.removeFavorite(userId, 'song', songId)).pipe(
           map(() => FavoritesActions.loadFavorites({ userId })),
           catchError((error) =>
-            of(FavoritesActions.loadFavoritesFailure({ error }))
-          )
-        )
-      )
-    )
+            of(FavoritesActions.loadFavoritesFailure({ error })),
+          ),
+        ),
+      ),
+    ),
   );
 
   // ➕ Ajouter un album aux favoris
@@ -93,11 +93,11 @@ export class FavoritesEffects {
         from(this.favoritesService.addFavorite(userId, 'album', album)).pipe(
           map(() => FavoritesActions.loadFavorites({ userId })),
           catchError((error) =>
-            of(FavoritesActions.loadFavoritesFailure({ error }))
-          )
-        )
-      )
-    )
+            of(FavoritesActions.loadFavoritesFailure({ error })),
+          ),
+        ),
+      ),
+    ),
   );
 
   // ❌ Retirer un album des favoris
@@ -106,14 +106,14 @@ export class FavoritesEffects {
       ofType(FavoritesActions.removeFavoriteAlbum),
       mergeMap(({ userId, albumId }) =>
         from(
-          this.favoritesService.removeFavorite(userId, 'album', albumId)
+          this.favoritesService.removeFavorite(userId, 'album', albumId),
         ).pipe(
           map(() => FavoritesActions.loadFavorites({ userId })),
           catchError((error) =>
-            of(FavoritesActions.loadFavoritesFailure({ error }))
-          )
-        )
-      )
-    )
+            of(FavoritesActions.loadFavoritesFailure({ error })),
+          ),
+        ),
+      ),
+    ),
   );
 }

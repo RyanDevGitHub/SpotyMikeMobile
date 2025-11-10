@@ -1,8 +1,8 @@
-import { LikeSongComponent } from '../../button/like-song/like-song.component';
-import { SongOptionComponent } from '../../button/song-option/song-option.component';
-import { Component, OnInit, input, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonImg, IonRow, IonCol } from '@ionic/angular/standalone';
+import { IonCol, IonImg, IonRow } from '@ionic/angular/standalone';
+
+import { LikeSongComponent } from '../../button/like-song/like-song.component';
 import { ShareSongComponent } from '../../button/share-song/share-song.component';
 
 @Component({
@@ -10,14 +10,7 @@ import { ShareSongComponent } from '../../button/share-song/share-song.component
   templateUrl: './playlist-container.component.html',
   styleUrls: ['./playlist-container.component.scss'],
   standalone: true,
-  imports: [
-    IonCol,
-    IonRow,
-    IonImg,
-    SongOptionComponent,
-    ShareSongComponent,
-    LikeSongComponent,
-  ],
+  imports: [IonCol, IonRow, IonImg, ShareSongComponent, LikeSongComponent],
 })
 export class PlaylistContainerComponent {
   @Input() nbSong: string;

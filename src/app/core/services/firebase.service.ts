@@ -1,19 +1,24 @@
-import { environment } from 'src/environments/environment';
 import { Injectable } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import {
   addDoc,
+  collection,
   deleteDoc,
+  doc,
+  DocumentData,
   getDoc,
   getDocs,
   getFirestore,
+  Query,
   query,
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { doc, collection } from 'firebase/firestore';
-import { Query, DocumentData } from 'firebase/firestore';
-import { Observable, from, map } from 'rxjs';
+import { from, map, Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
+interface FirestoreDocumentData {
+  [key: string]: unknown; // unknown est plus strict que any
+}
 
 // TODO: Replace the following with your app's Firebase project configuration
 // See: https://support.google.com/firebase/answer/7015592
@@ -31,13 +36,13 @@ export class Firebase {
   constructor() {}
 
   // Create a new document in collection
-  async createDocument(collectionName: string, data: any) {
+  async createDocument(collectionName: string, data: FirestoreDocumentData) {
     await addDoc(collection(this.db, collectionName), data);
     return console.log('Success : Document Create');
   }
 
   // get a document in collection
-  async getDocument(collectionName: string, documentId: any) {
+  async getDocument(collectionName: string, documentId: string) {
     const docSnap = await getDoc(doc(this.db, collectionName, documentId));
     return docSnap.data();
   }
@@ -46,8 +51,8 @@ export class Firebase {
   getDocumentByField(
     collectionName: string,
     fieldName: string,
-    value: any,
-  ): Observable<any | null> {
+    value: string,
+  ): Observable<DocumentData | null> {
     const querySnapshotPromise = getDocs(
       query(collection(this.db, collectionName), where(fieldName, '==', value)),
     );
@@ -90,13 +95,17 @@ export class Firebase {
   }
 
   // Update a document in collection
-  async updateDocument(collectionName: string, documentId: string, data: any) {
+  async updateDocument(
+    collectionName: string,
+    documentId: string,
+    data: object,
+  ) {
     await updateDoc(doc(this.db, collectionName, documentId), data);
     return console.log('Success : Document Update');
   }
 
   // Delete a document in collection
-  async deleteDocument(collectionName: string, documentId: any) {
+  async deleteDocument(collectionName: string, documentId: string) {
     await deleteDoc(doc(this.db, collectionName, documentId));
     return console.log('Success : Document Delete');
   }
@@ -104,7 +113,7 @@ export class Firebase {
   async deleteDocumentByField(
     collectionName: string,
     fieldName: string,
-    value: any,
+    value: string,
   ): Promise<void> {
     const querySnapshot = await getDocs(
       query(collection(this.db, collectionName), where(fieldName, '==', value)),

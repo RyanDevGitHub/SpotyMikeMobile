@@ -1,25 +1,15 @@
-import { selectAllAlbums } from './../selector/album.selector';
 // core/store/effects/song.effects.ts
 import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { combineLatest, of } from 'rxjs';
-import {
-  catchError,
-  filter,
-  map,
-  mergeMap,
-  tap,
-  withLatestFrom,
-} from 'rxjs/operators';
-import { loadSongFailure, loadSongSuccess } from '../action/song.action';
-import { Store } from '@ngrx/store';
-import { loadAlbumsSuccess } from '../action/album.acton';
-import { ISong } from '../../interfaces/song';
-import {
-  selectAllArtistInfos,
-  selectAllArtists,
-} from '../selector/artist.selector';
 import { AppState } from '@capacitor/app';
+import { Actions, createEffect } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
+import { combineLatest } from 'rxjs';
+import { filter, map, tap } from 'rxjs/operators';
+
+import { ISong } from '../../interfaces/song';
+import { loadSongSuccess } from '../action/song.action';
+import { selectAllArtistInfos } from '../selector/artist.selector';
+import { selectAllAlbums } from './../selector/album.selector';
 
 @Injectable()
 export class SongEffects {

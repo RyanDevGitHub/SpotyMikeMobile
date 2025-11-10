@@ -1,16 +1,9 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ModalController, IonicModule } from '@ionic/angular';
+import { Component, Input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { IonicModule, ModalController } from '@ionic/angular';
 import { Store } from '@ngrx/store';
 import { ISong } from 'src/app/core/interfaces/song';
 import { createPlaylist } from 'src/app/core/store/action/user.action';
-import {
-  IonButton,
-  IonLabel,
-  IonInput,
-  IonContent,
-  IonItem,
-} from '@ionic/angular/standalone';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-create-playlist',

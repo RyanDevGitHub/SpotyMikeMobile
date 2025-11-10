@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personCircleOutline } from 'ionicons/icons';
-import { IonContent, IonIcon } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-user-menu',

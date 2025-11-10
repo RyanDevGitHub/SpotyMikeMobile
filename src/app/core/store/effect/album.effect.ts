@@ -3,14 +3,14 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { from, of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
+
+import { AlbumsRepository } from '../../services/repositories/album-repository.service';
 import {
   loadAlbums,
   loadAlbumsFailure,
   loadAlbumsSuccess,
 } from '../action/album.acton';
-import { MusicServiceService } from '../../services/music-service.service';
 import { loadArtistsSuccess } from '../action/artist.action';
-import { AlbumsRepository } from '../../services/repositories/album-repository.service';
 
 @Injectable()
 export class AlbumEffects {

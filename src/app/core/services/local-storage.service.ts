@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 interface ICache {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: BehaviorSubject<any>;
 }
-type serializable = object | Object;
+type serializable = object | string | number | boolean;
 
 @Injectable({
   providedIn: 'root',
@@ -27,17 +28,17 @@ export class LocalStorageService {
     return (this.cache[key] = new BehaviorSubject(value));
   }
 
-  getItem<T extends serializable>(key: string): Observable<T | null> {
-    if (this.cache[key]) {
-      return this.cache[key].asObservable();
-    } else {
-      try {
-        const data = JSON.parse(localStorage.getItem(key) ?? 'null');
-        this.cache[key] = new BehaviorSubject<T | null>(data);
-        return this.cache[key].asObservable();
-      } catch (error) {
-        return of(null); // Retourne un Observable avec une valeur `null`
-      }
+  getItem<T extends serializable>(key: string): T | null {
+    try {
+      const data = localStorage.getItem(key);
+      if (!data) return null;
+      return JSON.parse(data) as T;
+    } catch (error) {
+      console.error(
+        `Erreur lors de la lecture du localStorage pour la clé "${key}"`,
+        error
+      );
+      return null;
     }
   }
 

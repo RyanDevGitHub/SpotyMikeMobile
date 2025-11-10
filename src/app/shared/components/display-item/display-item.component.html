@@ -1,13 +1,15 @@
 <ion-grid fixed>
   @for (playlist of playlists; track playlist) {
-    <app-playlist-container
-      nbSong="{{ playlist }}"
-      playlistName="{{ playlist.title }}"
-      cover="{{ playlist.songs[0] }}"
-      playlistId="{{ playlist.id }}"
-    ></app-playlist-container>
-  }
-  @for (music of songList; track music) {
-    <app-music-container [song]="music"></app-music-container>
+  <app-playlist-container
+    nbSong="{{ playlist }}"
+    playlistName="{{ playlist.title }}"
+    cover="{{ playlist.songs[0] }}"
+    playlistId="{{ playlist.id }}"
+  ></app-playlist-container>
+  } @for (music of songList; track music) {
+  <app-music-container
+    [openWith]="playContext"
+    [song]="music"
+  ></app-music-container>
   }
 </ion-grid>

@@ -1,9 +1,13 @@
+import { User } from 'firebase/auth';
 import { FieldValue } from 'firebase/firestore/lite';
-import { IPlaylist, IPlaylistRaw } from './../interfaces/playlistes';
+import { IPlaylistRaw } from 'src/app/core/interfaces/playlists';
 
 export enum ERoleUser {
   User = 'user',
   Artist = 'artist',
+}
+export interface ICover {
+  src: string;
 }
 
 export interface IUser {
@@ -12,7 +16,7 @@ export interface IUser {
   token?: string;
   email: string;
   id: string;
-  lastsplayeds: string[];
+  lastsPlayed: string[];
   firstName: string;
   lastName: string;
   password: string;
@@ -50,7 +54,7 @@ export interface IUserDataBase {
   favorites: IFavorite;
   artiste?: IArtist;
   playlists: IPlaylistRaw[];
-  lastsplayeds: string[];
+  lastsPlayed: string[];
   created_at: string;
   role: ERoleUser;
 }
@@ -58,7 +62,17 @@ export interface IFavorite {
   songs: string[];
   albums: string[];
 }
+interface IStsTokenManager {
+  accessToken: string;
+  expirationTime: number;
+  refreshToken: string;
+}
 
+// Interface qui étend le type officiel User et ajoute la propriété manquante
+export interface IFirebaseUser extends User {
+  // Ajoutez la propriété stsTokenManager à notre version du User
+  stsTokenManager?: IStsTokenManager; // On la met optionnelle au cas où
+}
 export interface IUserUpdateDataBase {
   id?: string;
   firstName?: string;
@@ -69,6 +83,6 @@ export interface IUserUpdateDataBase {
   favorites?: IFavorite | FieldValue;
   artiste?: IArtist;
   playlists?: IPlaylistRaw[];
-  lastsplayeds?: string[] | FieldValue;
+  lastsPlayed?: string[] | FieldValue;
   created_at?: string;
 }

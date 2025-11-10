@@ -1,20 +1,18 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { AppState } from '../app.state';
+
+import { ISong } from '../../interfaces/song';
 import { adapter, SongsState } from '../reducer/song.reducer';
-import { ISong, SongGenre } from '../../interfaces/song';
-import { selectUser } from './user.selector';
-import { selectAllArtists, selectAllArtistInfos } from './artist.selector';
 import { selectSortState } from './sort.selectors';
+import { selectUser, selectUserPlaylists } from './user.selector';
 // Sélecteur pour récupérer l'état de la musique
 export const selectMusicState = createFeatureSelector<SongsState>('music');
 
 // Sélecteurs générés par l'adapter
-const { selectAll, selectEntities, selectIds, selectTotal } =
-  adapter.getSelectors();
+const { selectEntities, selectIds, selectTotal } = adapter.getSelectors();
 
 // Sélecteurs spécifiques
 export const selectAllSongs = createSelector(selectMusicState, (state) =>
-  state ? adapter.getSelectors().selectAll(state) : [],
+  state ? adapter.getSelectors().selectAll(state) : []
 );
 
 export const selectLastPlayedSongs = createSelector(selectAllSongs, (songs) => {
@@ -24,7 +22,7 @@ export const selectLastPlayedSongs = createSelector(selectAllSongs, (songs) => {
 
 export const selectSongEntities = createSelector(
   selectMusicState,
-  selectEntities,
+  selectEntities
 );
 export const selectSongIds = createSelector(selectMusicState, selectIds);
 export const selectTotalSongs = createSelector(selectMusicState, selectTotal);
@@ -32,11 +30,11 @@ export const selectTotalSongs = createSelector(selectMusicState, selectTotal);
 // Sélecteurs pour charger l'état de la musique
 export const selectLoading = createSelector(
   selectMusicState,
-  (state) => state.loading,
+  (state) => state.loading
 );
 export const selectError = createSelector(
   selectMusicState,
-  (state) => state.error,
+  (state) => state.error
 );
 
 export const debugSelectAllSongs = createSelector(selectAllSongs, (songs) => {
@@ -51,7 +49,7 @@ export const debugSelectAllSongs = createSelector(selectAllSongs, (songs) => {
 export const selectFilteredAndSortedSongsByGenre = (genre: string) =>
   createSelector(selectAllSongs, selectSortState, (songs, sortState) => {
     // Filtrage par genre
-    let filteredSongs =
+    const filteredSongs =
       genre && genre !== 'All'
         ? songs.filter((song) => song.genre === genre)
         : songs;
@@ -70,16 +68,16 @@ export const selectFilteredAndSortedSongsByGenre = (genre: string) =>
         case 'artist':
           return sort.direction === 'asc'
             ? (a.artistInfo?.firstName || '').localeCompare(
-                b.artistInfo?.firstName || '',
+                b.artistInfo?.firstName || ''
               )
             : (b.artistInfo?.firstName || '').localeCompare(
-                a.artistInfo?.firstName || '',
+                a.artistInfo?.firstName || ''
               );
         case 'album':
           return sort.direction === 'asc'
             ? (a.albumInfo?.title || '').localeCompare(b.albumInfo?.title || '')
             : (b.albumInfo?.title || '').localeCompare(
-                a.albumInfo?.title || '',
+                a.albumInfo?.title || ''
               );
         default:
           return 0;
@@ -99,9 +97,9 @@ export const selectRecentSongs = createSelector(selectAllSongs, (songs) => {
   return recentSongs;
 });
 
-function toDate(timestamp: { seconds: number; nanoseconds: number }): Date {
-  return new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1e6);
-}
+// function toDate(timestamp: { seconds: number; nanoseconds: number }): Date {
+//   return new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1e6);
+// }
 
 // Sélecteur pour les 5 chansons avec le plus de listeningCount
 export const selectTopSongsByListeningCount = createSelector(
@@ -110,7 +108,7 @@ export const selectTopSongsByListeningCount = createSelector(
     return songs
       .sort((a, b) => Number(b.listeningCount) - Number(a.listeningCount)) // convertir en nombre pour trier
       .slice(0, 5); // top 5 chansons
-  },
+  }
 );
 
 export const selectSortedTopSongs = createSelector(
@@ -136,16 +134,16 @@ export const selectSortedTopSongs = createSelector(
         case 'artist':
           return sort.direction === 'asc'
             ? (a.artistInfo?.firstName || '').localeCompare(
-                b.artistInfo?.firstName || '',
+                b.artistInfo?.firstName || ''
               )
             : (b.artistInfo?.firstName || '').localeCompare(
-                a.artistInfo?.firstName || '',
+                a.artistInfo?.firstName || ''
               );
         case 'album':
           return sort.direction === 'asc'
             ? (a.albumInfo?.title || '').localeCompare(b.albumInfo?.title || '')
             : (b.albumInfo?.title || '').localeCompare(
-                a.albumInfo?.title || '',
+                a.albumInfo?.title || ''
               );
         case 'listeningCount':
           return sort.direction === 'asc'
@@ -158,36 +156,36 @@ export const selectSortedTopSongs = createSelector(
 
     // Top 5 chansons
     return sorted.slice(0, 5);
-  },
+  }
 );
 
 export const selectLastSongsByUser = createSelector(
   selectUser,
   selectAllSongs,
   (user, songs): ISong[] => {
-    console.log('[Selector] User last songs IDs:', user?.lastsplayeds);
-    if (!user || !user.lastsplayeds) {
+    console.log('[Selector] User last songs IDs:', user?.lastsPlayed);
+    if (!user || !user.lastsPlayed) {
       return []; // Retourner une liste vide si l'utilisateur ou lastSongs est indéfini
     }
-    return user.lastsplayeds
+    return user.lastsPlayed
       .map((songId) => songs.find((song) => song.id === songId))
       .filter((song): song is ISong => song !== undefined); // Filtrer et garantir le type
-  },
+  }
 );
 
 export const selectSongsBySearchTerm = (searchTerm: string) =>
   createSelector(selectAllSongs, (songs) => {
     console.log(
       '[Selector] selectSongsBySearchTerm: Songs before filtering:',
-      songs,
+      songs
     ); // Avant filtrage
     const lowerCaseTerm = searchTerm.toLowerCase();
     const filteredSongs = songs.filter((song) =>
-      song.title.toLowerCase().includes(lowerCaseTerm),
+      song.title.toLowerCase().includes(lowerCaseTerm)
     );
     console.log(
       '[Selector] selectSongsBySearchTerm: Filtered songs:',
-      filteredSongs,
+      filteredSongs
     ); // Après filtrage
     return filteredSongs;
   });
@@ -203,7 +201,7 @@ export const selectFavoriteSongsByUser = createSelector(
     return user.favorites.songs
       .map((songId) => songs.find((song) => song.id === songId))
       .filter((song): song is ISong => song !== undefined);
-  },
+  }
 );
 
 export const selectSortedLastPlayedSongs = createSelector(
@@ -225,16 +223,16 @@ export const selectSortedLastPlayedSongs = createSelector(
         case 'artist':
           return sort.direction === 'asc'
             ? (a.artistInfo?.firstName || '').localeCompare(
-                b.artistInfo?.firstName || '',
+                b.artistInfo?.firstName || ''
               )
             : (b.artistInfo?.firstName || '').localeCompare(
-                a.artistInfo?.firstName || '',
+                a.artistInfo?.firstName || ''
               );
         case 'album':
           return sort.direction === 'asc'
             ? (a.albumInfo?.title || '').localeCompare(b.albumInfo?.title || '')
             : (b.albumInfo?.title || '').localeCompare(
-                a.albumInfo?.title || '',
+                a.albumInfo?.title || ''
               );
         default:
           return 0;
@@ -243,5 +241,13 @@ export const selectSortedLastPlayedSongs = createSelector(
 
     console.log('📝 LastPlayedSongs après tri:', sorted, 'avec sort:', sort);
     return sorted;
-  },
+  }
 );
+export const selectSongsByPlaylistId = (playlistId: string) =>
+  createSelector(selectUserPlaylists, (playlists) => {
+    // 1. Trouver la playlist par son ID
+    const playlist = playlists.find((p) => p.id === playlistId);
+
+    // 2. Si la playlist est trouvée, retourner son tableau de chansons; sinon, un tableau vide.
+    return playlist ? playlist.songs : [];
+  });
