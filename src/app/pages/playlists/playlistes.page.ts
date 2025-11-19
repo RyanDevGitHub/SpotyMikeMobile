@@ -17,8 +17,8 @@ import { HeaderCategoryComponent } from 'src/app/shared/components/headers/heade
 
 @Component({
   selector: 'app-playlistes',
-  templateUrl: './playlistes.page.html',
-  styleUrls: ['./playlistes.page.scss'],
+  templateUrl: './playlists.page.html',
+  styleUrls: ['./playlists.page.scss'],
   standalone: true,
   imports: [
     IonGrid,
@@ -37,10 +37,10 @@ export class PlaylistesPage implements OnInit, OnDestroy {
   private router = inject(Router);
   constructor(
     private modalCtrl: ModalController,
-    private modalStateService: ModalStateService,
+    private modalStateService: ModalStateService
   ) {
     this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value),
+      (value) => (this.isModalOpen = value)
     );
   }
   public listPlaylistes = this.store.select(selectUserPlaylists);

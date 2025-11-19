@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import {
   IonCol,
   IonImg,
@@ -29,7 +29,7 @@ import { SongOptionComponent } from '../../button/song-option/song-option.compon
     IonCol,
   ],
 })
-export class MusicContainerComponent {
+export class MusicContainerComponent implements OnInit {
   modalStateService = inject(ModalStateService);
   modalCtrl = inject(ModalController);
   constructor() {}
@@ -42,6 +42,10 @@ export class MusicContainerComponent {
   @Input() song: ISong;
   @Input() openWith: PlayContext;
 
+  ngOnInit(): void {
+    console.log(this.openWith);
+    this.openWith.sourceId = this.song.id;
+  }
   async openPlayer() {
     const modal = await this.modalCtrl.create({
       component: PlaySongPage,

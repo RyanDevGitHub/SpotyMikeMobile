@@ -91,9 +91,9 @@ export const selectRecentSongs = createSelector(selectAllSongs, (songs) => {
   const recentSongs = songs
     .filter((song) => song.createAt)
     .sort((a, b) => b.createAt.getTime() - a.createAt.getTime())
-    .slice(0, 3);
+    .slice(0, 10);
 
-  console.log('[Selector] Recent 3 songs:', recentSongs);
+  console.log('[Selector] Recent 10 songs:', recentSongs);
   return recentSongs;
 });
 
@@ -107,7 +107,7 @@ export const selectTopSongsByListeningCount = createSelector(
   (songs) => {
     return songs
       .sort((a, b) => Number(b.listeningCount) - Number(a.listeningCount)) // convertir en nombre pour trier
-      .slice(0, 5); // top 5 chansons
+      .slice(0, 10); // top 10 chansons
   }
 );
 
@@ -118,10 +118,10 @@ export const selectSortedTopSongs = createSelector(
     // On récupère le tri pour la page 'topSongs'
     const sort = sortState.top_songs;
     if (!sort) {
-      // Si pas de tri, on fait le top 5 par écoute par défaut
+      // Si pas de tri, on fait le top 15 par écoute par défaut
       return [...songs]
         .sort((a, b) => Number(b.listeningCount) - Number(a.listeningCount))
-        .slice(0, 5);
+        .slice(0, 15);
     }
 
     // Sinon, on trie selon la clé et la direction
@@ -154,8 +154,8 @@ export const selectSortedTopSongs = createSelector(
       }
     });
 
-    // Top 5 chansons
-    return sorted.slice(0, 5);
+    // Top 15 chansons
+    return sorted.slice(0, 15);
   }
 );
 

@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   InfiniteScrollCustomEvent,
@@ -31,10 +31,8 @@ import { PlayContext } from './../../../core/interfaces/play-page-type';
     MusicContainerComponent,
   ],
 })
-export class SectionWithDropdownComponent {
-  constructor() {
-    this.playContext = { type: this.pageType };
-  }
+export class SectionWithDropdownComponent implements OnInit {
+  constructor() {}
   private router = inject(Router);
   @Input() type: unknown;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,6 +43,10 @@ export class SectionWithDropdownComponent {
   @Input() pageType: PlayPageType;
   playContext: PlayContext;
 
+  ngOnInit(): void {
+    console.log(this.pageType);
+    this.playContext = { type: this.pageType };
+  }
   private generateItems() {
     if (Array.isArray(this.items)) {
       const count = this.items.length + 1;

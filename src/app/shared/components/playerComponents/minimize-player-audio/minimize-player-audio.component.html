@@ -2,14 +2,21 @@
   <ion-toolbar>
     <ion-grid fixed>
       <ion-row class="ion-align-items-center">
-        <ion-col size="auto">
+        <ion-col size="auto" (click)="openPlayerModal()">
+          @if (_music && _music.cover) {
           <ion-img
-            [src]="music?.cover"
+            [src]="_music.cover"
             style="width: 50px; height: auto"
+            [alt]="'Cover de la chanson ' + _music.title"
           ></ion-img>
+          } @else {
+          <div class="placeholder-cover">
+            [Image de l'icône de la note de musique générique]
+          </div>
+          }
         </ion-col>
-        <ion-col>
-          <p class="ion-text-left">{{ music?.title }}</p>
+        <ion-col (click)="openPlayerModal()">
+          <p class="ion-text-left">{{ _music?.title }}</p>
           <p class="ion-text-left"></p>
         </ion-col>
         <ion-col size="auto">

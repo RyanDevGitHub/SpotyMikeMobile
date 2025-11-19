@@ -1,6 +1,8 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -20,6 +22,7 @@ import {
 import { Subscription } from 'rxjs';
 import { ISong } from 'src/app/core/interfaces/song';
 import { MusicServiceService } from 'src/app/core/services/music-service.service';
+import { PlayerStateService } from 'src/app/core/services/player-state.service';
 
 import { PlaybackMode } from '../../../../core/interfaces/song';
 
@@ -52,7 +55,8 @@ export class MusicNavBarComponent implements OnInit, OnChanges, OnDestroy {
   private isPlayingSubscription: Subscription;
   private currentTimeSubscription: Subscription;
   private durationSubscription: Subscription;
-
+  private playerState = inject(PlayerStateService);
+  private cdRef = inject(ChangeDetectorRef);
   currentPlaybackMode: PlaybackMode = PlaybackMode.Default;
 
   constructor(private audioService: MusicServiceService) {}
@@ -73,40 +77,29 @@ export class MusicNavBarComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
   async ngOnInit() {
-    console.log(
-      `[NAV BAR INIT] Démarrage du composant. URL fournie: ${this.music?.url}`
-    ); // LOG INIT
-
-    // Démarrer la lecture si aucune chanson n'est en cours
-    if (!this.audioService.isPlayingNow() && this.music?.url) {
-      console.log(
-        `[NAV BAR INIT] Lecture initiale demandée pour : ${this.music.title}`
-      ); // LOG LOAD
-      await this.audioService.loadAndPlay(this.music);
-    }
-
+    console.log(`[NAV BAR INIT] Démarrage du composant.`);
     this.isPlayingSubscription = this.audioService.isPlaying$.subscribe(
       (isPlaying) => {
         this.isPlaying = isPlaying;
-        console.log(`[NAV BAR SUB] isPlaying mis à jour : ${isPlaying}`); // LOG LECTURE STATE
+        console.log(`[NAV BAR SYNC] isPlaying mis à jour à : ${isPlaying}`);
+        this.cdRef.detectChanges();
       }
     );
 
+    // 🎯 Correction 2 : Abonnement complet à getCurrentTime$
     this.currentTimeSubscription = this.audioService
-      .getCurrentTime$() // Expose le BehaviorSubject currentTime$
+      .getCurrentTime$()
       .subscribe((time) => {
-        this.currentTime = time; // 👈 MISE À JOUR DE LA VARIABLE 'currentTime'
-        // ... (Logique de log)
+        this.currentTime = time;
       });
 
+    // 🎯 Correction 3 : Abonnement complet à duration$
     this.durationSubscription = this.audioService.duration$.subscribe(
-      (duration) => {
-        if (duration > 0) {
-          this.duration = duration;
-          console.log(
-            `[NAV BAR SUB] Durée récupérée via Observable : ${this.duration}`
-          );
-        }
+      (durationValue) => {
+        this.duration = durationValue;
+        console.log(
+          `[NAV BAR SYNC] Durée maximale mise à jour : ${this.duration}`
+        );
       }
     );
   }
@@ -142,28 +135,18 @@ export class MusicNavBarComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
   playPrevMusic() {
-    console.log(
-      `[NAV BAR ACTION] ⬅️ Demande de chanson PRÉCÉDENTE. Mode actuel: ${this.currentPlaybackMode}`
-    );
     if (this.currentPlaybackMode === PlaybackMode.Shuffle) {
-      // En mode Shuffle, on lance aussi un morceau aléatoire (le "précédent" aléatoire n'existe pas vraiment).
-      // *Vous pourriez décider de revenir au morceau précédent dans la pile Shuffle, mais aléatoire est plus courant.*
-      this.navigateSong.emit('shuffle');
+      this.playerState.navigate('shuffle');
     } else {
-      this.navigateSong.emit('prev');
+      this.playerState.navigate('prev');
     }
   }
 
   playAfterMusic() {
-    console.log(
-      `[NAV BAR ACTION] ➡️ Demande de chanson SUIVANTE. Mode actuel: ${this.currentPlaybackMode}`
-    );
     if (this.currentPlaybackMode === PlaybackMode.Shuffle) {
-      // En mode Shuffle, on demande un morceau aléatoire.
-      this.navigateSong.emit('shuffle');
+      this.playerState.navigate('shuffle');
     } else {
-      // En mode Normal, on demande le morceau suivant.
-      this.navigateSong.emit('next');
+      this.playerState.navigate('next');
     }
   }
 

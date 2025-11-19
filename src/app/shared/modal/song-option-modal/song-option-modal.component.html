@@ -1,6 +1,17 @@
 <ion-grid fixed class="container-song-option" (click)="cancel()">
   <ion-row class="ion-justify-content-center ion-align-items-center">
-    <ion-col size="6"><ion-img src="{{ song.cover }}"></ion-img></ion-col>
+    <ion-col size="6">
+      @if (song && song.cover) {
+      <ion-img
+        [src]="song.cover"
+        [alt]="'Cover de la chanson ' + song.title"
+      ></ion-img>
+      } @else {
+      <div class="placeholder-cover">
+        [Image de l'icône de la note de musique générique]
+      </div>
+      }</ion-col
+    >
   </ion-row>
 
   <ion-row class="ion-justify-content-center">

@@ -45,9 +45,9 @@ export const routes: Routes = [
           import('./pages/home/home.page').then((m) => m.HomePage).then(),
       },
       {
-        path: 'playlistes',
+        path: 'playlists',
         loadComponent: () =>
-          import('./pages/playlistes/playlistes.page')
+          import('./pages/playlists/playlistes.page')
             .then((m) => m.PlaylistesPage)
             .then(),
       },

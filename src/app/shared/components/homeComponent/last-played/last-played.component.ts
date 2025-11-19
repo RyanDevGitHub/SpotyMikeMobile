@@ -22,6 +22,7 @@ export class LastPlayedComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
+    console.log(this.pageType);
     this.store.select(selectLastSongsByUser).subscribe({
       next: (songs) => {
         this.musicList = songs; // Doit être un tableau

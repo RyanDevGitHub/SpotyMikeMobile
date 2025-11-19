@@ -20,11 +20,17 @@
     </ion-row>
     <ion-row id="cover">
       <ion-col>
+        @if (music && music.cover) {
         <ion-img
-          src="https://d1csarkz8obe9u.cloudfront.net/posterpreviews/artistic-album-cover-design-template-d12ef0296af80b58363dc0deef077ecc_screen.jpg?ts=1735798846"
-          alt="Cover de la chanson {{music.title}}"
-        ></ion-img
-      ></ion-col>
+          [src]="music.cover"
+          [alt]="'Cover de la chanson ' + music.title"
+        ></ion-img>
+        } @else {
+        <div class="placeholder-cover">
+          [Image de l'icône de la note de musique générique]
+        </div>
+        }
+      </ion-col>
     </ion-row>
     <ion-row>
       <ion-col>{{music.title}}<br /></ion-col>
@@ -37,7 +43,7 @@
       <ion-col
         ><app-music-nav-bar
           [music]="music"
-          (navigateSong)="handleNavigation($event)"
+          (navigateSong)="handleNavigationDelegated($event)"
         ></app-music-nav-bar
       ></ion-col>
     </ion-row>

@@ -42,7 +42,7 @@ export class LikeSongComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private storeUser: Store<IUser[]>,
-    private favorisService: FavoritesService,
+    private favorisService: FavoritesService
   ) {}
 
   ngOnInit(): void {
@@ -70,11 +70,11 @@ export class LikeSongComponent implements OnInit {
 
         if (this.song) {
           this.isLiked = !!favorites.songs.find(
-            (s: ISong) => s.id === this.song?.id,
+            (s: ISong) => s.id === this.song?.id
           );
         } else if (this.album) {
           this.isLiked = !!favorites.albums.find(
-            (a: IAlbum) => a.id === this.album?.id,
+            (a: IAlbum) => a.id === this.album?.id
           );
         }
       });
@@ -98,14 +98,14 @@ export class LikeSongComponent implements OnInit {
 
     if (this.isLiked) {
       this.store.dispatch(
-        removeFavoriteSong({ userId: this.user.id, songId: fullSong.id }),
+        removeFavoriteSong({ userId: this.user.id, songId: fullSong.id })
       );
     } else {
       this.store.dispatch(
-        addFavoriteSong({ song: fullSong, userId: this.user.id }),
+        addFavoriteSong({ song: fullSong, userId: this.user.id })
       );
     }
-    this.isLiked = !this.isLiked;
+    // this.isLiked = !this.isLiked;
   }
 
   private handleAlbumLike(): void {
@@ -116,13 +116,13 @@ export class LikeSongComponent implements OnInit {
 
     if (this.isLiked) {
       this.store.dispatch(
-        removeFavoriteAlbum({ userId: this.user.id, albumId: fullAlbum.id }),
+        removeFavoriteAlbum({ userId: this.user.id, albumId: fullAlbum.id })
       );
     } else {
       this.store.dispatch(
-        addFavoriteAlbum({ album: fullAlbum, userId: this.user.id }),
+        addFavoriteAlbum({ album: fullAlbum, userId: this.user.id })
       );
     }
-    this.isLiked = !this.isLiked;
+    // this.isLiked = !this.isLiked;
   }
 }

@@ -24,6 +24,8 @@ export class MusicServiceService {
   private currentSongSubject = new BehaviorSubject<ISong | null>(null);
   currentSong$ = this.currentSongSubject.asObservable();
   private zone: NgZone = inject(NgZone);
+  private isAudioActiveSubject = new BehaviorSubject<boolean>(false);
+  isAudioActive$ = this.isAudioActiveSubject.asObservable();
 
   // Flag pour s'assurer que les événements ne sont enregistrés qu'une seule fois
   private listenersRegistered = false;
@@ -31,7 +33,9 @@ export class MusicServiceService {
   constructor(private platform: Platform) {
     this.isWeb = !this.platform.is('capacitor');
   }
-
+  isAudioActiveNow(): boolean {
+    return this.isAudioActiveSubject.getValue();
+  }
   public init() {
     if (this.platform.is('capacitor') && !this.listenersRegistered) {
       console.log('[MUSIC SERVICE] Initialisation des Event Listeners...');
@@ -239,6 +243,7 @@ export class MusicServiceService {
       this.webAudio.play();
       this.startCurrentTimeUpdater();
       this.currentSongSubject.next(song);
+      this.isAudioActiveSubject.next(true);
     } else {
       // 1. Détruire l'ancienne source (si elle existe)
       try {
@@ -265,6 +270,7 @@ export class MusicServiceService {
       }).catch((e) => console.error('AudioPlayer.create failed:', e));
 
       this.currentSongSubject.next(song);
+      this.isAudioActiveSubject.next(true);
       if (!this.isWeb) {
         this.init(); // Appel la méthode init pour enregistrer les listeners une seule fois
       }
@@ -332,6 +338,7 @@ export class MusicServiceService {
       this.currentTimeSubject.next(0);
       this.durationSubject.next(0);
       this.stopCurrentTimeUpdater();
+      this.isAudioActiveSubject.next(false);
     } else if (!this.isWeb) {
       this.stopCurrentTimeUpdater(true);
       try {
