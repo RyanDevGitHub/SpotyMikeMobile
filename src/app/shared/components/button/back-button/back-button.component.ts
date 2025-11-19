@@ -1,37 +1,20 @@
-import { LoginPage } from '../../../../pages/login/login.page';
-import { Component, Input, OnInit, inject } from '@angular/core';
-import {
-  IonNav,
-  IonBackButton,
-  IonToolbar,
-  IonButtons,
-  IonTitle,
-  IonIcon,
-  ModalController,
-  IonModal,
-  IonButton,
-} from '@ionic/angular/standalone';
-import { chevronBackOutline } from 'ionicons/icons';
-import { addIcons } from 'ionicons';
-import { Platform } from '@ionic/angular/standalone';
 import { Location } from '@angular/common';
+import { Component, Input, OnInit } from '@angular/core';
+import {
+  IonBackButton,
+  IonButtons,
+  ModalController,
+  Platform,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { chevronBackOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-back-button',
   templateUrl: './back-button.component.html',
   standalone: true,
   styleUrls: ['./back-button.component.scss'],
-  imports: [
-    IonModal,
-    IonIcon,
-    IonTitle,
-    IonButtons,
-    IonToolbar,
-    IonBackButton,
-    IonNav,
-    LoginPage,
-    IonButton,
-  ],
+  imports: [IonButtons, IonBackButton],
 })
 export class BackButtonComponent implements OnInit {
   @Input() color: string;
@@ -39,7 +22,7 @@ export class BackButtonComponent implements OnInit {
   constructor(
     private modalCtrl: ModalController,
     private platform: Platform,
-    private _location: Location
+    private _location: Location,
   ) {
     this.platform.backButton.subscribeWithPriority(10, () => {
       console.log('Handler was called!');

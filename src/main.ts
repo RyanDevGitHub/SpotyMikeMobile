@@ -1,53 +1,68 @@
-import { MinimizePlayerAudioService } from './app/core/services/minimize-player-audio.service';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AuthentificationService } from 'src/app/core/services/authentification.service';
-import { AuthService } from './app/core/services/auth.service';
-import { enableProdMode, importProvidersFrom } from '@angular/core';
+// Imports des services de l'application
+import { provideHttpClient } from '@angular/common/http';
+// Imports Angular/Ionic de base
+import { enableProdMode, inject } from '@angular/core';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+// Imports AngularFire (les modules natifs sont maintenant gérés par ceux-ci)
+import { Auth, getAuth, provideAuth } from '@angular/fire/auth';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { getStorage, provideStorage } from '@angular/fire/storage';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { RouteReuseStrategy, provideRouter } from '@angular/router';
+import { provideRouter, RouteReuseStrategy } from '@angular/router';
 import {
   IonicRouteStrategy,
   provideIonicAngular,
 } from '@ionic/angular/standalone';
-
-import { routes } from './app/app.routes';
-import { AppComponent } from './app/app.component';
-import { environment } from './environments/environment';
-import { provideHttpClient } from '@angular/common/http';
-import { i18nProviders } from './app/core/providers/i18n.providers';
-import { LocalStorageService } from './app/core/services/local-strorage.service';
-import { Firebase } from './app/core/services/firebase.service';
-import { FIREBASE_OPTIONS } from '@angular/fire/compat';
-import { provideStore, StoreModule } from '@ngrx/store';
-import { musicReducer } from './app/core/store/reducer/song.reducer';
 import { provideEffects } from '@ngrx/effects';
-import { SongEffects } from './app/core/store/effect/song.effects';
+// Imports NGRX
+import { provideStore } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
-import { userReducer } from './app/core/store/reducer/user.reducer';
-import { UserEffects } from './app/core/store/effect/user.effects';
-import { IonicModule } from '@ionic/angular';
-import { MusicControls } from '@awesome-cordova-plugins/music-controls/ngx';
+// Imports Ionicons
 import { addIcons } from 'ionicons';
 import {
   addCircleOutline,
   albumsOutline,
   alertOutline,
+  chevronBackOutline,
+  chevronForwardOutline,
   ellipsisHorizontalOutline,
+  heartOutline,
   homeOutline,
   musicalNoteOutline,
+  pauseOutline,
   personAddOutline,
   personCircleOutline,
+  personOutline,
+  playOutline,
   playSkipBackOutline,
   playSkipForwardOutline,
+  repeatOutline,
+  settingsOutline,
   shareOutline,
+  shuffleOutline,
+  timerOutline,
 } from 'ionicons/icons';
-import { favoritesReducer } from './app/core/store/reducer/favorite.reducer';
-import { FavoritesEffects } from './app/core/store/effect/favorites.effect';
-import { albumReducer } from './app/core/store/reducer/album.reducer';
+
+import { AppComponent } from './app/app.component';
+import { routes } from './app/app.routes';
+import { i18nProviders } from './app/core/providers/i18n.providers';
+import { AuthService } from './app/core/services/auth.service';
+import { AuthentificationService } from './app/core/services/authentification.service';
+import { FirebaseAuthToken } from './app/core/services/firebase-auth.token';
+import { LocalStorageService } from './app/core/services/local-storage.service';
 import { AlbumEffects } from './app/core/store/effect/album.effect';
 import { ArtistsEffects } from './app/core/store/effect/artist.effect';
+import { FavoritesEffects } from './app/core/store/effect/favorites.effect';
+import { SongEffects } from './app/core/store/effect/song.effects';
+import { UserEffects } from './app/core/store/effect/user.effects';
+import { albumReducer } from './app/core/store/reducer/album.reducer';
 import { artistsReducer } from './app/core/store/reducer/artist.reducer';
+import { favoritesReducer } from './app/core/store/reducer/favorite.reducer';
+import { musicReducer } from './app/core/store/reducer/song.reducer';
 import { sortReducer } from './app/core/store/reducer/sort.reducer';
+import { userReducer } from './app/core/store/reducer/user.reducer';
+import { environment } from './environments/environment';
+
 if (environment.production) {
   enableProdMode();
 }
@@ -64,25 +79,51 @@ addIcons({
   'share-outline': shareOutline,
   'person-add-outline': personAddOutline,
   'musical-notes-outline': musicalNoteOutline,
+  'chevron-back-outline': chevronBackOutline,
+  'timer-outline': timerOutline,
+  'settings-outline': settingsOutline,
+  'repeat-outline': repeatOutline,
+  'shuffle-outline': shuffleOutline,
+  'chevron-forward-outline': chevronForwardOutline,
+  'heart-outline': heartOutline,
+  'play-outline': playOutline,
+  'person-outline': personOutline,
+  'pause-outline': pauseOutline,
 });
 
 bootstrapApplication(AppComponent, {
   providers: [
-    i18nProviders,
+    // --- FOURNISSEURS DE BASE (Doivent être en haut) ---
+    provideIonicAngular(),
+    provideRouter(routes),
     provideHttpClient(),
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+
+    // --- FOURNISSEURS GLOBALS ---
+    i18nProviders,
     LocalStorageService,
-    Firebase,
     AuthService,
     AuthentificationService,
-    MinimizePlayerAudioService,
-    AngularFireAuth,
+
+    // --- FIREBASE ---
+    provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
+    provideFirestore(() => getFirestore()),
+    provideAuth(() => getAuth()),
+    {
+      // Mappe l'instance AngularFire Auth sur notre jeton explicite
+      provide: FirebaseAuthToken,
+      useFactory: () => inject(Auth),
+    },
+    provideStorage(() => getStorage()),
+
+    // --- NGRX / STORE ---
     provideStore({
       music: musicReducer,
       user: userReducer,
       favorites: favoritesReducer,
       albums: albumReducer,
       artists: artistsReducer,
-      sort: sortReducer, // Enregistrez votre reducer ici
+      sort: sortReducer,
     }),
     provideEffects([
       SongEffects,
@@ -91,13 +132,9 @@ bootstrapApplication(AppComponent, {
       AlbumEffects,
       ArtistsEffects,
     ]),
-    provideStoreDevtools(),
-    provideIonicAngular(),
+    // Correction : retrait du double de provideStoreDevtools
     provideStoreDevtools({
       connectInZone: false,
     }),
-    provideRouter(routes),
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    { provide: FIREBASE_OPTIONS, useValue: environment.firebaseConfig },
   ],
 });

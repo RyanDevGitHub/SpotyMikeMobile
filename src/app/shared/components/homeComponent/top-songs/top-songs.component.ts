@@ -1,20 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
-import {
-  InfiniteScrollCustomEvent,
-  IonCol,
-  IonContent,
-  IonImg,
-  IonRow,
-  IonList,
-  IonInfiniteScrollContent,
-  IonInfiniteScroll,
-} from '@ionic/angular/standalone';
-import { IonGrid } from '@ionic/angular/standalone';
-import { SeeAllComponent } from '../../button/see-all/see-all.component';
-import { Observable, of } from 'rxjs';
-import { ISong, SongGenre } from 'src/app/core/interfaces/song';
 import { CommonModule } from '@angular/common';
-import { MusicContainerComponent } from '../../containers/music-container/music-container.component';
+import { Component, Input } from '@angular/core';
+import { IonCol, IonGrid, IonRow } from '@ionic/angular/standalone';
+import { PlayPageType } from 'src/app/core/interfaces/play-page-type';
+import { ISong } from 'src/app/core/interfaces/song';
+
+import { SeeAllComponent } from '../../button/see-all/see-all.component';
 import { MusicContainerVerticalComponent } from '../../containers/music-container-vertical/music-container-vertical.component';
 
 @Component({
@@ -26,18 +16,16 @@ import { MusicContainerVerticalComponent } from '../../containers/music-containe
     IonGrid,
     IonRow,
     IonCol,
-    IonImg,
+
     SeeAllComponent,
-    IonContent,
-    IonList,
-    IonInfiniteScroll,
-    IonInfiniteScrollContent,
+
     CommonModule,
     MusicContainerVerticalComponent,
   ],
 })
 export class TopSongsComponent {
   @Input() items: ISong[] | null;
+  public pageType: PlayPageType = PlayPageType.TopSongs;
   constructor() {}
 
   // private generateItems(existingItems: IMusicDate[]): IMusicDate[] {

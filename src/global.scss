@@ -47,7 +47,25 @@
   /* Couleur personnalisée */
 }
 
+// .md {
+//   /* Assurez-vous que le composant de l'en-tête est décalé vers le bas 
+//      par la valeur de la zone de sécurité supérieure. */
+//   ion-header {
+//     padding-top: var(--ion-safe-area-top);
+//   }
 
+//   /* Si cela ne suffit pas, vous pouvez cibler directement la barre d'outils 
+//      du haut (le premier ion-toolbar dans l'en-tête) */
+//   ion-header ion-toolbar:first-child {
+//     --padding-top: var(--ion-safe-area-top);
+//     /* Optionnel : peut être nécessaire si votre header a une couleur différente */
+//     /* background: var(--ion-color-primary); */ 
+//   }
+// }
+
+// ion-content {
+//   padding-top: var(--ion-safe-area-top);
+// }
 
 .center {
   text-align: center;

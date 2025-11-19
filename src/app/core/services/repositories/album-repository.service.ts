@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import {
   collection,
-  getDocs,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
 } from 'firebase/firestore';
-
 import { environment } from 'src/environments/environment';
+
 import { IAlbum } from '../../interfaces/album';
 import { ISong } from '../../interfaces/song';
 

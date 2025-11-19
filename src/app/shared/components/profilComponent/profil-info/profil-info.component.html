@@ -4,15 +4,15 @@
     <ion-col size="6">
       <ion-avatar class="avatar">
         @if (user$) {
-        <img
-          [src]="user$.avatar || 'assets/avatar/album-photo.jpg'"
-          alt="Avatar"
-        />
+          <img
+            [src]="user$.avatar || 'assets/avatar/album-photo.jpg'"
+            alt="Avatar"
+          />
         } @else {
-        <ion-skeleton-text
-          animated
-          style="border-radius: 50%; width: 48px; height: 48px"
-        ></ion-skeleton-text>
+          <ion-skeleton-text
+            animated
+            style="border-radius: 50%; width: 48px; height: 48px"
+          ></ion-skeleton-text>
         }
       </ion-avatar>
     </ion-col>
@@ -25,12 +25,12 @@
         </ion-col>
       </ion-row>
 
-      @if (user$?.role === 'artist') {
-      <ion-row>
-        <ion-col>
-          {{ user$?.artiste?.subscribers }}
-        </ion-col>
-      </ion-row>
+      @if (user$?.role === "artist") {
+        <ion-row>
+          <ion-col>
+            {{ user$?.artiste?.subscribers }}
+          </ion-col>
+        </ion-row>
       }
     </ion-col>
   </ion-row>

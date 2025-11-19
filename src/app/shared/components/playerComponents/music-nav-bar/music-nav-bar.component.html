@@ -51,11 +51,13 @@
           color="success"
           (click)="togglePlayPause()"
         >
-          <ion-icon
-            slot="icon-only"
-            [name]="isPlaying ? 'pause-outline' : 'play-outline'"
-          ></ion-icon> </ion-button
-      ></ion-col>
+          @if (!isPlaying) {
+          <ion-icon slot="icon-only" name="play-outline"></ion-icon>
+          } @else {
+          <ion-icon slot="icon-only" name="pause-outline"></ion-icon>
+          }</ion-button
+        ></ion-col
+      >
 
       <ion-col size="auto">
         <ion-button

@@ -1,33 +1,27 @@
-import { MusicContainerComponent } from '../../shared/components/containers/music-container/music-container.component';
-import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AppState } from '@capacitor/app';
+import { LoadingController, ToastController } from '@ionic/angular';
 import {
   IonAvatar,
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
   IonCol,
-  IonRow,
-  IonItem,
+  IonContent,
   IonInput,
-  IonSelectOption,
+  IonItem,
+  IonRow,
   IonSelect,
-  IonLabel,
+  IonSelectOption,
 } from '@ionic/angular/standalone';
-import { PlaylistContainerComponent } from 'src/app/shared/components/containers/playlist-container/playlist-container.component';
-import { HeaderSettingComponent } from 'src/app/shared/components/headers/header-setting/header-setting.component';
-import { AppState } from '@capacitor/app';
 import { Store } from '@ngrx/store';
+import { filter, take } from 'rxjs';
+import { IUser, IUserUpdateDataBase } from 'src/app/core/interfaces/user';
+import { updateUser } from 'src/app/core/store/action/user.action';
 import {
   selectUser,
   selectUserState,
 } from 'src/app/core/store/selector/user.selector';
-import { IUser, IUserUpdateDataBase } from 'src/app/core/interfaces/user';
-import { updateUser } from 'src/app/core/store/action/user.action';
-import { filter, take } from 'rxjs';
-import { LoadingController, ToastController } from '@ionic/angular';
+import { HeaderSettingComponent } from 'src/app/shared/components/headers/header-setting/header-setting.component';
 
 @Component({
   selector: 'app-edit-profile',
@@ -35,7 +29,6 @@ import { LoadingController, ToastController } from '@ionic/angular';
   styleUrls: ['./edit-profile.page.scss'],
   standalone: true,
   imports: [
-    IonLabel,
     IonCol,
     IonContent,
     CommonModule,
@@ -60,7 +53,7 @@ export class EditProfilPage implements OnInit {
 
   constructor(
     private loadingCtrl: LoadingController,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
   ) {}
 
   ngOnInit() {
@@ -68,7 +61,7 @@ export class EditProfilPage implements OnInit {
     this.user$
       .pipe(
         take(1),
-        filter((user): user is IUser => !!user)
+        filter((user): user is IUser => !!user),
       )
       .subscribe((user) => {
         this.firstName = user.firstName ?? '';
@@ -79,7 +72,7 @@ export class EditProfilPage implements OnInit {
       });
     console.log(this.firstName, this.lastName, this.email, this.sexe, this.tel);
   }
-  onChildSave(data: any) {
+  onChildSave(data: boolean) {
     console.log('[Parent] Received save data:', data);
 
     const updatedData: IUserUpdateDataBase = {
@@ -98,7 +91,7 @@ export class EditProfilPage implements OnInit {
 
       // 2️⃣ Dispatch action pour update
       this.store.dispatch(
-        updateUser({ userId: user.id, changes: updatedData })
+        updateUser({ userId: user.id, changes: updatedData }),
       );
 
       // 3️⃣ Ecouter le succès / échec via store
@@ -106,7 +99,7 @@ export class EditProfilPage implements OnInit {
         .select(selectUserState) // Crée un selector pour loading/error si tu n'as pas
         .pipe(
           filter((state) => !state.loading), // Quand le loading devient false
-          take(1)
+          take(1),
         )
         .subscribe(async (state) => {
           await loading.dismiss(); // Masquer le loader

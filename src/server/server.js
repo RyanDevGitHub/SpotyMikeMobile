@@ -1,12 +1,12 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const admin = require('firebase-admin');
-
+import bodyParser from "body-parser";
+import express from "express";
+import admin from "firebase-admin";
+import * as serviceAccount from "./serviceAccountKey.json";
 // Initialiser Firebase Admin SDK
-const serviceAccount = require('./serviceAccountKey.json');
+const serviceAccount = serviceAccount;
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
 
 const app = express();
@@ -14,11 +14,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-app.post('/check-token', async (req, res) => {
+app.post("/check-token", async (req, res) => {
   const token = req.body.token;
 
   if (!token) {
-    return res.status(400).send({ error: 'Token is required' });
+    return res.status(400).send({ error: "Token is required" });
   }
 
   try {

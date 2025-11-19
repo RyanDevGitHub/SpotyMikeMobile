@@ -1,23 +1,23 @@
-import { Injectable } from '@angular/core';
+// import { Injectable } from '@angular/core';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class MinimizePlayerAudioService {
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class MinimizePlayerAudioService {
 
-  constructor() { }
+//   constructor() { }
 
-  private miniPlayerVisible = false;
+//   private miniPlayerVisible = false;
 
-  showMiniPlayer() {
-    this.miniPlayerVisible = true;
-  }
+//   showMiniPlayer() {
+//     this.miniPlayerVisible = true;
+//   }
 
-  hideMiniPlayer() {
-    this.miniPlayerVisible = false;
-  }
+//   hideMiniPlayer() {
+//     this.miniPlayerVisible = false;
+//   }
 
-  isMiniPlayerVisible(): boolean {
-    return this.miniPlayerVisible;
-  }
-}
+//   isMiniPlayerVisible(): boolean {
+//     return this.miniPlayerVisible;
+//   }
+// }

@@ -1,18 +1,20 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { LocalStorageService } from '../services/local-strorage.service';
-import { IToken } from '../interfaces/user';
-import { firstValueFrom, map, take } from 'rxjs';
 import { AppState } from '@capacitor/app';
 import { Store } from '@ngrx/store';
+import { firstValueFrom, take } from 'rxjs';
+
+import { IToken } from '../interfaces/user';
 import { selectAuthToken } from '../store/selector/user.selector';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = (_route, _state) => {
   const router = inject(Router);
   const store = inject(Store<AppState>);
 
   return (async () => {
-    const selectorToken = await firstValueFrom(store.select(selectAuthToken).pipe(take(1)));
+    const selectorToken = await firstValueFrom(
+      store.select(selectAuthToken).pipe(take(1)),
+    );
     if (selectorToken) {
       return true;
     }

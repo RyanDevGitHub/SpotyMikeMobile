@@ -1,16 +1,7 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonText,
-} from '@ionic/angular/standalone';
+import { IonCol, IonGrid, IonRow, IonText } from '@ionic/angular/standalone';
 import { HeaderSettingComponent } from 'src/app/shared/components/headers/header-setting/header-setting.component';
 import { environment } from 'src/environments/environment';
 
@@ -24,19 +15,13 @@ import { environment } from 'src/environments/environment';
     IonCol,
     IonRow,
     IonGrid,
-    IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
     CommonModule,
     FormsModule,
     HeaderSettingComponent,
   ],
 })
-export class AboutPage implements OnInit {
+export class AboutPage {
   version = environment.version;
 
   constructor() {}
-
-  ngOnInit() {}
 }

@@ -1,3 +1,4 @@
+import { AsyncPipe } from '@angular/common';
 import {
   Component,
   inject,
@@ -6,47 +7,36 @@ import {
   signal,
   ViewChildren,
 } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { AppState } from '@capacitor/app';
 import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonGrid,
-  IonCol,
-  IonRow,
-  IonText,
-  IonImg,
   IonButton,
-  IonButtons,
+  IonCol,
+  IonContent,
+  IonGrid,
   IonIcon,
-  IonSegmentButton,
+  IonImg,
   IonLabel,
+  IonRow,
   IonSegment,
+  IonSegmentButton,
+  IonText,
 } from '@ionic/angular/standalone';
-import { MusicContainerComponent } from 'src/app/shared/components/containers/music-container/music-container.component';
-import { ISong } from 'src/app/core/interfaces/song';
-import { SectionWithDropdownComponent } from 'src/app/shared/components/section-with-dropdown/section-with-dropdown.component';
+import { Store } from '@ngrx/store';
 import { addIcons } from 'ionicons';
 import { playOutline } from 'ionicons/icons';
-import { ModalStateService } from 'src/app/core/services/modal-state.service';
-import {
-  filter,
-  map,
-  Observable,
-  shareReplay,
-  Subscription,
-  take,
-  tap,
-} from 'rxjs';
-import { BackButtonComponent } from 'src/app/shared/components/button/back-button/back-button.component';
-import { selectArtistData } from 'src/app/core/store/selector/cross.selector';
-import { Store } from '@ngrx/store';
-import { AppState } from '@capacitor/app';
-import { ActivatedRoute } from '@angular/router';
+import { filter, map, Observable, shareReplay, Subscription, tap } from 'rxjs';
 import { IAlbum } from 'src/app/core/interfaces/album';
+import { PlayPageType } from 'src/app/core/interfaces/play-page-type';
+import { ISong } from 'src/app/core/interfaces/song';
 import { IArtist } from 'src/app/core/interfaces/user';
+import { ModalStateService } from 'src/app/core/services/modal-state.service';
+import { selectArtistData } from 'src/app/core/store/selector/cross.selector';
+import { BackButtonComponent } from 'src/app/shared/components/button/back-button/back-button.component';
 import { AlbumContainerComponent } from 'src/app/shared/components/containers/album-container/album-container.component';
-import { AsyncPipe } from '@angular/common';
+import { MusicContainerComponent } from 'src/app/shared/components/containers/music-container/music-container.component';
+
+import { PlayContext } from './../../core/interfaces/play-page-type';
 
 @Component({
   selector: 'app-artist-page',
@@ -63,13 +53,8 @@ import { AsyncPipe } from '@angular/common';
     IonCol,
     IonGrid,
     IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
     IonRow,
-    SectionWithDropdownComponent,
     MusicContainerComponent,
-    IonButtons,
     IonIcon,
     AsyncPipe,
     BackButtonComponent,
@@ -87,7 +72,9 @@ export class ArtistPagePage implements OnInit {
   private store = inject(Store<AppState>);
   private route = inject(ActivatedRoute);
   public artistId: string;
+  public pageType = PlayPageType.Artist;
   private modalSubscription: Subscription;
+  playContext: PlayContext;
 
   @ViewChildren(MusicContainerComponent)
   musicComponents!: QueryList<MusicContainerComponent>;
@@ -106,7 +93,7 @@ export class ArtistPagePage implements OnInit {
     this.route.paramMap.subscribe((params) => {
       this.artistId = params.get('id')!;
       console.log('[ArtistPage] Param artistId:', this.artistId);
-
+      this.playContext = { type: this.pageType, sourceId: this.artistId };
       if (this.artistId) {
         const artistData$ = this.store
           .select(selectArtistData(this.artistId))

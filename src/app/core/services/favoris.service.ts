@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IFavorite } from '../interfaces/favorites';
-import { IAlbum } from '../interfaces/album';
+import { Store } from '@ngrx/store';
 import {
   BehaviorSubject,
   combineLatest,
@@ -11,12 +10,12 @@ import {
   switchMap,
   take,
 } from 'rxjs';
-import { ISong } from '../interfaces/song';
-import { UserRepositoryService } from './repositories/user-repository.service';
-import { Store } from '@ngrx/store';
 
+import { IAlbum } from '../interfaces/album';
+import { ISong } from '../interfaces/song';
 import { selectAllAlbums } from '../store/selector/album.selector';
 import { selectAllSongs } from '../store/selector/song.selector';
+import { UserRepositoryService } from './repositories/user-repository.service';
 
 @Injectable({ providedIn: 'root' })
 export class FavoritesService {
@@ -28,7 +27,10 @@ export class FavoritesService {
   private favorisSongs$ = new BehaviorSubject<ISong[]>([]);
   private favorisAlbums$ = new BehaviorSubject<IAlbum[]>([]);
 
-  constructor(private store: Store, private userRepo: UserRepositoryService) {
+  constructor(
+    private store: Store,
+    private userRepo: UserRepositoryService,
+  ) {
     this.loadFromStorage();
   }
 
@@ -36,7 +38,7 @@ export class FavoritesService {
   // 🔹 CHARGEMENT FAVORIS
   // ==========================
   getUserFavorites(
-    userId?: string
+    userId?: string,
   ): Observable<{ songs: ISong[]; albums: IAlbum[] }> {
     if (!userId) return of({ songs: [], albums: [] });
 
@@ -51,16 +53,16 @@ export class FavoritesService {
             const favoriteAlbumIds = user?.favorites?.albums || [];
 
             const favoriteSongs = allSongs.filter((s) =>
-              favoriteSongIds.includes(s.id)
+              favoriteSongIds.includes(s.id),
             );
             const favoriteAlbums = allAlbums.filter((a) =>
-              favoriteAlbumIds.includes(a.id)
+              favoriteAlbumIds.includes(a.id),
             );
 
             return { songs: favoriteSongs, albums: favoriteAlbums };
-          })
-        )
-      )
+          }),
+        ),
+      ),
     );
   }
 
@@ -70,7 +72,7 @@ export class FavoritesService {
   async addFavorite(
     userId: string,
     type: 'song' | 'album',
-    item: ISong | IAlbum
+    item: ISong | IAlbum,
   ) {
     const user = await this.userRepo.getUserById(userId);
     if (!user) throw new Error('Utilisateur non trouvé');
@@ -107,7 +109,7 @@ export class FavoritesService {
     const targetArray =
       type === 'song' ? user.favorites.songs : user.favorites.albums;
     user.favorites[type === 'song' ? 'songs' : 'albums'] = targetArray.filter(
-      (fav) => fav !== id
+      (fav) => fav !== id,
     );
 
     await this.userRepo.updateUser(userId, { favorites: user.favorites });

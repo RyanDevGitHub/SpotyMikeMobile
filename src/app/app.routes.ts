@@ -1,5 +1,5 @@
-import { SongManagementPage } from './pages/song-management/song-management.page';
 import { Routes } from '@angular/router';
+
 import { authGuard } from './core/guard/auth.guard';
 
 export const routes: Routes = [
@@ -45,16 +45,16 @@ export const routes: Routes = [
           import('./pages/home/home.page').then((m) => m.HomePage).then(),
       },
       {
-        path: 'playlistes',
+        path: 'playlists',
         loadComponent: () =>
-          import('./pages/playlistes/playlistes.page')
+          import('./pages/playlists/playlistes.page')
             .then((m) => m.PlaylistesPage)
             .then(),
       },
       {
         path: 'favorite',
         loadComponent: () =>
-          import('./pages/favorie/favorie.page').then((m) => m.FavoriePage),
+          import('./pages/favori/favori.page').then((m) => m.FavoriPage),
       },
       {
         path: 'account',

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonText } from '@ionic/angular/standalone';
 
@@ -9,12 +9,10 @@ import { IonText } from '@ionic/angular/standalone';
   styleUrls: ['./see-all.component.scss'],
   imports: [IonText],
 })
-export class SeeAllComponent implements OnInit {
+export class SeeAllComponent {
   constructor(private router: Router) {}
   @Input() redirectTo: string;
   @Input() param: string;
-
-  ngOnInit() {}
 
   redirectToPage() {
     this.router.navigate([this.redirectTo], {

@@ -1,22 +1,14 @@
-import { AppState } from './../../core/store/app.state';
-import { Store } from '@ngrx/store';
-import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonGrid,
   IonCol,
+  IonContent,
+  IonGrid,
   IonRow,
   IonText,
 } from '@ionic/angular/standalone';
-import { ResearchComponent } from 'src/app/shared/components/research/research.component';
-import { IPlaylist, IPlaylistRaw } from 'src/app/core/interfaces/playlistes';
-import { PlaylistContainerComponent } from 'src/app/shared/components/containers/playlist-container/playlist-container.component';
-import { ModalStateService } from 'src/app/core/services/modal-state.service';
+import { Store } from '@ngrx/store';
 import {
   debounceTime,
   distinctUntilChanged,
@@ -26,16 +18,24 @@ import {
   Subscription,
   switchMap,
 } from 'rxjs';
-import { ISong } from 'src/app/core/interfaces/song';
-import { MusicContainerComponent } from 'src/app/shared/components/containers/music-container/music-container.component';
-import { IArtist } from 'src/app/core/interfaces/user';
-import { IArtistContainer } from 'src/app/core/interfaces/artist';
-import { ArtistContainerComponent } from 'src/app/shared/components/containers/artist-container/artist-container.component';
-import { selectSongsBySearchTerm } from 'src/app/core/store/selector/song.selector';
-import { selectSearchResults } from 'src/app/core/store/selector/cross.selector';
 import { IAlbum } from 'src/app/core/interfaces/album';
+import { IArtistContainer } from 'src/app/core/interfaces/artist';
+import {
+  PlayContext,
+  PlayPageType,
+} from 'src/app/core/interfaces/play-page-type';
+import { IPlaylistRaw } from 'src/app/core/interfaces/playlists';
+import { ISong } from 'src/app/core/interfaces/song';
+import { IArtist } from 'src/app/core/interfaces/user';
+import { ModalStateService } from 'src/app/core/services/modal-state.service';
+import { selectSearchResults } from 'src/app/core/store/selector/cross.selector';
 import { AlbumContainerComponent } from 'src/app/shared/components/containers/album-container/album-container.component';
-import { ArtistPagePage } from '../artist-page/artist-page.page';
+import { ArtistContainerComponent } from 'src/app/shared/components/containers/artist-container/artist-container.component';
+import { MusicContainerComponent } from 'src/app/shared/components/containers/music-container/music-container.component';
+import { PlaylistContainerComponent } from 'src/app/shared/components/containers/playlist-container/playlist-container.component';
+import { ResearchComponent } from 'src/app/shared/components/research/research.component';
+
+import { AppState } from './../../core/store/app.state';
 
 @Component({
   selector: 'app-search',
@@ -48,9 +48,6 @@ import { ArtistPagePage } from '../artist-page/artist-page.page';
     IonCol,
     IonGrid,
     IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
     CommonModule,
     FormsModule,
     ResearchComponent,
@@ -58,15 +55,15 @@ import { ArtistPagePage } from '../artist-page/artist-page.page';
     MusicContainerComponent,
     ArtistContainerComponent,
     AlbumContainerComponent,
-    ArtistPagePage,
   ],
 })
 export class SearchPage implements OnInit {
   public artistLists: IArtistContainer[] = [];
-  public listPlaylistes: IPlaylistRaw[] = [];
+  public listPlaylists: IPlaylistRaw[] = [];
   public isModalOpen: boolean;
-
-  private modalSubscription: any;
+  public pageType = PlayPageType.Independently;
+  public playContext: PlayContext;
+  private modalSubscription: Subscription;
   private searchTerm$ = new Subject<string>();
 
   public songs$: Observable<ISong[]>;
@@ -78,6 +75,7 @@ export class SearchPage implements OnInit {
     this.modalSubscription = modalStateService.modalOpen$.subscribe(
       (value) => (this.isModalOpen = value)
     );
+    this.playContext = { type: this.pageType };
   }
 
   ngOnInit() {

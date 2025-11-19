@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { SeeAllComponent } from '../../button/see-all/see-all.component';
+import { Component } from '@angular/core';
 import { IonButton, IonCol, IonGrid, IonRow } from '@ionic/angular/standalone';
+
+import { SeeAllComponent } from '../../button/see-all/see-all.component';
 
 @Component({
   selector: 'app-music-genres',
@@ -9,11 +10,10 @@ import { IonButton, IonCol, IonGrid, IonRow } from '@ionic/angular/standalone';
   standalone: true,
   imports: [IonGrid, SeeAllComponent, IonCol, IonRow, IonButton],
 })
-export class MusicGenresComponent implements OnInit {
-  selectedGenre: string = 'All';
+export class MusicGenresComponent {
+  selectedGenre: string = 'all';
   constructor() {}
 
-  ngOnInit() {}
   selectGenre(genre: string) {
     this.selectedGenre = genre;
   }

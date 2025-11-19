@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { SearchPage } from './search.page';
 
 describe('SearchPage', () => {

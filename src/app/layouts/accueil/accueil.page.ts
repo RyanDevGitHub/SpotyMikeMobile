@@ -1,25 +1,31 @@
 import { AsyncPipe } from '@angular/common';
-import { MinimizePlayerAudioComponent } from '../../shared/components/playerComponents/minimize-player-audio/minimize-player-audio.component';
-import { Component, Inject, OnInit, inject } from '@angular/core';
-import { IonToast } from '@ionic/angular/standalone';
-import { IonButton, IonGrid, IonIcon, IonRow } from '@ionic/angular/standalone';
-import { IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
 import {
-  heartOutline,
-  homeOutline,
-  personOutline,
-  playOutline,
-} from 'ionicons/icons';
-import { MinimizePlayerAudioService } from 'src/app/core/services/minimize-player-audio.service';
+  ChangeDetectionStrategy,
+  Component,
+  Inject,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
+import {
+  IonGrid,
+  IonIcon,
+  IonRow,
+  IonTabBar,
+  IonTabButton,
+  IonTabs,
+} from '@ionic/angular/standalone';
+import { filter, Subscription, tap, withLatestFrom } from 'rxjs';
 import { MusicServiceService } from 'src/app/core/services/music-service.service';
 import { PlayerStateService } from 'src/app/core/services/player-state.service';
+
+import { MinimizePlayerAudioComponent } from '../../shared/components/playerComponents/minimize-player-audio/minimize-player-audio.component';
 
 @Component({
   selector: 'app-accueil',
   templateUrl: './accueil.page.html',
   standalone: true,
   styleUrls: ['./accueil.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     IonTabs,
     IonTabBar,
@@ -28,22 +34,44 @@ import { PlayerStateService } from 'src/app/core/services/player-state.service';
     IonGrid,
     IonRow,
     MinimizePlayerAudioComponent,
-    IonButton,
-    IonToast,
     MinimizePlayerAudioComponent,
     AsyncPipe,
   ],
 })
-export class AccueilPage {
+export class AccueilPage implements OnInit, OnDestroy {
   miniPlayerVisible$ = this.playerState.miniPlayerVisible$;
   currentSong$ = this.playerState.currentSong$;
 
+  private visibilitySubscription: Subscription; // Pour gérer la désinscription
+
   constructor(
     @Inject(MusicServiceService) public audioService: MusicServiceService,
-    @Inject(MinimizePlayerAudioService)
-    public minimizePlayerAudioService: MinimizePlayerAudioService,
     private playerState: PlayerStateService
-  ) {
-    addIcons({ heartOutline, homeOutline, playOutline, personOutline });
+  ) {}
+
+  ngOnInit(): void {
+    // 🎼 Logique d'abonnement pour la journalisation
+    this.visibilitySubscription = this.miniPlayerVisible$
+      .pipe(
+        // 1. Filtrer uniquement lorsque la visibilité passe à TRUE
+        filter((isVisible) => isVisible),
+        // 2. Combiner avec la dernière valeur connue de la chanson en cours
+        withLatestFrom(this.currentSong$),
+        // 3. Journaliser l'information
+        tap(([isVisible, song]) => {
+          // isVisible sera toujours true ici grâce au filter()
+          console.log('✅ Mini-player visible ! Chanson en cours :', song);
+          console.log(isVisible);
+          console.log(`Titre: ${song?.title || 'Aucun'}`);
+        })
+      )
+      .subscribe();
+  }
+
+  ngOnDestroy(): void {
+    // 🗑️ Ne pas oublier de se désinscrire pour éviter les fuites de mémoire
+    if (this.visibilitySubscription) {
+      this.visibilitySubscription.unsubscribe();
+    }
   }
 }

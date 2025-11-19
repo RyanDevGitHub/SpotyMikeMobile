@@ -6,7 +6,10 @@
   ></app-header-category>
   <ion-grid fixed>
     @for(songGenre of songs; track songGenre){
-    <app-music-container [song]="songGenre"></app-music-container>
+    <app-music-container
+      [openWith]="playContext"
+      [song]="songGenre"
+    ></app-music-container>
     }
   </ion-grid>
 </ion-content>

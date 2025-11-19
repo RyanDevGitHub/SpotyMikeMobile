@@ -5,6 +5,7 @@
     [filter]="false"
   ></app-header-category>
   @for (song of playlist.songs; track $index) {
-  <app-music-container [song]="song"> </app-music-container>
+  <app-music-container [openWith]="playContext" [song]="song">
+  </app-music-container>
   }
 </ion-content>

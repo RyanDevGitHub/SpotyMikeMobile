@@ -1,8 +1,8 @@
-import { map } from 'rxjs';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
+
+import { ISong } from '../../interfaces/song';
 import { AppState } from '../app.state';
 import { UserState } from '../reducer/user.reducer';
-import { ISong } from '../../interfaces/song';
 
 export const selectSongsEntities = (state: AppState) => state.music.entities;
 
@@ -51,9 +51,43 @@ export const selectUserPlaylists = createSelector(
     if (!user?.playlists) return [];
 
     return user.playlists.map((playlist) => {
+      // 🎶 Ajout du log de débogage
+      console.log('--- Traitement de la Playlist:', playlist.title, '---');
+      console.log(
+        'IDs de chansons dans la playlist (playlist.songs):',
+        playlist.songs
+      );
+      console.log(
+        'Entités de chansons disponibles (songsEntities):',
+        songsEntities
+      );
+
       const songs: ISong[] = playlist.songs
-        .map((song) => songsEntities[song.idSong])
+        // 🚨 CORRECTION ICI : Si l'élément est une chaîne (l'ID), on l'utilise directement.
+        // On suppose que l'élément est soit une chaîne (l'ID), soit un objet avec un idSong.
+        .map((song) => {
+          // Détermine l'ID à utiliser
+          const songId = typeof song === 'string' ? song : song?.idSong;
+
+          const foundSong = songId ? songsEntities[songId] : undefined;
+
+          // Log pour chaque ID
+          if (!foundSong && songId) {
+            console.log(`❌ Chanson non trouvée pour l'ID: ${songId}`);
+          }
+          if (!songId) {
+            console.log(
+              '⚠️ ID de chanson manquant ou non valide dans la source de la playlist:',
+              song
+            );
+          }
+
+          return foundSong;
+        })
         .filter((song): song is ISong => song !== undefined); // 👈 type guard
+
+      // 🎶 Log du résultat
+      console.log('Chansons filtrées et trouvées (songs):', songs);
 
       return {
         ...playlist,

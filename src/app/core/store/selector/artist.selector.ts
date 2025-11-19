@@ -1,6 +1,8 @@
-import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { ArtistsState } from '../reducer/artist.reducer';
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+
 import { IArtistInfo } from '../../interfaces/artist';
+import { ArtistsState } from '../reducer/artist.reducer';
+import { selectAllSongs } from './song.selector';
 
 export const selectArtistsState =
   createFeatureSelector<ArtistsState>('artists');
@@ -44,3 +46,8 @@ export const selectAllArtistInfos = createSelector(
     return infos;
   }
 );
+
+export const selectSongsByArtistId = (artistId: string) =>
+  createSelector(selectAllSongs, (songs) => {
+    return songs.filter((song) => song.artistId === artistId);
+  });

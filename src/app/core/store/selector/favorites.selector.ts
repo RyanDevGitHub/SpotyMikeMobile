@@ -1,9 +1,9 @@
-import { FavoritesState } from './../reducer/favorite.reducer';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { selectSortState } from './sort.selectors';
-import { SortState } from '../reducer/sort.reducer';
-import { ISong } from '../../interfaces/song';
+
 import { IAlbum } from '../../interfaces/album';
+import { ISong } from '../../interfaces/song';
+import { FavoritesState } from './../reducer/favorite.reducer';
+import { selectSortState } from './sort.selectors';
 
 export const selectFavoritesState =
   createFeatureSelector<FavoritesState>('favorites');
@@ -14,7 +14,7 @@ export const selectFavoriteSongs = createSelector(
   (state) => {
     console.log('[Selector] selectFavoriteSongs →', state.songs);
     return state.songs;
-  }
+  },
 );
 
 export const selectFavoriteAlbums = createSelector(
@@ -22,7 +22,7 @@ export const selectFavoriteAlbums = createSelector(
   (state) => {
     console.log('[Selector] selectFavoriteAlbums →', state.albums);
     return state.albums;
-  }
+  },
 );
 
 // ⚙️ Loading & Error
@@ -31,7 +31,7 @@ export const selectFavoritesLoading = createSelector(
   (state) => {
     console.log('[Selector] selectFavoritesLoading →', state.loading);
     return state.loading;
-  }
+  },
 );
 
 export const selectFavoritesError = createSelector(
@@ -39,7 +39,7 @@ export const selectFavoritesError = createSelector(
   (state) => {
     console.log('[Selector] selectFavoritesError →', state.error);
     return state.error;
-  }
+  },
 );
 
 // 🎧 Savoir si une chanson est favorite
@@ -66,7 +66,7 @@ export const selectAllFavorites = createSelector(
     const favorites = { songs, albums };
     console.log('[Selector] selectAllFavorites →', favorites);
     return favorites;
-  }
+  },
 );
 
 // 🔠 Tri des favoris selon le sortState
@@ -81,33 +81,50 @@ export const selectSortedFavorites = createSelector(
     const combined = [...favorites.songs, ...favorites.albums];
 
     // 🔢 On applique le tri selon la clé choisie
-    const sorted = [...combined].sort((a: any, b: any) => {
-      switch (sort.key) {
-        case 'title':
-          return sort.direction === 'asc'
-            ? (a.title || '').localeCompare(b.title || '')
-            : (b.title || '').localeCompare(a.title || '');
+    const sorted = [...combined].sort(
+      (a: ISong | IAlbum, b: ISong | IAlbum) => {
+        switch (sort.key) {
+          case 'title':
+            return sort.direction === 'asc'
+              ? (a.title || '').localeCompare(b.title || '')
+              : (b.title || '').localeCompare(a.title || '');
 
-        case 'artist':
-          return sort.direction === 'asc'
-            ? (a.artistInfo?.firstName || '').localeCompare(
-                b.artistInfo?.firstName || ''
-              )
-            : (b.artistInfo?.firstName || '').localeCompare(
-                a.artistInfo?.firstName || ''
-              );
+          case 'artist':
+            // ⚠️ CORRECTION : Utilisation de la garde de type pour accéder à artistInfo
 
-        case 'album':
-          return sort.direction === 'asc'
-            ? (a.albumInfo?.title || '').localeCompare(b.albumInfo?.title || '')
-            : (b.albumInfo?.title || '').localeCompare(
-                a.albumInfo?.title || ''
-              );
+            // Extrait le prénom de l'artiste de manière sécurisée pour 'a'
+            const aArtistFirstName =
+              'artistInfo' in a && a.artistInfo
+                ? a.artistInfo.firstName || ''
+                : '';
 
-        default:
-          return 0;
-      }
-    });
+            // Extrait le prénom de l'artiste de manière sécurisée pour 'b'
+            const bArtistFirstName =
+              'artistInfo' in b && b.artistInfo
+                ? b.artistInfo.firstName || ''
+                : '';
+
+            return sort.direction === 'asc'
+              ? aArtistFirstName.localeCompare(bArtistFirstName)
+              : bArtistFirstName.localeCompare(aArtistFirstName);
+
+          case 'album':
+            // ⚠️ CORRECTION : Utilisation de la garde de type pour accéder à albumInfo
+
+            const aAlbumTitle =
+              'albumInfo' in a && a.albumInfo ? a.albumInfo.title || '' : '';
+
+            const bAlbumTitle =
+              'albumInfo' in b && b.albumInfo ? b.albumInfo.title || '' : '';
+
+            return sort.direction === 'asc'
+              ? aAlbumTitle.localeCompare(bAlbumTitle)
+              : bAlbumTitle.localeCompare(aAlbumTitle);
+          default:
+            return 0;
+        }
+      },
+    );
 
     // 🧱 On peut choisir :
     // 👉 soit renvoyer le tableau trié combiné
@@ -117,5 +134,5 @@ export const selectSortedFavorites = createSelector(
       songs: sorted.filter((item): item is ISong => 'artistInfo' in item),
       albums: sorted.filter((item): item is IAlbum => !('artistInfo' in item)),
     };
-  }
+  },
 );

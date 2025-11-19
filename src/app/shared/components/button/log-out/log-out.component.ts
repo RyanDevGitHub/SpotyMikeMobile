@@ -1,5 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, inject } from '@angular/core';
 import { AppState } from '@capacitor/app';
 import { IonButton } from '@ionic/angular/standalone';
 import { Store } from '@ngrx/store';
@@ -15,7 +14,7 @@ import { logout } from 'src/app/core/store/action/user.action';
 export class LogOutComponent {
   store = inject(Store<AppState>);
   constructor() {}
-  
+
   logOut() {
     this.store.dispatch(logout());
   }

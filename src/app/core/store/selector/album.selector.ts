@@ -1,8 +1,7 @@
 // core/store/selectors/album.selector.ts
 import { createFeatureSelector, createSelector } from '@ngrx/store';
+
 import { AlbumsState } from '../reducer/album.reducer';
-import { ISong } from '../../interfaces/song';
-import { IAlbum } from '../../interfaces/album';
 
 export const selectAlbumsState = createFeatureSelector<AlbumsState>('albums');
 
@@ -36,3 +35,12 @@ export const selectAlbumBySong = (songId: string) =>
   createSelector(selectAllAlbums, (albums) =>
     albums.find((album) => album.songs.some((music) => music.id === songId))
   );
+
+export const selectSongsByAlbumId = (albumId: string) =>
+  createSelector(selectAllAlbums, (albums) => {
+    // 1. Trouver l'album par son ID
+    const album = albums.find((a) => a.id === albumId);
+
+    // 2. Si l'album est trouvé, renvoyer son tableau de chansons; sinon, renvoyer un tableau vide.
+    return album ? album.songs : [];
+  });

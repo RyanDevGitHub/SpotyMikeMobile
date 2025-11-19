@@ -1,7 +1,6 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
-import { IonImg, IonRow, IonCol, IonText } from '@ionic/angular/standalone';
-import { SongOptionComponent } from '../../button/song-option/song-option.component';
+import { Component, inject, Input } from '@angular/core';
 import { Router } from '@angular/router';
+import { IonCol, IonImg, IonRow, IonText } from '@ionic/angular/standalone';
 import { IArtist } from 'src/app/core/interfaces/user';
 
 @Component({
@@ -9,7 +8,7 @@ import { IArtist } from 'src/app/core/interfaces/user';
   templateUrl: './artist-container.component.html',
   styleUrls: ['./artist-container.component.scss'],
   standalone: true,
-  imports: [IonText, IonCol, IonRow, IonImg, SongOptionComponent],
+  imports: [IonText, IonCol, IonRow, IonImg],
 })
 export class ArtistContainerComponent {
   @Input() artist: IArtist;

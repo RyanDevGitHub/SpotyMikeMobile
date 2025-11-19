@@ -9,8 +9,8 @@ describe('MusicContainerVerticalComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MusicContainerVerticalComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [MusicContainerVerticalComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MusicContainerVerticalComponent);

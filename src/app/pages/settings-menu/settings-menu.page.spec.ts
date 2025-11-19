@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { SettingsMenuPage } from './settings-menu.page';
 
 describe('SettingsMenuPage', () => {

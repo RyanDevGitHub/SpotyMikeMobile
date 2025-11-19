@@ -1,10 +1,10 @@
-import { LocalStorageService } from './../../../core/services/local-strorage.service';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { StorageService } from 'src/app/core/services/storage.service';
-import { SongRepositoryService } from 'src/app/core/services/repositories/song-repository.service';
-import { ISong, SongGenre } from 'src/app/core/interfaces/song';
-import { ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import {
   IonButton,
   IonButtons,
@@ -18,7 +18,11 @@ import {
   IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
-import { Observable } from 'rxjs';
+import { SongGenre } from 'src/app/core/interfaces/song';
+import { SongRepositoryService } from 'src/app/core/services/repositories/song-repository.service';
+import { StorageService } from 'src/app/core/services/storage.service';
+
+import { LocalStorageService } from '../../../core/services/local-storage.service';
 
 @Component({
   selector: 'app-add-song-modal',
@@ -111,31 +115,31 @@ export class AddSongModalComponent {
     }
 
     try {
-      const formValues = this.songForm.value;
+      // const formValues = this.songForm.value;
 
-      // Étape 1 : Récupérer l'utilisateur depuis le localStorage
-      const userObservable: Observable<string | null> =
-        this.localStorageService.getItem('user');
+      // // Étape 1 : Récupérer l'utilisateur depuis le localStorage
+      // const userObservable: IUser | null =
+      //   this.localStorageService.getItem('IUser');
 
-      userObservable.subscribe((user: any | null) => {
-        // Utilisez 'any' si l'objet peut être de n'importe quel type
-        if (user) {
-          formValues.artistId = user.id; // Assurez-vous que 'user' a bien une propriété 'id'
-        } else {
-          console.error('User not found in localStorage');
-          return; // Si l'utilisateur n'est pas trouvé dans le localStorage, on arrête le processus
-        }
-      });
+      // userObservable.subscribe((user: IUser | null) => {
+      //   // Utilisez 'any' si l'objet peut être de n'importe quel type
+      //   if (user) {
+      //     formValues.artistId = user.id; // Assurez-vous que 'user' a bien une propriété 'id'
+      //   } else {
+      //     console.error('User not found in localStorage');
+      //     return; // Si l'utilisateur n'est pas trouvé dans le localStorage, on arrête le processus
+      //   }
+      // });
 
       // Étape 2 : Uploader la cover et récupérer l'URL
-      const coverUrl = await this.storageService
-        .uploadFile(this.coverFile, 'covers')
-        .toPromise();
+      // const coverUrl = await this.storageService
+      //   .uploadFile(this.coverFile, 'covers')
+      //   .toPromise();
 
       // Étape 3 : Uploader le fichier MP3 et récupérer l'URL
-      const songUrl = await this.storageService
-        .uploadFile(this.songFile, 'songs')
-        .toPromise();
+      // const songUrl = await this.storageService
+      //   .uploadFile(this.songFile, 'songs')
+      //   .toPromise();
 
       // Étape 4 : Construire l'objet IMusic
 

@@ -1,11 +1,11 @@
-import { IArtist } from 'src/app/core/interfaces/user';
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { IonCol, IonImg, IonRow } from '@ionic/angular/standalone';
+import { IAlbum } from 'src/app/core/interfaces/album';
+import { IArtist } from 'src/app/core/interfaces/user';
 
-import { IonCol, IonRow, IonImg } from '@ionic/angular/standalone';
 import { LikeSongComponent } from '../../button/like-song/like-song.component';
 import { ShareSongComponent } from '../../button/share-song/share-song.component';
-import { Router } from '@angular/router';
-import { IAlbum } from 'src/app/core/interfaces/album';
 
 @Component({
   selector: 'app-album-container',

@@ -1,9 +1,10 @@
-import { IArtist } from '../../interfaces/user';
 import { createReducer, on } from '@ngrx/store';
+
+import { IArtist } from '../../interfaces/user';
 import {
   loadArtists,
-  loadArtistsSuccess,
   loadArtistsFailure,
+  loadArtistsSuccess,
 } from '../action/artist.action';
 
 export interface ArtistsState {
@@ -45,5 +46,5 @@ export const artistsReducer = createReducer(
   on(loadArtistsFailure, (state, { error }) => {
     console.error('[Reducer] loadArtistsFailure - error:', error);
     return { ...state, loading: false, loaded: false, error };
-  })
+  }),
 );

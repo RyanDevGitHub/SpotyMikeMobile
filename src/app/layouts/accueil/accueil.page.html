@@ -1,10 +1,9 @@
 <ion-grid fixed class="main-grid">
   <ion-row class="tabs-row">
     <ion-tabs id="ion-tabs">
-      @if(minimizePlayerAudioService.isMiniPlayerVisible()){
+      @if(this.miniPlayerVisible$ | async){
       <!-- <ion-tab-bar slot="bottom" class="mini-player"> -->
-      <app-minimize-player-audio [music]="currentSong$ | async">
-      </app-minimize-player-audio>
+      <app-minimize-player-audio> </app-minimize-player-audio>
       <!-- </ion-tab-bar> -->
       }
       <ion-tab-bar slot="bottom">
@@ -16,7 +15,7 @@
           <ion-icon name="heart-outline"></ion-icon>
         </ion-tab-button>
 
-        <ion-tab-button tab="playlistes">
+        <ion-tab-button tab="playlists">
           <ion-icon name="play-outline"></ion-icon>
         </ion-tab-button>
 

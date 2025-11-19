@@ -1,23 +1,14 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-} from '@ionic/angular/standalone';
-import { HeaderCategoryComponent } from 'src/app/shared/components/headers/header-category/header-category.component';
-import { DisplayItemComponent } from 'src/app/shared/components/display-item/display-item.component';
-import { IPlaylist, IPlaylistRaw } from 'src/app/core/interfaces/playlistes';
-import { ISong } from 'src/app/core/interfaces/song';
-import { Store } from '@ngrx/store';
 import { AppState } from '@capacitor/app';
-import {
-  selectLastSongsByUser,
-  selectSortedLastPlayedSongs,
-} from 'src/app/core/store/selector/song.selector';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { IonContent } from '@ionic/angular/standalone';
+import { Store } from '@ngrx/store';
+import { IPlaylistRaw } from 'src/app/core/interfaces/playlists';
+import { ISong } from 'src/app/core/interfaces/song';
+import { selectSortedLastPlayedSongs } from 'src/app/core/store/selector/song.selector';
+import { DisplayItemComponent } from 'src/app/shared/components/display-item/display-item.component';
+import { HeaderCategoryComponent } from 'src/app/shared/components/headers/header-category/header-category.component';
 
 @Component({
   selector: 'app-last-played',
@@ -26,9 +17,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
   standalone: true,
   imports: [
     IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
     CommonModule,
     FormsModule,
     HeaderCategoryComponent,

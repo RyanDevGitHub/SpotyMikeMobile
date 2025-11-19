@@ -1,15 +1,14 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ModalController } from '@ionic/angular/standalone';
 import {
-  IonHeader,
-  IonToolbar,
-  IonButtons,
   IonButton,
-  IonTitle,
+  IonButtons,
   IonContent,
+  IonHeader,
   IonInput,
   IonItem,
+  IonToolbar,
+  ModalController,
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -21,7 +20,6 @@ import {
     IonItem,
     IonInput,
     IonContent,
-    IonTitle,
     IonButton,
     IonButtons,
     IonToolbar,

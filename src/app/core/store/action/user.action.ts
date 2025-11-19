@@ -1,13 +1,8 @@
 import { createAction, props } from '@ngrx/store';
-import {
-  IToken,
-  IUser,
-  IUserDataBase,
-  IUserUpdateDataBase,
-} from '../../interfaces/user';
-import { IPlaylist, IPlaylistRaw } from '../../interfaces/playlistes';
-import { title } from 'process';
+
+import { IPlaylistRaw } from '../../interfaces/playlists';
 import { ISong } from '../../interfaces/song';
+import { IToken, IUser, IUserUpdateDataBase } from '../../interfaces/user';
 
 export const loadUser = createAction('[User] Load User');
 export const loadUserSuccess = createAction(
@@ -76,6 +71,8 @@ export const loginFailure = createAction(
   props<{ error: string }>()
 );
 
+export const initializeAuth = createAction('[Auth] Initialize Auth State');
+
 // ---- CREATE PLAYLIST ----
 export const createPlaylist = createAction(
   '[Playlist] Create Playlist',
@@ -121,5 +118,5 @@ export const removeSongFromPlaylistSuccess = createAction(
 
 export const removeSongFromPlaylistFailure = createAction(
   '[Playlist] Remove Song From Playlist Failure',
-  props<{ error: any }>()
+  props<{ error: unknown }>()
 );

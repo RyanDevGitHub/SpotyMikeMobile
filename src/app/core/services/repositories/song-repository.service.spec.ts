@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { SongRepositoryService } from './song-repository.service';
-
 // Import Firebase mocks (par exemple avec `@angular/fire/testing` ou un mock custom)
 import { provideFirebaseApp } from '@angular/fire/app';
-import { initializeApp } from 'firebase/app';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { initializeApp } from 'firebase/app';
 import { environment } from 'src/environments/environment';
+
+import { SongRepositoryService } from './song-repository.service';
 
 describe('SongRepositoryService', () => {
   let service: SongRepositoryService;

@@ -1,16 +1,7 @@
-import {
-  IonAvatar,
-  IonButton,
-  IonCol,
-  IonGrid,
-  IonIcon,
-  IonModal,
-  IonRow,
-  ModalController,
-} from '@ionic/angular/standalone';
+import { Component, inject, Input } from '@angular/core';
+import { IonButton, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { Component, inject, Input, OnInit } from '@angular/core';
-import { heartOutline, shareSocialOutline } from 'ionicons/icons';
+import { shareSocialOutline } from 'ionicons/icons';
 import { ShareModalComponent } from 'src/app/shared/modal/share-modal/share-modal.component';
 
 @Component({
@@ -18,16 +9,7 @@ import { ShareModalComponent } from 'src/app/shared/modal/share-modal/share-moda
   templateUrl: './share-song.component.html',
   standalone: true,
   styleUrls: ['./share-song.component.scss'],
-  imports: [
-    IonButton,
-    IonIcon,
-    IonModal,
-    IonGrid,
-    IonCol,
-    IonRow,
-    IonAvatar,
-    ShareModalComponent,
-  ],
+  imports: [IonButton, IonIcon],
 })
 export class ShareSongComponent {
   constructor() {

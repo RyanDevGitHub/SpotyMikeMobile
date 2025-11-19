@@ -9,8 +9,8 @@ describe('LyricsBoxComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ LyricsBoxComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [LyricsBoxComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LyricsBoxComponent);

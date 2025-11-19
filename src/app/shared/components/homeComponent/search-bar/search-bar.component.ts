@@ -1,34 +1,32 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import {
   AnimationController,
   IonButton,
-  IonCol,
-  IonGrid,
+  IonButtons,
   IonIcon,
-  IonRow,
+  IonToolbar,
   ModalController,
-  createAnimation,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { flashOutline, searchOutline } from 'ionicons/icons';
+
 import { QuickMenuComponent } from '../../../modal/quick-menu/quick-menu.component';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-search-bar',
   templateUrl: './search-bar.component.html',
   standalone: true,
   styleUrls: ['./search-bar.component.scss'],
-  imports: [IonGrid, IonRow, IonCol, IonButton, IonIcon],
+  imports: [IonButtons, IonToolbar, IonButton, IonIcon],
 })
-export class SearchBarComponent implements OnInit {
+export class SearchBarComponent {
   constructor(private animationCtrl: AnimationController) {
     addIcons({ flashOutline, searchOutline });
   }
 
   private modalCtl = inject(ModalController);
   private router = inject(Router);
-  ngOnInit() {}
 
   async openQuickMenu() {
     const modal = await this.modalCtl.create({
@@ -40,16 +38,16 @@ export class SearchBarComponent implements OnInit {
   }
 
   MyEnterAnimation = (baseEl: HTMLElement) => {
-    const root: any = baseEl.shadowRoot;
+    const root: ShadowRoot | null = baseEl.shadowRoot;
 
     const backdropAnimation = this.animationCtrl
       .create()
-      .addElement(root.querySelector('ion-backdrop')!)
+      .addElement(root!.querySelector('ion-backdrop')!)
       .fromTo('opacity', '0.01', 'var(--backdrop-opacity)');
 
     const wrapperAnimation = this.animationCtrl
       .create()
-      .addElement(root.querySelector('.modal-wrapper')!)
+      .addElement(root!.querySelector('.modal-wrapper')!)
       .fromTo('transform', 'translateX(-100%)', 'translateX(0)')
       .fromTo('opacity', 0, 1);
 

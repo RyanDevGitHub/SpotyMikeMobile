@@ -9,8 +9,8 @@ describe('TopSongsComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ TopSongsComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [TopSongsComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TopSongsComponent);

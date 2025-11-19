@@ -1,7 +1,5 @@
-import { IUser } from './../../core/interfaces/user';
-import { Firebase } from '../../core/services/firebase.service';
-import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -9,36 +7,27 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AppState } from '@capacitor/app';
 import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonList,
-  IonItem,
-  IonInput,
   IonButton,
   IonIcon,
-  IonAvatar,
-  ToastController,
+  IonInput,
+  IonItem,
+  IonList,
   IonSpinner,
+  ModalController,
+  ToastController,
 } from '@ionic/angular/standalone';
-import { AuthentificationService } from 'src/app/core/services/authentification.service';
-import { TranslateModule } from '@ngx-translate/core';
-import {
-  LoginRequestError,
-  LoginRequestSuccess,
-} from 'src/app/core/interfaces/login';
-import { Router } from '@angular/router';
-import { ModalController } from '@ionic/angular/standalone';
-import { PasswordLostComponent } from 'src/app/shared/modal/password-lost/password-lost.component';
-import { LocalStorageService } from 'src/app/core/services/local-strorage.service';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { timeout } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { AppState } from '@capacitor/app';
-import { log } from 'console';
-import { login, loginFailure, loginSuccess } from 'src/app/core/store/action/user.action';
+import { TranslateModule } from '@ngx-translate/core';
+import { Auth } from 'firebase/auth';
+import { AuthentificationService } from 'src/app/core/services/authentification.service';
+// CORRECTION : Importation du jeton depuis le fichier dédié
+import { FirebaseAuthToken } from 'src/app/core/services/firebase-auth.token';
+import { LocalStorageService } from 'src/app/core/services/local-storage.service';
+import { login } from 'src/app/core/store/action/user.action';
+import { PasswordLostComponent } from 'src/app/shared/modal/password-lost/password-lost.component';
 
 @Component({
   selector: 'app-login',
@@ -47,16 +36,11 @@ import { login, loginFailure, loginSuccess } from 'src/app/core/store/action/use
   standalone: true,
   imports: [
     IonSpinner,
-    IonAvatar,
     IonIcon,
     IonItem,
     IonList,
-    IonTitle,
     IonInput,
-    IonHeader,
     IonButton,
-    IonToolbar,
-    IonContent,
     FormsModule,
     CommonModule,
     TranslateModule,
@@ -71,7 +55,8 @@ export class LoginPage implements OnInit {
   private router = inject(Router);
   private modalCtl = inject(ModalController);
   private serviceAuth = inject(AuthentificationService);
-  private toastCtrl = inject(ToastController);
+  private toastCtrl = inject(ToastController); // CORRECTION : Injection via le jeton explicite (FirebaseAuthToken)
+  private auth: Auth = inject(FirebaseAuthToken);
   private store = inject(Store<AppState>);
 
   form: FormGroup = new FormGroup({
@@ -86,15 +71,15 @@ export class LoginPage implements OnInit {
   });
 
   constructor() {}
-  ngOnInit() {
+  async ngOnInit() {
     window.addEventListener('offline', () => {
       this.showNetworkToast();
     });
   }
-  onSubmit() {
-    this.error = '';
 
-    // Vérification connexion réseau
+  onSubmit() {
+    this.error = ''; // Vérification connexion réseau
+
     if (!navigator.onLine) {
       this.showNetworkToast();
       return;
@@ -108,7 +93,7 @@ export class LoginPage implements OnInit {
       login({
         email: this.form.value.email,
         password: this.form.value.password,
-      })
+      }),
     );
   }
 
@@ -129,20 +114,8 @@ export class LoginPage implements OnInit {
     modal.present();
   }
 
-  loginWithGoogle() {
-    this.error = '';
-    this.submitForm = true;
-
-    this.serviceAuth.signInWithGoogle().subscribe((result) => {
-      this.submitForm = false;
-      if (result.type === 'success') {
-        this.store.dispatch(
-          loginSuccess({ user: result.user, token: result.token })
-        );
-      } else {
-        this.error = result.message;
-        this.store.dispatch(loginFailure({ error: result.message }));
-      }
-    });
+  async loginWithGoogle() {
+    //User Authentication
+    // this.serviceAuth.signInWithGoogle();
   }
 }

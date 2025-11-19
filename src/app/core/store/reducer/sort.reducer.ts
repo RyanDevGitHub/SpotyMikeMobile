@@ -1,4 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
+
 import * as SortActions from '../action/sort.action';
 
 export interface SortState {
@@ -54,5 +55,5 @@ export const sortReducer = createReducer(
   on(SortActions.resetSort, (state, { page }) => ({
     ...state,
     [page]: null,
-  }))
+  })),
 );

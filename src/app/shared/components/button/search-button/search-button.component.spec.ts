@@ -9,8 +9,8 @@ describe('SearchButtonComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchButtonComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [SearchButtonComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SearchButtonComponent);

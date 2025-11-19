@@ -1,17 +1,13 @@
-import {
-  EntityState,
-  EntityAdapter,
-  createEntityAdapter,
-  Dictionary,
-} from '@ngrx/entity';
-import { ISong } from '../../interfaces/song';
+import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 import { createReducer, on } from '@ngrx/store';
+
+import { ISong } from '../../interfaces/song';
 import * as ActionSOngs from '../action/song.action';
 
-export interface SongsState extends EntityState<ISong> {
-  loading: boolean;
-  error: string | null;
-}
+  export interface SongsState extends EntityState<ISong> {
+    loading: boolean;
+    error: string | null;
+  }
 
 export const adapter: EntityAdapter<ISong> = createEntityAdapter<ISong>();
 
@@ -32,7 +28,7 @@ export const musicReducer = createReducer(
         loading: true,
         error: null,
       }
-    )
+    ),
   ),
   on(ActionSOngs.loadSongSuccess, (state, { songs }) => {
     console.log('[Reducer] Updating state with songs:', songs);
@@ -47,8 +43,8 @@ export const musicReducer = createReducer(
         loading: false,
         error,
       }
-    )
-  )
+    ),
+  ),
 );
 
 // Générer les sélecteurs

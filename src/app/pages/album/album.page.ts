@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   Input,
@@ -5,34 +6,32 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonGrid,
-  IonRow,
-  IonImg,
-  IonCol,
-  IonButton,
-  IonIcon,
-} from '@ionic/angular/standalone';
-import { LikeSongComponent } from 'src/app/shared/components/button/like-song/like-song.component';
-import { ShareSongComponent } from 'src/app/shared/components/button/share-song/share-song.component';
-import { MusicContainerComponent } from 'src/app/shared/components/containers/music-container/music-container.component';
-import { IAlbum } from 'src/app/core/interfaces/album';
-import { IArtist } from 'src/app/core/interfaces/user';
-import { Subscription, tap } from 'rxjs';
-import { ModalStateService } from 'src/app/core/services/modal-state.service';
-import { AppState } from '@capacitor/app';
-import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
-import { selectAlbumById } from 'src/app/core/store/selector/album.selector';
+import { AppState } from '@capacitor/app';
+import {
+  IonButton,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonIcon,
+  IonImg,
+  IonRow,
+} from '@ionic/angular/standalone';
+import { Store } from '@ngrx/store';
+import { Subscription, tap } from 'rxjs';
+import { IAlbum } from 'src/app/core/interfaces/album';
+import {
+  PlayContext,
+  PlayPageType,
+} from 'src/app/core/interfaces/play-page-type';
 import { ISong } from 'src/app/core/interfaces/song';
+import { IArtist } from 'src/app/core/interfaces/user';
+import { ModalStateService } from 'src/app/core/services/modal-state.service';
+import { selectAlbumById } from 'src/app/core/store/selector/album.selector';
 import { selectArtistById } from 'src/app/core/store/selector/artist.selector';
 import { BackButtonComponent } from 'src/app/shared/components/button/back-button/back-button.component';
+import { MusicContainerComponent } from 'src/app/shared/components/containers/music-container/music-container.component';
 
 @Component({
   selector: 'app-album',
@@ -47,13 +46,8 @@ import { BackButtonComponent } from 'src/app/shared/components/button/back-butto
     IonRow,
     IonGrid,
     IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
     CommonModule,
     FormsModule,
-    LikeSongComponent,
-    ShareSongComponent,
     MusicContainerComponent,
     BackButtonComponent,
   ],
@@ -64,6 +58,8 @@ export class AlbumPage implements OnInit {
   duration: string = '0 min';
   public isModalOpen: boolean;
   private modalSubscription: Subscription;
+  pageType = PlayPageType.Album;
+  playContext: PlayContext;
   @ViewChildren(MusicContainerComponent)
   musicComponents!: QueryList<MusicContainerComponent>;
 
@@ -79,6 +75,7 @@ export class AlbumPage implements OnInit {
 
   ngOnInit() {
     const albumId = this.route.snapshot.paramMap.get('id')!;
+    this.playContext = { type: this.pageType, sourceId: albumId };
     this.store
       .select(selectAlbumById(albumId))
       .pipe(tap((alb) => console.log('[DEBUG] album:', alb)))

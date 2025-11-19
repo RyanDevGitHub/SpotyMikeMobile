@@ -1,10 +1,11 @@
 import { createSelector } from '@ngrx/store';
-import { selectAllSongs } from './song.selector';
-import { selectAllAlbums } from './album.selector';
-import { ISong } from '../../interfaces/song';
+
 import { IAlbum } from '../../interfaces/album';
-import { selectAllArtists } from './artist.selector';
+import { ISong } from '../../interfaces/song';
 import { IArtist } from '../../interfaces/user';
+import { selectAllAlbums } from './album.selector';
+import { selectAllArtists } from './artist.selector';
+import { selectAllSongs } from './song.selector';
 
 export const selectSearchResults = (searchTerm: string) =>
   createSelector(
@@ -15,14 +16,14 @@ export const selectSearchResults = (searchTerm: string) =>
       const lowerTerm = searchTerm.toLowerCase();
 
       const filteredSongs = songs.filter((song) =>
-        song.title.toLowerCase().includes(lowerTerm)
+        song.title.toLowerCase().includes(lowerTerm),
       );
 
       const filteredAlbums = albums.filter((album) =>
-        album.title.toLowerCase().includes(lowerTerm)
+        album.title.toLowerCase().includes(lowerTerm),
       );
       const filteredArtist = artists.filter((artist) =>
-        artist.firstName.toLowerCase().includes(lowerTerm)
+        artist.firstName.toLowerCase().includes(lowerTerm),
       );
 
       return {
@@ -30,7 +31,7 @@ export const selectSearchResults = (searchTerm: string) =>
         albums: filteredAlbums,
         artists: filteredArtist,
       };
-    }
+    },
   );
 export const selectArtistData = (userId: string) =>
   createSelector(
@@ -52,7 +53,7 @@ export const selectArtistData = (userId: string) =>
             .sort(
               (a, b) =>
                 new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime()
+                new Date(a.createdAt).getTime(),
             )[0].cover
         : null;
 
@@ -62,5 +63,5 @@ export const selectArtistData = (userId: string) =>
         albums: artistAlbums,
         lastAlbumCover,
       };
-    }
+    },
   );

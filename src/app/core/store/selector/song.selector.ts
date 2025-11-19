@@ -1,16 +1,14 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { AppState } from '../app.state';
+
+import { ISong } from '../../interfaces/song';
 import { adapter, SongsState } from '../reducer/song.reducer';
-import { ISong, SongGenre } from '../../interfaces/song';
-import { selectUser } from './user.selector';
-import { selectAllArtists, selectAllArtistInfos } from './artist.selector';
 import { selectSortState } from './sort.selectors';
+import { selectUser, selectUserPlaylists } from './user.selector';
 // Sélecteur pour récupérer l'état de la musique
 export const selectMusicState = createFeatureSelector<SongsState>('music');
 
 // Sélecteurs générés par l'adapter
-const { selectAll, selectEntities, selectIds, selectTotal } =
-  adapter.getSelectors();
+const { selectEntities, selectIds, selectTotal } = adapter.getSelectors();
 
 // Sélecteurs spécifiques
 export const selectAllSongs = createSelector(selectMusicState, (state) =>
@@ -51,7 +49,7 @@ export const debugSelectAllSongs = createSelector(selectAllSongs, (songs) => {
 export const selectFilteredAndSortedSongsByGenre = (genre: string) =>
   createSelector(selectAllSongs, selectSortState, (songs, sortState) => {
     // Filtrage par genre
-    let filteredSongs =
+    const filteredSongs =
       genre && genre !== 'All'
         ? songs.filter((song) => song.genre === genre)
         : songs;
@@ -93,15 +91,15 @@ export const selectRecentSongs = createSelector(selectAllSongs, (songs) => {
   const recentSongs = songs
     .filter((song) => song.createAt)
     .sort((a, b) => b.createAt.getTime() - a.createAt.getTime())
-    .slice(0, 3);
+    .slice(0, 10);
 
-  console.log('[Selector] Recent 3 songs:', recentSongs);
+  console.log('[Selector] Recent 10 songs:', recentSongs);
   return recentSongs;
 });
 
-function toDate(timestamp: { seconds: number; nanoseconds: number }): Date {
-  return new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1e6);
-}
+// function toDate(timestamp: { seconds: number; nanoseconds: number }): Date {
+//   return new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1e6);
+// }
 
 // Sélecteur pour les 5 chansons avec le plus de listeningCount
 export const selectTopSongsByListeningCount = createSelector(
@@ -109,7 +107,7 @@ export const selectTopSongsByListeningCount = createSelector(
   (songs) => {
     return songs
       .sort((a, b) => Number(b.listeningCount) - Number(a.listeningCount)) // convertir en nombre pour trier
-      .slice(0, 5); // top 5 chansons
+      .slice(0, 10); // top 10 chansons
   }
 );
 
@@ -120,10 +118,10 @@ export const selectSortedTopSongs = createSelector(
     // On récupère le tri pour la page 'topSongs'
     const sort = sortState.top_songs;
     if (!sort) {
-      // Si pas de tri, on fait le top 5 par écoute par défaut
+      // Si pas de tri, on fait le top 15 par écoute par défaut
       return [...songs]
         .sort((a, b) => Number(b.listeningCount) - Number(a.listeningCount))
-        .slice(0, 5);
+        .slice(0, 15);
     }
 
     // Sinon, on trie selon la clé et la direction
@@ -156,8 +154,8 @@ export const selectSortedTopSongs = createSelector(
       }
     });
 
-    // Top 5 chansons
-    return sorted.slice(0, 5);
+    // Top 15 chansons
+    return sorted.slice(0, 15);
   }
 );
 
@@ -165,11 +163,11 @@ export const selectLastSongsByUser = createSelector(
   selectUser,
   selectAllSongs,
   (user, songs): ISong[] => {
-    console.log('[Selector] User last songs IDs:', user?.lastsplayeds);
-    if (!user || !user.lastsplayeds) {
+    console.log('[Selector] User last songs IDs:', user?.lastsPlayed);
+    if (!user || !user.lastsPlayed) {
       return []; // Retourner une liste vide si l'utilisateur ou lastSongs est indéfini
     }
-    return user.lastsplayeds
+    return user.lastsPlayed
       .map((songId) => songs.find((song) => song.id === songId))
       .filter((song): song is ISong => song !== undefined); // Filtrer et garantir le type
   }
@@ -245,3 +243,11 @@ export const selectSortedLastPlayedSongs = createSelector(
     return sorted;
   }
 );
+export const selectSongsByPlaylistId = (playlistId: string) =>
+  createSelector(selectUserPlaylists, (playlists) => {
+    // 1. Trouver la playlist par son ID
+    const playlist = playlists.find((p) => p.id === playlistId);
+
+    // 2. Si la playlist est trouvée, retourner son tableau de chansons; sinon, un tableau vide.
+    return playlist ? playlist.songs : [];
+  });

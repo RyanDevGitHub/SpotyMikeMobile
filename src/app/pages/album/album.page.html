@@ -30,7 +30,10 @@
     <!-- Liste des chansons -->
     <ion-row *ngFor="let song of album.songs">
       <ion-col>
-        <app-music-container [song]="song"></app-music-container>
+        <app-music-container
+          [openWith]="playContext"
+          [song]="song"
+        ></app-music-container>
       </ion-col>
     </ion-row>
   </ion-grid>

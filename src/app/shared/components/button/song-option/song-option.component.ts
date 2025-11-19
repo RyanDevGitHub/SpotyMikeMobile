@@ -1,62 +1,27 @@
-import { Component, Input, OnInit, ViewChild, inject } from '@angular/core';
-import { addIcons } from 'ionicons';
+import { Component, inject, Input, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import {
-  addCircleOutline,
-  albumsOutline,
-  ellipsisHorizontalOutline,
-  personAddOutline,
-  shareOutline,
-} from 'ionicons/icons';
-import {
-  IonIcon,
   IonButton,
-  IonContent,
+  IonIcon,
   IonModal,
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonTitle,
-  IonItem,
-  IonInput,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonImg,
-  IonText,
   ModalController,
 } from '@ionic/angular/standalone';
-import { ModalStateService } from 'src/app/core/services/modal-state.service';
-import { Router } from '@angular/router';
-import { SongOptionModalComponent } from '../../../modal/song-option-modal/song-option-modal.component';
 import { ISong } from 'src/app/core/interfaces/song';
+import { ModalStateService } from 'src/app/core/services/modal-state.service';
+
+import { SongOptionModalComponent } from '../../../modal/song-option-modal/song-option-modal.component';
 
 @Component({
   selector: 'app-song-option',
   templateUrl: './song-option.component.html',
   standalone: true,
   styleUrls: ['./song-option.component.scss'],
-  imports: [
-    IonText,
-    IonImg,
-    IonCol,
-    IonRow,
-    IonGrid,
-    IonButtons,
-    IonButton,
-    IonIcon,
-    IonContent,
-    IonModal,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonItem,
-    IonInput,
-  ],
+  imports: [IonButton, IonIcon],
 })
 export class SongOptionComponent {
   constructor(
     private modalStateService: ModalStateService,
-    private router: Router
+    private router: Router,
   ) {}
   @ViewChild(IonModal) modalRef!: IonModal;
   @Input() id: string;

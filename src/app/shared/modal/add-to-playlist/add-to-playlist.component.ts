@@ -1,38 +1,31 @@
-import { selectUserPlaylists } from './../../../core/store/selector/user.selector';
 import { Component, inject, Input, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { AppState } from '@capacitor/app';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonButtons,
   IonAvatar,
-  IonRadio,
+  IonButton,
+  IonButtons,
   IonCheckbox,
+  IonContent,
+  IonHeader,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonTitle,
+  IonToolbar,
   ModalController,
   ToastController,
 } from '@ionic/angular/standalone';
 import { Store } from '@ngrx/store';
+import { IPlaylistWithSelection } from 'src/app/core/interfaces/playlists';
 import { ISong } from 'src/app/core/interfaces/song';
-import {
-  IPlaylist,
-  IPlaylistWithSelection,
-} from 'src/app/core/interfaces/playlistes';
-import {
-  IonContent,
-  IonList,
-  IonButton,
-  IonItem,
-  IonLabel,
-} from '@ionic/angular/standalone';
-import { AppState } from '@capacitor/app';
-import { AsyncPipe } from '@angular/common';
-import { CreatePlaylistComponent } from '../create-playlist/create-playlist.component';
 import {
   addSongToPlaylist,
   removeSongFromPlaylist,
 } from 'src/app/core/store/action/user.action';
-import { firstValueFrom, map } from 'rxjs';
-import { FormsModule } from '@angular/forms';
+
+import { CreatePlaylistComponent } from '../create-playlist/create-playlist.component';
+import { selectUserPlaylists } from './../../../core/store/selector/user.selector';
 
 @Component({
   selector: 'app-add-to-playlist',
@@ -41,7 +34,6 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [
     IonCheckbox,
-    IonRadio,
     IonAvatar,
     IonButtons,
     IonTitle,
@@ -52,7 +44,6 @@ import { FormsModule } from '@angular/forms';
     IonButton,
     IonList,
     IonContent,
-    AsyncPipe,
     FormsModule,
   ],
 })

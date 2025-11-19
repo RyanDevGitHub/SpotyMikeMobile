@@ -9,8 +9,8 @@ describe('ShareSongComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ShareSongComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [ShareSongComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ShareSongComponent);

@@ -38,7 +38,10 @@
   <ion-grid>
     @switch(selectedTab()) { @case('music') { @for(song of (songList$ | async);
     track song) {
-    <app-music-container [song]="song"></app-music-container>
+    <app-music-container
+      [openWith]="playContext"
+      [song]="song"
+    ></app-music-container>
     } } @case('album') { @for(album of (albumList$ | async); track album) {
     <app-album-container [album]="album"></app-album-container>
     } } }

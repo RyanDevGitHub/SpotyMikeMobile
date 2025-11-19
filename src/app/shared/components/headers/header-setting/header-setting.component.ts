@@ -1,13 +1,14 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   IonCol,
   IonGrid,
   IonHeader,
   IonRow,
   IonText,
-  IonToolbar,
   IonTitle,
+  IonToolbar,
 } from '@ionic/angular/standalone';
+
 import { BackButtonComponent } from '../../button/back-button/back-button.component';
 
 @Component({
@@ -26,19 +27,17 @@ import { BackButtonComponent } from '../../button/back-button/back-button.compon
     IonText,
   ],
 })
-export class HeaderSettingComponent implements OnInit {
+export class HeaderSettingComponent {
   @Input() title: string;
   @Input() saveData: boolean;
 
-  @Output() saveEvent = new EventEmitter<any>(); // l’EventEmitter
+  @Output() saveEvent = new EventEmitter<boolean>(); // l’EventEmitter
   constructor() {}
 
-  ngOnInit() {}
   save() {
     if (this.saveData) {
       this.saveEvent.emit(this.saveData); // on envoie la data au parent
       console.log('[Child] Save data emitted:', this.saveData);
     }
   }
-  
 }

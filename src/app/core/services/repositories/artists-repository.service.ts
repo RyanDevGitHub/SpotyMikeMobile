@@ -2,14 +2,15 @@ import { Injectable } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import {
   collection,
-  getDocs,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
   query,
   where,
 } from 'firebase/firestore';
 import { environment } from 'src/environments/environment';
+
 import { IArtist } from '../../interfaces/user';
 
 @Injectable({ providedIn: 'root' })
@@ -51,7 +52,7 @@ export class ArtistsRepository {
       });
 
       const artists = (await Promise.all(artistDocsPromises)).filter(
-        (a): a is IArtist => a !== null
+        (a): a is IArtist => a !== null,
       );
 
       console.log('[Repository] ✅ Loaded artists:', artists.length);

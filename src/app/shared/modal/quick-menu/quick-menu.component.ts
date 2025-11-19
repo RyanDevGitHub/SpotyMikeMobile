@@ -1,26 +1,16 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   AnimationController,
   IonAvatar,
   IonButton,
-  IonButtons,
   IonCol,
   IonContent,
   IonGrid,
-  IonHeader,
   IonIcon,
-  IonImg,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonModal,
   IonRow,
   IonText,
-  IonTitle,
-  IonToolbar,
   ModalController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -38,20 +28,10 @@ import { AuthFacade } from 'src/app/core/state/auth/auth.facade';
   standalone: true,
   styleUrls: ['./quick-menu.component.scss'],
   imports: [
-    IonModal,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
     IonContent,
-    IonList,
     IonButton,
-    IonItem,
     IonAvatar,
-    IonImg,
-    IonLabel,
     IonText,
-    IonInput,
     IonGrid,
     IonCol,
     IonRow,
@@ -63,7 +43,7 @@ export class QuickMenuComponent implements OnInit {
   user$ = this.authFacade.user$;
   constructor(
     private animationCtrl: AnimationController,
-    private authFacade: AuthFacade
+    private authFacade: AuthFacade,
   ) {}
   private modalCtl = inject(ModalController);
   private router = inject(Router);
