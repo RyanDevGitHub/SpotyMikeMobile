@@ -23,6 +23,7 @@ import { musicReducer } from './core/store/reducer/song.reducer';
 export class AppComponent implements OnInit {
   private translate = inject(TranslateService);
   store = inject(Store<AppState>);
+
   // Injectez Platform ici
   constructor(
     private audioService: MusicServiceService,
@@ -34,14 +35,26 @@ export class AppComponent implements OnInit {
 
   async initializeSocialLogin() {
     // Le plugin recommande de le faire "tôt"
-    await SocialLogin.initialize({
+    // On peut retirer l'await ici si on utilise .then() pour le logging
+    return SocialLogin.initialize({
       google: {
         // ⭐ Le webClientId est obligatoire pour le mode web (ionic serve) et Android
         webClientId: environment.firebaseConfig.webClientId,
-        mode: 'online',
       },
       // Ajoutez vos configs Apple, Facebook ici si nécessaire
-    });
+    })
+      .then(() => {
+        // 💡 CE LOG S'EXÉCUTE UNIQUEMENT LORSQUE L'INITIALISATION EST TERMINÉE AVEC SUCCÈS
+        console.log('[SocialLogin] ✅ Plugin initialisé avec succès.');
+        return true; // Retourne un succès
+      })
+      .catch((error) => {
+        console.error(
+          "[SocialLogin] ❌ Échec de l'initialisation du plugin:",
+          error
+        );
+        return false; // Retourne un échec
+      });
   }
   setStatusBarStyleDark = async () => {
     await StatusBar.setStyle({ style: Style.Dark });
@@ -78,6 +91,24 @@ export class AppComponent implements OnInit {
         this.logStatusBarInfo();
       }
     });
+
+    SocialLogin.isLoggedIn({ provider: 'google' })
+      .then(async (result) => {
+        // L'utilisateur est maintenant connecté dans le contexte du plugin
+        // Mais vous devez toujours faire l'échange Firebase si c'est la fenêtre parente qui se connecte.
+        console.log('Redirection gérée, token récupéré:', result);
+        const authCodeResult = await SocialLogin.getAuthorizationCode({
+          provider: 'google',
+        });
+        console.log(
+          '✅ Code/Token obtenu via getAuthorizationCode :',
+          authCodeResult
+        );
+        this.authService.exchangeTokenWithFirebase(authCodeResult.jwt!);
+      })
+      .catch((e) => {
+        console.error('Erreur lors de la gestion de la redirection:', e);
+      });
 
     console.log('[App] Dispatching initializeAuth');
     this.store.dispatch(initializeAuth());

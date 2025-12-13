@@ -15,6 +15,7 @@ import { IToken, IUserDataBase } from './../interfaces/user';
 import { AuthService } from './auth.service';
 import { Firebase } from './firebase.service';
 import { UserRepositoryService } from './repositories/user-repository.service';
+import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 
 @Injectable({
   providedIn: 'root',
@@ -87,42 +88,7 @@ export class AuthentificationService {
     );
   }
 
-  // signInWithGoogle(): Observable<LoginRequestSuccess | LoginRequestError> {
-  //   console.log(
-  //     'GOOGLE SIGN-IN: Début de l’appel à this.auth.signInWithGoogle()'
-  //   );
-  //   // 🚨 IL FAUT AJOUTER UN CATCH ICI POUR CAPTURER L'ERREUR DU PLUGIN CAPACITOR 🚨
-  //   return this.auth.signInWithGoogle().pipe(
-  //     map((result) => {
-  //       console.log('GOOGLE SIGN-IN: Succès du processus Google.', result);
-  //       return result; // Supposons que result est de type LoginRequestSuccess
-  //     }),
-  //     catchError((error) => {
-  //       console.error(
-  //         "*** GOOGLE SIGN-IN FAILED (TS) ***: Erreur capturée par l'AuthentificationService",
-  //         error
-  //       );
-  //       // Si l'erreur est un objet, essayez d'accéder à son message :
-  //       console.error('Erreur détaillée:', error.message || error);
 
-  //       // Si le message d'erreur est trop long, le logcat peut le tronquer, d'où la nécessité de logs supplémentaires :
-  //       if (
-  //         error &&
-  //         error.message &&
-  //         error.message.includes('DEVELOPER_ERROR')
-  //       ) {
-  //         console.error(
-  //           'ERREUR CLÉ: DEVELOPER_ERROR DETECTED! Vérifiez la configuration SHA-1 / Client ID.'
-  //         );
-  //       }
-
-  //       // Retourner l'erreur pour la gestion front-end
-  //       return of({
-  //         message: error.message || 'Google Sign-In failed.',
-  //       } as LoginRequestError);
-  //     })
-  //   );
-  // }
 
   register(email: string, password: string, user: IUserDataBase) {
     console.log(`REGISTER: Tentative d'inscription pour l'email: ${email}`);
