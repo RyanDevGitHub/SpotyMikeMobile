@@ -4,7 +4,9 @@ import {
   Auth,
   createUserWithEmailAndPassword,
   getAuth,
+  GoogleAuthProvider,
   onAuthStateChanged,
+  signInWithCredential,
   signInWithCustomToken,
   signInWithEmailAndPassword,
   signOut,
@@ -12,10 +14,14 @@ import {
 } from 'firebase/auth';
 // Import du jeton d'injection depuis le fichier dédié
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
-import { from, Observable, of } from 'rxjs';
+import { from, lastValueFrom, Observable, of } from 'rxjs';
 
-import { IUserDataBase } from '../interfaces/user';
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { IFirebaseUser, IUserDataBase } from '../interfaces/user';
 import { EAuthPage } from '../models/refData';
+import { loginSuccess } from '../store/action/user.action';
+import { AppState } from '../store/app.state';
 import { FirebaseAuthToken } from './firebase-auth.token';
 import { UserRepositoryService } from './repositories/user-repository.service';
 
@@ -28,12 +34,14 @@ export class AuthService {
     '823395277840-be9l5id933b1rk6e12dnoj9p9n92v2n4.apps.googleusercontent.com'; // Injection via le jeton explicite qui est configuré dans main.ts
   private auth: Auth = inject(FirebaseAuthToken);
   public user$: Observable<User | null>;
+  store = inject(Store<AppState>);
+  router = inject(Router);
   public authState$ = new Observable<User | null>((subscriber) => {
     onAuthStateChanged(this.auth, subscriber);
   });
   constructor(
     private http: HttpClient,
-    private userService: UserRepositoryService
+    private UserRepository: UserRepositoryService
   ) {
     this.user$ = new Observable<User | null>((subscriber) => {
       // Firebase lit la session du Local Storage et vérifie si le token est valide.
@@ -123,9 +131,7 @@ export class AuthService {
     return from(signInPromise);
   }
 
-  // signInWithGoogle(
-  //   useRedirect?: boolean
-  // ): Observable<LoginRequestSuccess | LoginRequestError> {
+  // signInWithGoogle(): Observable<LoginRequestSuccess | LoginRequestError> {
   //   console.log('--- Service : Entrée dans signInWithGoogle ---');
 
   //   // L'opérateur 'from' doit recevoir la Promise RÉSULTANTE
@@ -134,6 +140,7 @@ export class AuthService {
   //       // 1. Définition de la fonction async
 
   //       // ✅ Le code va s'exécuter et le log devrait s'afficher
+
   //       const isNative =
   //         (window as any)?.Capacitor?.isNativePlatform?.() ?? false;
   //       console.log('isNative platform:', isNative);
@@ -169,7 +176,7 @@ export class AuthService {
   //           // Await and return the UserCredential so every code path returns a value
   //           const result = await signInWithPopup(auth, provider);
   //           return result;
-  //         } catch (error: any) {
+  //         } catch (error: Error ) {
   //           // Normalize the error by throwing so the outer from(...) promise rejects and is handled by catchError
   //           throw new Error(
   //             `Web Google login failed: ${error?.message || 'Unknown error'}`
@@ -179,7 +186,9 @@ export class AuthService {
   //       // Note: Il est crucial que tous les chemins de code retournent ou lèvent une erreur.
   //     })() // 2. L'appel immédiat : retourne la Promise au 'from'
   //   ).pipe(
-  //     switchMap((userCredential) => this.handleCredential(userCredential ?? null)),
+  //     switchMap((userCredential) =>
+  //       this.handleCredential(userCredential ?? null)
+  //     ),
   //     catchError((err: any) => {
   //       console.error(err);
   //       return of({
@@ -225,35 +234,49 @@ export class AuthService {
   //   );
   // }
 
-  // private handleCredential(
-  //   userCredential: UserCredential | null
-  // ): Observable<LoginRequestSuccess | LoginRequestError> {
-  //   const firebaseUser = userCredential?.user ?? null;
-  //   if (!firebaseUser) {
-  //     return of({
-  //       type: 'error',
-  //       message: 'Google login failed',
-  //     } as LoginRequestError);
-  //   }
+  async exchangeTokenWithFirebase(idToken: string) {
+    try {
+      // 1. Connexion Firebase (Étape 1)
+      const credential = GoogleAuthProvider.credential(idToken);
+      const userCredential = await signInWithCredential(this.auth, credential);
 
-  //   return from(firebaseUser.getIdToken()).pipe(
-  //     switchMap((idToken) => {
-  //       const tokenObj: IToken = { token: idToken };
+      // L'utilisateur Firebase est maintenant connecté :
+      const firebaseUser = userCredential.user;
 
-  //       return this.userService.getOrCreateUser(firebaseUser).pipe(
-  //         map(
-  //           (user) =>
-  //             ({
-  //               type: 'success',
-  //               user,
-  //               token: tokenObj,
-  //               error: false,
-  //             } as LoginRequestSuccess)
-  //         )
-  //       );
-  //     })
-  //   );
-  // }
+      console.log(
+        '🎉 CONNEXION TERMINÉE ! Utilisateur Firebase ID:',
+        firebaseUser.uid
+      );
+
+      // ⭐ 2. NOUVELLE ÉTAPE : Créer ou obtenir le document utilisateur BDD
+      // Utilisez la méthode getOrCreateUser, et convertissez la Promise finale en Observable si nécessaire
+      // Si vous voulez rester dans l'async/await, vous devez convertir l'Observable en Promise
+
+      // Convertir l'Observable en Promise et l'attendre
+      const appUser = await lastValueFrom(
+        this.UserRepository.getOrCreateUser(firebaseUser as IFirebaseUser)
+        // NOTE: Assurez-vous que firebaseUser correspond bien à l'interface IFirebaseUser attendue
+      );
+
+      console.log(
+        `✅ Document utilisateur BDD géré pour : ${appUser.firstName}`
+      );
+
+      // 3. Redirection (qui se fait une fois que tout est fini, y compris la création BDD)
+      this.store.dispatch(
+        loginSuccess({
+          user: appUser,
+          token: { token: idToken },
+        })
+      );
+    } catch (firebaseError) {
+      console.error(
+        "❌ Échec lors de l'authentification ou de la création de l'utilisateur:",
+        firebaseError
+      );
+      // Gérer les erreurs de connexion ou de BDD ici
+    }
+  }
 
   async signUp(email: string, password: string): Promise<string> {
     const userCredential = await createUserWithEmailAndPassword(
