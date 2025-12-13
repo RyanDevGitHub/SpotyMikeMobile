@@ -1,0 +1,106 @@
+name: 🚀 CD - Ionic/Angular Build, Push & Deploy
+
+on:
+  push:
+    branches: ["main"] # Déclencher sur un push vers la branche 'main'
+
+# Permissions nécessaires : lire le code source et écrire sur le Container Registry
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  # ===============================================
+  # JOB 1: BUILD, TAG & PUSH L'IMAGE DOCKER (GHCR)
+  # ===============================================
+  docker-build-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      # 1. Utilisation d'un Personal Access Token (PAT) pour l'accès en écriture à GHCR
+      - name: 🔑 Login to GHCR (Push)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          # Utilise le secret GHCR_TOKEN (doit être un PAT avec le scope write:packages)
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      # 2. Construction de l'image et ajout de tags (latest et TAG SHA)
+      - name: 🐳 Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+          # Ajout du cache pour accélérer les builds futurs (étape npm install)
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ===============================================
+  # JOB 2: DÉPLOIEMENT SUR LE VPS VIA SSH
+  # ===============================================
+  deploy:
+    name: "🚀 Deploy to VPS"
+    runs-on: ubuntu-latest
+    # Dépend du succès du build
+    needs: docker-build-push
+
+    steps:
+      - name: 🚀 Deploy to VPS via SSH
+        # Utilise une version récente de l'action SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          # Utilise le secret de clé privée pour l'authentification
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # Port SSH (optionnel, utiliser 22 si non spécifié)
+          port: ${{ secrets.VPS_PORT }}
+
+          # Script exécuté sur le VPS
+          script: |
+            # --- Variables ---
+            CONTAINER_NAME="ionic-app-container" # Nom de conteneur recommandé, plus clair
+            IMAGE_REPO="ghcr.io/${{ github.repository }}" # Ex: ghcr.io/ryandevgithub/site-vitrine-web-catalyste
+            IMAGE_NAME="$IMAGE_REPO:latest"
+            NETWORK_NAME="mon_reseau_web" # Remplacez si votre réseau a un nom différent
+
+            # 1. Login sur le VPS pour pouvoir PULL l'image privée
+            # Utilise à nouveau le PAT (GHCR_TOKEN) pour l'authentification
+            echo "Authentification Docker pour GHCR..."
+            echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # 2. Arrêt et suppression de l'ancien conteneur
+            echo "Arrêt et suppression de l'ancien conteneur ($CONTAINER_NAME)..."
+            docker stop $CONTAINER_NAME || true
+            docker rm $CONTAINER_NAME || true
+
+            # 3. Pull la dernière image
+            echo "Pull de la dernière image ($IMAGE_NAME)..."
+            docker pull $IMAGE_NAME
+
+            # 4. Lancement du nouveau conteneur (Utilisation du réseau interne !)
+            echo "Lancement du nouveau conteneur sur le réseau ($NETWORK_NAME)..."
+            docker run -d \
+              --name $CONTAINER_NAME \
+              --restart unless-stopped \
+              --network $NETWORK_NAME \
+              $IMAGE_NAME
+              
+            # 5. Déconnexion Docker (Sécurité)
+            echo "Déconnexion Docker..."
+            docker logout ghcr.io
+
+            # 6. Nettoyage des images non utilisées (bonne pratique)
+            echo "Nettoyage des anciennes images..."
+            docker image prune -f
+
+            # 7. Vérification finale
+            echo "Vérification du lancement du conteneur :"
+            docker ps -f name=$CONTAINER_NAME
