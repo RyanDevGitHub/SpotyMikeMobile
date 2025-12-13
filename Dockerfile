@@ -11,17 +11,18 @@ RUN npm install
 COPY . .
 
 # Compilation en mode production
-# Utilise npm run build et ajoute l'argument de configuration de production
+# Commande fonctionnelle qui produit les fichiers dans /app/dist/...
 RUN npm run build -- --configuration production 
 
 # ÉTAPE 2: STAGE DE PRODUCTION (Image finale très légère avec Nginx)
 FROM nginx:alpine
 
-# (Configuration Nginx pour les Single Page Applications - SPA)
+# Configuration Nginx pour les SPA
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copie des fichiers compilés depuis le stage 'build' vers le répertoire Nginx
-# ATTENTION: Vérifiez et ajustez "spoty-mike-mobile/browser" si nécessaire !
-COPY --from=build /app/dist/spoty-mike-mobile/browser /usr/share/nginx/html
+# Tentative Finale: Suppression du sous-dossier "/browser"
+# Le chemin est maintenant /app/dist/spoty-mike-mobile/
+COPY --from=build /app/dist/spoty-mike-mobile /usr/share/nginx/html
 
 EXPOSE 80
