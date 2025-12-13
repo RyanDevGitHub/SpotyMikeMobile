@@ -71,34 +71,38 @@ jobs:
 
           # Script exécuté sur le VPS
           script: |
-            # --- Variables ---
             CONTAINER_NAME="ionic-app-container"
-            IMAGE_REPO="ghcr.io/${{ github.repository }}" 
-            IMAGE_NAME="$IMAGE_REPO:latest"
-            NETWORK_NAME="mon_reseau_web" # Assurez-vous que c'est le bon nom
+            REPO_FULL_NAME="${{ github.repository }}" 
+
+            # 🚨 CORRECTION : Conversion du nom du dépôt en minuscules. 
+            # La commande 'tr' est universelle sur les systèmes Linux.
+            IMAGE_REPO_LOWERCASE=$(echo "$REPO_FULL_NAME" | tr '[:upper:]' '[:lower:]')
+
+            IMAGE_NAME="ghcr.io/$IMAGE_REPO_LOWERCASE:latest" # <-- Utilisation de la variable corrigée
+            NETWORK_NAME="mon_reseau_web" # Assurez-vous que ce nom est correct sur votre VPS
 
             # 1. Login sur le VPS pour PULL l'image privée
-            # 🚨 UTILISE LE PAT (GHCR_TOKEN) - NÉCESSAIRE POUR L'ACCÈS EXTERNE AU VPS
             echo "Authentification Docker pour GHCR..."
             echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             # 2. Arrêt et suppression de l'ancien conteneur
+            # Le message "No such container" est ignoré grâce à '|| true'
             echo "Arrêt et suppression de l'ancien conteneur ($CONTAINER_NAME)..."
             docker stop $CONTAINER_NAME || true
             docker rm $CONTAINER_NAME || true
 
-            # 3. Pull la dernière image
+            # 3. Pull la dernière image (nom d'image corrigé)
             echo "Pull de la dernière image ($IMAGE_NAME)..."
             docker pull $IMAGE_NAME
 
-            # 4. Lancement du nouveau conteneur
+            # 4. Lancement du nouveau conteneur (nom d'image corrigé)
             echo "Lancement du nouveau conteneur sur le réseau ($NETWORK_NAME)..."
             docker run -d \
-              --name $CONTAINER_NAME \
-              --restart unless-stopped \
-              --network $NETWORK_NAME \
-              $IMAGE_NAME
-              
+             --name $CONTAINER_NAME \
+             --restart unless-stopped \
+             --network $NETWORK_NAME \
+             $IMAGE_NAME
+             
             # 5. Déconnexion Docker (Sécurité)
             echo "Déconnexion Docker..."
             docker logout ghcr.io
