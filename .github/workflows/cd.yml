@@ -2,12 +2,13 @@ name: 🚀 CD - Ionic/Angular Build, Push & Deploy
 
 on:
   push:
-    branches: ["main"] # Déclencher sur un push vers la branche 'main'
+    branches: ["main"]
 
-# Permissions nécessaires : lire le code source et écrire sur le Container Registry
+# Permissions nécessaires pour le jeton par défaut (GITHUB_TOKEN)
+# Ceci donne le droit d'écrire (PUSH) sur ghcr.io
 permissions:
   contents: read
-  packages: write
+  packages: write # <--- La clé pour résoudre l'erreur de PUSH
 
 jobs:
   # ===============================================
@@ -25,20 +26,21 @@ jobs:
 
       - name: ⬇️ Set Image Repository Name (Lowercase)
         id: repo_name
-        # Cette commande bash convertit le nom du dépôt (par exemple, RyanDevGitHub/SpotyMikeMobile) en minuscules.
+        # Cette commande bash convertit le nom du dépôt en minuscules.
         run: echo "IMAGE_REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
 
-      # 1. Utilisation d'un Personal Access Token (PAT) pour l'accès en écriture à GHCR
-      - name: 🔑 Login to GHCR (Push)
+      # 1. Login to GHCR : UTILISE LE GITHUB_TOKEN par défaut
+      # Ce jeton hérite de 'packages: write' défini en haut, donc le PUSH fonctionnera.
+      - name: 🔑 Login to GHCR (Push via GITHUB_TOKEN)
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          # Utilise le secret GHCR_TOKEN (doit être un PAT avec le scope write:packages)
-          password: ${{ secrets.GHCR_TOKEN }}
+          # UTILISATION DU GITHUB_TOKEN PAR DÉFAUT (qui a maintenant les permissions nécessaires)
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 2. Construction de l'image et ajout de tags (latest et TAG SHA)
-      - name: 🐳 Build Docker image
+      # 2. Construction de l'image et ajout de tags
+      - name: 🐳 Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -46,7 +48,6 @@ jobs:
           tags: |
             ghcr.io/${{ steps.repo_name.outputs.IMAGE_REPO }}:latest
             ghcr.io/${{ steps.repo_name.outputs.IMAGE_REPO }}:${{ github.sha }}
-          # Ajout du cache pour accélérer les builds futurs (étape npm install)
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -61,26 +62,23 @@ jobs:
 
     steps:
       - name: 🚀 Deploy to VPS via SSH
-        # Utilise une version récente de l'action SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          # Utilise le secret de clé privée pour l'authentification
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          # Port SSH (optionnel, utiliser 22 si non spécifié)
           port: ${{ secrets.VPS_PORT }}
 
           # Script exécuté sur le VPS
           script: |
             # --- Variables ---
-            CONTAINER_NAME="ionic-app-container" # Nom de conteneur recommandé, plus clair
-            IMAGE_REPO="ghcr.io/${{ github.repository }}" # Ex: ghcr.io/ryandevgithub/site-vitrine-web-catalyste
+            CONTAINER_NAME="ionic-app-container"
+            IMAGE_REPO="ghcr.io/${{ github.repository }}" 
             IMAGE_NAME="$IMAGE_REPO:latest"
-            NETWORK_NAME="mon_reseau_web" # Remplacez si votre réseau a un nom différent
+            NETWORK_NAME="mon_reseau_web" # Assurez-vous que c'est le bon nom
 
-            # 1. Login sur le VPS pour pouvoir PULL l'image privée
-            # Utilise à nouveau le PAT (GHCR_TOKEN) pour l'authentification
+            # 1. Login sur le VPS pour PULL l'image privée
+            # 🚨 UTILISE LE PAT (GHCR_TOKEN) - NÉCESSAIRE POUR L'ACCÈS EXTERNE AU VPS
             echo "Authentification Docker pour GHCR..."
             echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
@@ -93,7 +91,7 @@ jobs:
             echo "Pull de la dernière image ($IMAGE_NAME)..."
             docker pull $IMAGE_NAME
 
-            # 4. Lancement du nouveau conteneur (Utilisation du réseau interne !)
+            # 4. Lancement du nouveau conteneur
             echo "Lancement du nouveau conteneur sur le réseau ($NETWORK_NAME)..."
             docker run -d \
               --name $CONTAINER_NAME \
@@ -105,7 +103,7 @@ jobs:
             echo "Déconnexion Docker..."
             docker logout ghcr.io
 
-            # 6. Nettoyage des images non utilisées (bonne pratique)
+            # 6. Nettoyage des images non utilisées
             echo "Nettoyage des anciennes images..."
             docker image prune -f
 
