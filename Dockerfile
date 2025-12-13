@@ -11,8 +11,8 @@ RUN npm install
 COPY . .
 
 # Compilation en mode production
-# Utilisation de npx pour trouver l'exécutable ionic local
-RUN npx ionic build --prod 
+# Utilise npm run build et ajoute l'argument de configuration de production
+RUN npm run build -- --configuration production 
 
 # ÉTAPE 2: STAGE DE PRODUCTION (Image finale très légère avec Nginx)
 FROM nginx:alpine
@@ -21,6 +21,7 @@ FROM nginx:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copie des fichiers compilés depuis le stage 'build' vers le répertoire Nginx
-COPY --from=build /app/www /usr/share/nginx/html
+# ATTENTION: Vérifiez et ajustez "spoty-mike-mobile/browser" si nécessaire !
+COPY --from=build /app/dist/spoty-mike-mobile/browser /usr/share/nginx/html
 
 EXPOSE 80
