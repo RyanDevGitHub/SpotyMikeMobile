@@ -181,3 +181,28 @@ ion-img {
     align-items: center;
   }
 }
+@media (min-width: 768px) {
+  /* Le Conteneur principal qui centre tout */
+  .iphone-container {
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px; 
+    background-color: #f0f0f0; 
+  }
+
+  /* La VUE Mobile (simule la taille du téléphone) */
+  .iphone-container app-root {
+    width: 430px; /* Force la largeur du téléphone */
+    height: 932px; /* Force la hauteur du téléphone */
+    /* ... Autres styles de bordure/cadre ici ... */
+    overflow: hidden; 
+  }
+
+  /* Force les composants à rester en mode mobile 12/12 dans ce cadre */
+  .iphone-container .song {
+    flex: 0 0 100% !important; 
+    width: 100% !important; 
+    max-width: 100% !important;
+  }
+}

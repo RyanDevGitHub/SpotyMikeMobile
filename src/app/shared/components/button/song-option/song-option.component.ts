@@ -21,7 +21,7 @@ import { SongOptionModalComponent } from '../../../modal/song-option-modal/song-
 export class SongOptionComponent {
   constructor(
     private modalStateService: ModalStateService,
-    private router: Router,
+    private router: Router
   ) {}
   @ViewChild(IonModal) modalRef!: IonModal;
   @Input() id: string;
@@ -33,13 +33,23 @@ export class SongOptionComponent {
     const modalRef = await this.ctrlModal.create({
       component: SongOptionModalComponent,
       componentProps: {
-        song: this.song, // Replace with actual cover image if available
+        song: this.song,
       },
-      initialBreakpoint: 1, // Set the initial breakpoint to 30%
-      breakpoints: [0, 1], // Allow dragging to full height or lower
+      initialBreakpoint: 1,
+      breakpoints: [0, 1],
       cssClass: 'custom-modal-class',
     });
+
+    // 1. Ouvrir la modale et mettre à jour l'état du service
     this.modalStateService.setModalOpen(true);
+
+    // 2. Écouter la fermeture de la modale, peu importe comment elle est fermée.
+    // L'événement onDidDismiss est émis après la fin de l'animation de fermeture.
+    modalRef.onDidDismiss().then(() => {
+      // 3. Mettre à jour l'état du service pour retirer la classe 'modal-open'
+      this.modalStateService.setModalOpen(false);
+    });
+
     modalRef.present();
   }
 }

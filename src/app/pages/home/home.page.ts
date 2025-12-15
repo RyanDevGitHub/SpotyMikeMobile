@@ -1,12 +1,16 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  inject,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppState } from '@capacitor/app';
 import { IonicModule } from '@ionic/angular';
 import { Store } from '@ngrx/store';
 import * as MusicControls from 'capacitor-music-controls-plugin';
-import { addIcons } from 'ionicons';
-import { book, home } from 'ionicons/icons';
 import { map, Observable, Subscription } from 'rxjs';
 import { ISong } from 'src/app/core/interfaces/song';
 import { IUser } from 'src/app/core/interfaces/user';
@@ -43,6 +47,7 @@ export class HomePage implements OnInit, OnDestroy {
   store = inject(Store<AppState>);
   public isModalOpen: boolean;
   private modalSubscription: Subscription;
+  private cd = inject(ChangeDetectorRef);
 
   topsSongs$: Observable<ISong[]> = this.store.select(
     selectTopSongsByListeningCount
@@ -55,10 +60,12 @@ export class HomePage implements OnInit, OnDestroy {
   );
   user: IUser | null;
   constructor(private modalStateService: ModalStateService) {
-    addIcons({ book, home });
-    this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
-    );
+    this.modalSubscription = modalStateService.modalOpen$.subscribe((value) => {
+      this.isModalOpen = value;
+      // VÉRIFIEZ LE LOG DANS LA CONSOLE DU NAVIGATEUR
+      console.log('HomePage: isModalOpen est mis à jour à', value);
+      this.cd.detectChanges();
+    });
   }
 
   ngOnInit() {

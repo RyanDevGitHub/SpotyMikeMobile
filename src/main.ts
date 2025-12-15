@@ -23,10 +23,12 @@ import {
   addCircleOutline,
   albumsOutline,
   alertOutline,
+  book,
   chevronBackOutline,
   chevronForwardOutline,
   ellipsisHorizontalOutline,
   heartOutline,
+  home,
   homeOutline,
   musicalNoteOutline,
   pauseOutline,
@@ -89,6 +91,8 @@ addIcons({
   'play-outline': playOutline,
   'person-outline': personOutline,
   'pause-outline': pauseOutline,
+  book: book,
+  home: home,
 });
 
 bootstrapApplication(AppComponent, {
