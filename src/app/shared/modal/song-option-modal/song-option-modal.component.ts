@@ -16,6 +16,7 @@ import { ISong } from 'src/app/core/interfaces/song';
 import { ModalStateService } from 'src/app/core/services/modal-state.service';
 
 import { AddToPlaylistComponent } from '../add-to-playlist/add-to-playlist.component';
+import { ShareModalComponent } from '../share-modal/share-modal.component';
 
 @Component({
   selector: 'app-song-option',
@@ -32,10 +33,11 @@ export class SongOptionModalComponent implements OnInit, OnDestroy {
   store = inject(Store<AppState>);
   public isModalOpen: boolean;
   private modalSubscription: Subscription;
+  modalCtl = inject(ModalController);
 
   constructor() {
     this.modalSubscription = this.modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value),
+      (value) => (this.isModalOpen = value)
     );
   }
 
@@ -53,13 +55,42 @@ export class SongOptionModalComponent implements OnInit, OnDestroy {
     modal.present();
   }
   onClickRedirectToAlbum() {
-    this.router.navigate(['/home/album', this.song.albumInfo?.id]);
+    const albumId = this.song.albumInfo?.id;
+
+    const dataToPassBack = {
+      action: 'REDIRECT_TO_ALBUM',
+      albumId: albumId,
+    };
+
+    // Fermer cette petite modale d'option, et envoyer l'intention.
+    // Utiliser un rôle spécifique, par exemple 'navigate-album', pour le distinguer d'une simple fermeture.
+    console.log("Redirection vers l'album avec ID :", albumId);
+    this.modalCtrl.dismiss(dataToPassBack, 'navigate-album');
+    // this.router.navigate(['/home/album', albumId]);
   }
 
-  onClickShare() {}
+  async onClickShare() {
+    const modal = await this.modalCtl.create({
+      component: ShareModalComponent,
+      initialBreakpoint: 1, // Set the initial breakpoint to 30%
+      breakpoints: [0, 1], // Allow dragging to full height or lower
+      cssClass: 'custom-modal-filter',
+    });
+    modal.present();
+  }
 
   onClickRedirectToArtist() {
-    this.router.navigate(['/home/artist-page/' + this.song.artistId]);
+    const artistId = this.song.artistId;
+
+    const dataToPassBack = {
+      action: 'REDIRECT_TO_ARTIST',
+      artistId: artistId,
+    };
+
+    // Fermer cette petite modale d'option, et envoyer l'intention.
+    // Utiliser un rôle spécifique, par exemple 'navigate-album', pour le distinguer d'une simple fermeture.
+    console.log("Redirection vers l'album avec ID :", artistId);
+    this.modalCtrl.dismiss(dataToPassBack, 'navigate-artist');
   }
 
   cancel() {

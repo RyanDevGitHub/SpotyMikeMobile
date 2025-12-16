@@ -243,7 +243,7 @@ export class RegisterPage implements OnInit {
     return this.form.get(input);
   }
   isBtnDisabled(input: string): boolean {
-    // console.log(this.form.get(this.input[this.step].formeControlName));
+    console.log(this.form.get(this.input[this.step].formeControlName));
     if (
       this.input[this.step].formeControlName === 'artist' &&
       !this.checkedToggle

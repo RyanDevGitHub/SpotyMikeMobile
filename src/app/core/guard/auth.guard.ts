@@ -13,7 +13,7 @@ export const authGuard: CanActivateFn = (_route, _state) => {
 
   return (async () => {
     const selectorToken = await firstValueFrom(
-      store.select(selectAuthToken).pipe(take(1)),
+      store.select(selectAuthToken).pipe(take(1))
     );
     if (selectorToken) {
       return true;
@@ -31,7 +31,7 @@ export const authGuard: CanActivateFn = (_route, _state) => {
         // ignore parse errors
       }
     }
-
+    console.log('No valid auth token found, redirecting to login.');
     await router.navigate(['/auth/login']);
     return false;
   })();

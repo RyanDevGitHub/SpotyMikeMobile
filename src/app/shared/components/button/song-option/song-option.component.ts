@@ -1,4 +1,11 @@
-import { Component, inject, Input, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import {
   IonButton,
@@ -26,30 +33,41 @@ export class SongOptionComponent {
   @ViewChild(IonModal) modalRef!: IonModal;
   @Input() id: string;
   @Input() song: ISong;
-
+  @Output() navigateRequest = new EventEmitter<{
+    action: string;
+    id: string;
+  }>();
   private ctrlModal = inject(ModalController);
 
   async openModal() {
     const modalRef = await this.ctrlModal.create({
       component: SongOptionModalComponent,
       componentProps: {
-        song: this.song,
+        song: this.song, // Replace with actual cover image if available
       },
-      initialBreakpoint: 1,
-      breakpoints: [0, 1],
+      initialBreakpoint: 1, // Set the initial breakpoint to 30%
+      breakpoints: [0, 1], // Allow dragging to full height or lower
       cssClass: 'custom-modal-class',
     });
-
-    // 1. Ouvrir la modale et mettre à jour l'état du service
     this.modalStateService.setModalOpen(true);
 
-    // 2. Écouter la fermeture de la modale, peu importe comment elle est fermée.
-    // L'événement onDidDismiss est émis après la fin de l'animation de fermeture.
-    modalRef.onDidDismiss().then(() => {
-      // 3. Mettre à jour l'état du service pour retirer la classe 'modal-open'
-      this.modalStateService.setModalOpen(false);
-    });
-
     modalRef.present();
+    const { data: song, role } = await modalRef.onDidDismiss();
+    if (role === 'navigate-album' && song) {
+      // 5. Transmet l'événement à PlaySongPage via l'Output !
+      console.log("Redirection vers l'album avec ID :", song.albumId);
+      this.navigateRequest.emit({
+        action: 'REDIRECT_TO_ALBUM',
+        id: song.albumId,
+      });
+      // La chaîne est complétée pour ce composant.
+    }
+    if (role === 'navigate-artist' && song) {
+      console.log("Redirection vers l'artiste avec ID :", song.artistId);
+      this.navigateRequest.emit({
+        action: 'REDIRECT_TO_ARTIST',
+        id: song.artistId,
+      });
+    }
   }
 }

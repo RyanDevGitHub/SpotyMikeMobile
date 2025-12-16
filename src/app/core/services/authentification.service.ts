@@ -15,7 +15,6 @@ import { IToken, IUserDataBase } from './../interfaces/user';
 import { AuthService } from './auth.service';
 import { Firebase } from './firebase.service';
 import { UserRepositoryService } from './repositories/user-repository.service';
-import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 
 @Injectable({
   providedIn: 'root',
@@ -87,8 +86,6 @@ export class AuthentificationService {
       })
     );
   }
-
-
 
   register(email: string, password: string, user: IUserDataBase) {
     console.log(`REGISTER: Tentative d'inscription pour l'email: ${email}`);

@@ -12,7 +12,10 @@
             </ion-buttons>
             <ion-title>{{music.title}}</ion-title>
             <ion-buttons slot="end">
-              <app-song-option [song]="music"></app-song-option>
+              <app-song-option
+                [song]="music"
+                (navigateRequest)="handleRedirectFromOptions($event)"
+              ></app-song-option>
             </ion-buttons>
           </ion-toolbar> </ion-header
       ></ion-col>

@@ -8,6 +8,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
   IonButtons,
   IonCol,
@@ -72,6 +73,7 @@ export class PlaySongPage implements OnDestroy, OnInit {
   private navigationSubscription: Subscription;
   private currentSongSubscription: Subscription;
   private cdRef = inject(ChangeDetectorRef);
+  private router = inject(Router);
   constructor(
     private modalStateService: ModalStateService,
     private modalController: ModalController,
@@ -110,7 +112,6 @@ export class PlaySongPage implements OnDestroy, OnInit {
         }
       }
     );
-
     // 2. Logique de chargement de la liste (inchangée)
     this.playerState
       .getTrackListForContext(this.openWith, this.music)
@@ -139,7 +140,7 @@ export class PlaySongPage implements OnDestroy, OnInit {
     this.store.dispatch(addLastSongUser({ songId: this.music.id }));
   }
 
-  minimizePlayer() {
+  public minimizePlayer() {
     console.log('[PlaySongPage Action] Minimisation du lecteur demandée.');
     this.playerState.setCurrentSong(this.music);
     this.playerState.setMiniPlayer(true);
@@ -160,5 +161,28 @@ export class PlaySongPage implements OnDestroy, OnInit {
     //   '❌ [PlaySongPage Destroy] PlaySongPage détruit, arrêt de la musique.'
     // );
     // this.audioService.destroy();
+  }
+
+  async handleRedirectFromOptions(event: { action: string; id: string }) {
+    if (event.action === 'REDIRECT_TO_ALBUM') {
+      const targetAlbumId = event.id; // 🛑 ACCÈS CORRECT À LA CHAÎNE DE CARACTÈRES
+
+      // 1. Fermeture du lecteur (méthode async/await recommandée)
+      await this.minimizePlayer();
+
+      // 2. Navigation : Utiliser la chaîne de caractères pure.
+      console.log('Final Navigation to correct Album ID:', event);
+
+      this.router.navigate(['/home/album/', targetAlbumId]);
+    }
+    if (event.action === 'REDIRECT_TO_ARTIST') {
+      const targetArtistId = event.id; // 🛑 ACCÈS CORRECT À LA CHAÎNE DE CARACTÈRES
+
+      // 1. Fermeture du lecteur (méthode async/await recommandée)
+      await this.minimizePlayer();
+      // 2. Navigation : Utiliser la chaîne de caractères pure.
+      console.log('Final Navigation to correct Artist ID:', event);
+      this.router.navigate(['/home/artist-page/', targetArtistId]);
+    }
   }
 }

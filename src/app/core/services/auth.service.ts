@@ -1,5 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core'; // Retrait de Inject et InjectionToken
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import {
   Auth,
   createUserWithEmailAndPassword,
@@ -16,8 +18,6 @@ import {
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { from, lastValueFrom, Observable, of } from 'rxjs';
 
-import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { IFirebaseUser, IUserDataBase } from '../interfaces/user';
 import { EAuthPage } from '../models/refData';
 import { loginSuccess } from '../store/action/user.action';

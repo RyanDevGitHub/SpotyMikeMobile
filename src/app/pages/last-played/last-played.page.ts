@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AppState } from '@capacitor/app';
 import { IonContent } from '@ionic/angular/standalone';
 import { Store } from '@ngrx/store';
+import { PlayPageType } from 'src/app/core/interfaces/play-page-type';
 import { IPlaylistRaw } from 'src/app/core/interfaces/playlists';
 import { ISong } from 'src/app/core/interfaces/song';
 import { selectSortedLastPlayedSongs } from 'src/app/core/store/selector/song.selector';
@@ -29,6 +30,9 @@ export class LastPlayedPage implements OnInit {
   store = inject(Store<AppState>);
   public listMusics = signal<ISong[]>([]);
   public listPlaylistes: IPlaylistRaw[];
+  public playcontext = {
+    type: PlayPageType.LastPlayed,
+  };
 
   ngOnInit() {
     // On se subscribe directement au selecteur trié
