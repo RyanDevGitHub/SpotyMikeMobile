@@ -93,8 +93,8 @@ export class AuthentificationService {
       .signUp(email, password)
       .then((userCredential) => {
         console.log('REGISTER: Inscription réussie', userCredential);
-        user.id = userCredential;
-        if (user.artiste?.firstName) user.artiste.id = userCredential;
+        user.id = userCredential.user.uid;
+        if (user.artiste?.firstName) user.artiste.id = userCredential.user.uid;
         console.log(
           "REGISTER: Création de l'utilisateur dans la base de données..."
         );

@@ -28,7 +28,11 @@ import { LocalStorageService } from 'src/app/core/services/local-storage.service
 import { environment } from 'src/environments/environment';
 
 // RETIRER : AngularFirestore, AngularFireStorage, DocumentData (redondant)
-import { IPlaylistRaw, ISongRef } from '../../interfaces/playlists';
+import {
+  IInitialSongRef,
+  IPlaylistRaw,
+  ISongRef,
+} from '../../interfaces/playlists';
 import {
   ERoleUser,
   IFirebaseUser,
@@ -128,8 +132,20 @@ export class UserRepositoryService {
   }
 
   async createUser(user: IUserDataBase) {
-    // Construire l'objet utilisateur
+    // 0. VÉRIFICATION CRITIQUE : Assurez-vous que user.id contient l'UID Firebase.
+    if (!user.id) {
+      console.error(
+        "Erreur: L'ID de l'utilisateur (UID) est manquant. Impossible de nommer le document."
+      );
+      return;
+    }
+
+    // Le document Firestore portera l'ID user.id (l'UID)
+    const documentId = user.id;
+
+    // 1. Construire l'objet utilisateur (simplifié pour la lisibilité, vous pouvez garder votre structure)
     const userData = {
+      // ... vos champs existants
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
@@ -143,28 +159,37 @@ export class UserRepositoryService {
       created_at: user.created_at,
     };
 
-    // Ajouter l'utilisateur à la collection "Users"
-    const userRef = await addDoc(
-      collection(this.db, environment.collection.users),
-      userData
-    );
+    // 2. CRÉATION DE LA RÉFÉRENCE EXPLICITE AU DOCUMENT
+    // Utiliser doc() pour pointer vers un document avec l'ID spécifié (documentId)
+    const userRef = doc(this.db, environment.collection.users, documentId);
 
-    // Ajouter les informations de l'artiste si disponibles
+    // 3. ÉCRIRE LE DOCUMENT UTILISATEUR PRINCIPAL AVEC setDoc()
+    // setDoc écrase ou crée le document à l'emplacement userRef (qui a l'ID = UID)
+    await setDoc(userRef, userData);
+
+    // ----------------------------------------------------
+    // Les sous-collections (elles utilisent déjà la référence userRef)
+    // ----------------------------------------------------
+
+    // 4. Ajouter les informations de l'artiste si disponibles
     if (user.artiste && user.artiste.id) {
-      // Assurez-vous que `user.artiste.id` n'est pas vide
+      // Si vous utilisez user.artiste.id comme l'UID, vous devriez utiliser setDoc ici aussi
+      // pour que l'ID du document artiste soit aussi l'UID.
       const artistRef = doc(collection(userRef, 'artist'), user.artiste.id);
-      await setDoc(artistRef, user.artiste); // Assurez-vous que `user.artiste` correspond à `IArtist`
+      await setDoc(artistRef, user.artiste);
     }
 
-    // Ajouter les playlists dans une sous-collection "playlists"
+    // 5. Ajouter les playlists dans une sous-collection "playlists"
     if (user.playlists && user.playlists.length > 0) {
       const playlistsRef = collection(userRef, 'playlists');
       for (const playlist of user.playlists) {
+        // Pour les items dans une sous-collection (playlists), il est généralement préférable
+        // d'utiliser addDoc pour laisser Firestore générer un ID unique pour la playlist.
         await addDoc(playlistsRef, playlist);
       }
     }
 
-    console.log('Success : User Created with Playlists and Artist Info');
+    console.log('Success : User Created. Document ID = UID');
   }
 
   async getUserById(fieldId: string | undefined): Promise<IUserDataBase> {
@@ -297,14 +322,13 @@ export class UserRepositoryService {
   async createPlaylist(
     userId: string,
     title: string,
-    song: ISongRef
+    initialSong: IInitialSongRef
   ): Promise<IPlaylistRaw> {
     console.log('🏗️ Repository createPlaylist appelé avec:', {
       userId,
       title,
-      song,
+      initialSong,
     });
-
     const q = query(
       collection(this.db, environment.collection.users).withConverter(
         this.userConverter
@@ -322,11 +346,12 @@ export class UserRepositoryService {
 
     const docRef = querySnap.docs[0].ref;
 
+    const initialCoverUrl = initialSong.songCoverUrl || 'assets/shapes.svg'; // Fallback
     const playlist: IPlaylistRaw = {
       id: crypto.randomUUID(),
       title,
-      songs: [song],
-      cover: '',
+      songs: [{ idSong: initialSong.idSong }],
+      cover: initialCoverUrl,
     };
 
     console.log('💾 Mise à jour Firestore avec playlist:', playlist);

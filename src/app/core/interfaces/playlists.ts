@@ -17,6 +17,10 @@ export interface IPlaylist {
 export interface ISongRef {
   idSong: string;
 }
+export interface IInitialSongRef {
+  idSong: string;
+  songCoverUrl: string; // <-- Ajout de l'URL de la cover
+}
 
 export interface IPlaylistWithSelection extends IPlaylist {
   selected?: boolean; // 👈 juste pour l’UI

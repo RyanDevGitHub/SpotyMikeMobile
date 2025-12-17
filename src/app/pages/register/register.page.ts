@@ -31,6 +31,7 @@ import { BackButtonComponent } from 'src/app/shared/components/button/back-butto
 
 import { ERoleUser, ICover, IUserDataBase } from './../../core/interfaces/user';
 import { AuthentificationService } from './../../core/services/authentification.service';
+import { LifecycleLoggerDirective } from './lifecycle-logger.directive';
 
 @Component({
   selector: 'app-register',
@@ -56,6 +57,7 @@ import { AuthentificationService } from './../../core/services/authentification.
     IonSelect,
     IonSelectOption,
     IonImg,
+    LifecycleLoggerDirective,
   ],
 })
 export class RegisterPage implements OnInit {
@@ -192,10 +194,8 @@ export class RegisterPage implements OnInit {
       ]),
       password: new FormControl('', [
         Validators.required,
-        Validators.pattern(
-          '^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$'
-        ),
         Validators.minLength(10),
+        Validators.pattern('^(?=.*[A-Z])(?=.*\\d)(?=.*\\W).{10,}$'),
       ]),
       dateOfBirth: new FormControl('', [
         Validators.required,
@@ -243,7 +243,8 @@ export class RegisterPage implements OnInit {
     return this.form.get(input);
   }
   isBtnDisabled(input: string): boolean {
-    console.log(this.form.get(this.input[this.step].formeControlName));
+    // console.log(this.form.get(this.input[this.step].formeControlName));
+    // console.log(input);
     if (
       this.input[this.step].formeControlName === 'artist' &&
       !this.checkedToggle
@@ -318,7 +319,9 @@ export class RegisterPage implements OnInit {
       this.step < this.input.length - 1 &&
       this.input[this.step].formeControlName != 'artist'
     ) {
-      this.form.get('email')?.reset();
+      // Dans ngOnInit ou dans une méthode d'initialisation :
+      console.log('Password Control:', this.form.get('password'));
+      this.form.get(this.input[this.step].formeControlName)?.reset();
       this.step++;
     } else if (
       this.input[this.step].formeControlName === 'artist' &&
@@ -329,8 +332,6 @@ export class RegisterPage implements OnInit {
       this.input[this.step].formeControlName === 'artist' &&
       this.checkedToggle
     ) {
-      console.log('test');
-      this.form.get('email')?.reset();
       this.step = this.step + 1;
     } else if (this.step === this.input.length - 1) {
       this.registerUser(this.user);

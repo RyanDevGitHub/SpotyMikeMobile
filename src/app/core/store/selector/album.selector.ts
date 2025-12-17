@@ -38,9 +38,23 @@ export const selectAlbumBySong = (songId: string) =>
 
 export const selectSongsByAlbumId = (albumId: string) =>
   createSelector(selectAllAlbums, (albums) => {
+    console.log(albums);
+
     // 1. Trouver l'album par son ID
     const album = albums.find((a) => a.id === albumId);
 
     // 2. Si l'album est trouvé, renvoyer son tableau de chansons; sinon, renvoyer un tableau vide.
+    console.log(`Selecting songs for album ID: ${albumId}`, album);
     return album ? album.songs : [];
+  });
+
+export const selectAlbumIdBySongId = (songId: string) =>
+  createSelector(selectAllAlbums, (albums) => {
+    console.log(`Searching for album containing Song ID: ${songId}`);
+
+    // Trouver le premier album qui contient l'ID de cette chanson
+    const album = albums.find((a) => a.songs.some((s) => s.id === songId));
+
+    // Retourner l'ID de l'album ou null/undefined si non trouvé
+    return album ? album.id : null;
   });

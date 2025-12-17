@@ -13,6 +13,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   User,
+  UserCredential,
 } from 'firebase/auth';
 // Import du jeton d'injection depuis le fichier dédié
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
@@ -278,13 +279,13 @@ export class AuthService {
     }
   }
 
-  async signUp(email: string, password: string): Promise<string> {
+  async signUp(email: string, password: string): Promise<UserCredential> {
     const userCredential = await createUserWithEmailAndPassword(
       this.auth,
       email,
       password
     );
-    return userCredential.user?.getIdToken() ?? '';
+    return userCredential;
   }
 
   async verifyToken(idToken: string): Promise<Observable<object>> {

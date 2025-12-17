@@ -14,42 +14,76 @@
         ><ion-list>
           <form [formGroup]="form">
             <ion-item>
+              @if (step === 4) {
               <ion-toggle
                 class="{{input[step].toggle}}"
-                [checked]="false"
+                [checked]="checkedToggle"
                 (ionChange)="onChangeToggle()"
                 >êtes vous un artist</ion-toggle
-              ><br /><br />
-
+              >
+              <br /><br />
+              } @if (step === 5) {
               <ion-img
                 src="{{avatar.src}}"
                 class="{{input[step].avatar}}"
                 (click)="takePicture()"
               ></ion-img>
-
+              } @if (step === 0) {
               <ion-input
-                class="{{input[step].hideInput}}"
                 labelPlacement="floating"
-                type="{{input[step].type}}"
-                name="{{input[step].type}}"
-                value=""
-                formControlName="{{input[step].formeControlName}}"
+                type="email"
+                formControlName="email"
               >
                 <div slot="label">
-                  {{input[step].label}}
+                  Email
                   <ion-text color="danger">(Obligatoire)</ion-text>
                 </div>
               </ion-input>
+              } @if (step === 1) {
+              <ion-input
+                labelPlacement="floating"
+                type="password"
+                formControlName="password"
+              >
+                <div slot="label">
+                  Mot de passe
+                  <ion-text color="danger">(Obligatoire)</ion-text>
+                </div>
+              </ion-input>
+              } @if (step === 2) {
+              <ion-input
+                labelPlacement="floating"
+                type="date"
+                formControlName="dateOfBirth"
+              >
+                <div slot="label">
+                  Date de naissance
+                  <ion-text color="danger">(Obligatoire)</ion-text>
+                </div>
+              </ion-input>
+              } @if (step === 6) {
+              <ion-input
+                labelPlacement="floating"
+                type="text"
+                formControlName="name"
+              >
+                <div slot="label">
+                  Quel est votre nom
+                  <ion-text color="danger">(Obligatoire)</ion-text>
+                </div>
+              </ion-input>
+              } @if (step === 3) {
               <ion-select
                 placeholder="Homme"
-                class="{{input[step].selectSexe}}"
                 interface="action-sheet"
                 (ionChange)="handleChange($event)"
+                formControlName="sexe"
               >
                 <div slot="label">Indiquer votre sexe</div>
                 <ion-select-option value="1">Homme</ion-select-option>
                 <ion-select-option value="0">Femme</ion-select-option>
               </ion-select>
+              }
             </ion-item>
           </form>
         </ion-list>

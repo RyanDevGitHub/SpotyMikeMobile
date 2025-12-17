@@ -321,7 +321,8 @@ export class UserEffects {
         // Appel réseau async via from()
         return from(
           this.userRepositoryService.createPlaylist(userId, title, {
-            idSong: song.id,
+            idSong: song.id, // ID pour la référence de chanson
+            songCoverUrl: song.cover, // URL de la cover pour initialiser la playlist
           })
         ).pipe(
           tap((playlist) =>

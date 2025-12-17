@@ -1,16 +1,17 @@
 import { inject, Injectable } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, switchMap } from 'rxjs';
 
 import { PlayContext, PlayPageType } from '../interfaces/play-page-type';
 import { AppState } from '../store/app.state';
-import { selectSongsByAlbumId } from '../store/selector/album.selector';
-import { selectSongsByArtistId } from '../store/selector/artist.selector';
+import {
+  selectAlbumIdBySongId,
+  selectSongsByAlbumId,
+} from '../store/selector/album.selector';
 import { selectSortedFavorites } from '../store/selector/favorites.selector';
 import {
   selectFilteredAndSortedSongsByGenre,
   selectRecentSongs,
-  selectSongsByPlaylistId,
   selectSortedLastPlayedSongs,
   selectSortedTopSongs,
 } from '../store/selector/song.selector';
@@ -196,15 +197,31 @@ export class PlayerStateService {
       case PlayPageType.Playlist:
       case PlayPageType.Album:
       case PlayPageType.Artist:
-        if (context.sourceId) {
-          const selector =
-            context.type === PlayPageType.Playlist
-              ? selectSongsByPlaylistId(context.sourceId as string)
-              : context.type === PlayPageType.Album
-              ? selectSongsByAlbumId(context.sourceId as string)
-              : selectSongsByArtistId(context.sourceId as string);
+        if (context.type === PlayPageType.Album) {
+          console.log(`Starting Album lookup using Song ID:`, context.sourceId);
 
-          return this.store.pipe(select(selector));
+          return this.store.pipe(
+            // 1. Utiliser l'ID de la Chanson pour trouver l'ID de l'Album
+            select(selectAlbumIdBySongId(context.sourceId!)),
+
+            // 2. Utiliser l'ID de l'Album trouvé (ou null) pour obtenir la liste de chansons
+            switchMap((albumId) => {
+              if (!albumId) {
+                console.warn(
+                  `Album ID non trouvé pour la chanson ID: ${context.sourceId!}.`
+                );
+                return of([]); // Retourne un Observable de tableau vide
+              }
+
+              console.log(
+                `Found Album ID: ${albumId}. Fetching songs for this Album.`
+              );
+              // 3. Appel du sélecteur original avec le bon ID d'Album
+              return this.store.pipe(
+                select(selectSongsByAlbumId(albumId as string))
+              );
+            })
+          );
         }
         break;
 

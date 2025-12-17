@@ -14,5 +14,5 @@ export enum PlayPageType {
 }
 export interface PlayContext {
   type: PlayPageType;
-  sourceId?: string | number;
+  sourceId?: string;
 }

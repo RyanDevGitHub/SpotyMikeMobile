@@ -14,6 +14,7 @@ import {
   distinctUntilChanged,
   map,
   Observable,
+  shareReplay,
   Subject,
   Subscription,
   switchMap,
@@ -79,37 +80,22 @@ export class SearchPage implements OnInit {
   }
 
   ngOnInit() {
-    console.log('init search page');
-
-    // Définir les observables filtrés
-    this.songs$ = this.searchTerm$.pipe(
-      debounceTime(300), // Attend 300ms entre chaque frappe
-      distinctUntilChanged(), // Évite de refaire la recherche si le terme n’a pas changé
-      switchMap((term) =>
-        this.store
-          .select(selectSearchResults(term))
-          .pipe(map((results) => results.songs || []))
-      )
-    );
-
-    this.albums$ = this.searchTerm$.pipe(
+    const searchResults$ = this.searchTerm$.pipe(
       debounceTime(300),
       distinctUntilChanged(),
-      switchMap((term) =>
-        this.store
-          .select(selectSearchResults(term))
-          .pipe(map((results) => results.albums || []))
-      )
-    );
+      // Une seule fois l'appel au selecteur pour le terme actuel
+      switchMap((term) => this.store.select(selectSearchResults(term))),
+      // Optionnel: partager les résultats si plusieurs composants s'y abonnent
+      shareReplay({ bufferSize: 1, refCount: true })
+    );  
 
-    this.artists$ = this.searchTerm$.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap((term) =>
-        this.store
-          .select(selectSearchResults(term))
-          .pipe(map((results) => results.artists || []))
-      )
+    // Dériver les observables spécifiques à partir du résultat unique
+    this.songs$ = searchResults$.pipe(map((results) => results.songs || []));
+
+    this.albums$ = searchResults$.pipe(map((results) => results.albums || []));
+
+    this.artists$ = searchResults$.pipe(
+      map((results) => results.artists || [])
     );
   }
 
