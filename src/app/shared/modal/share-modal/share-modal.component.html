@@ -1,56 +1,50 @@
-<ion-grid fixed>
-  <ion-row class="ion-justify-content-center">
-    <ion-col size="3" class="ion-align-self-center"
-      ><ion-avatar>
-        <img
-          alt="share with link"
-          src="assets/icon/hyperlien.png"
-        /> </ion-avatar
-    ></ion-col>
-    <ion-col size="3"
-      ><ion-avatar>
-        <img alt="share with email" src="assets/icon/email.png" /> </ion-avatar
-    ></ion-col>
-    <ion-col size="3"
-      ><ion-avatar>
-        <img alt="share with sms" src="assets/icon/sms.png" /> </ion-avatar
-    ></ion-col>
-    <ion-col size="3"
-      ><ion-avatar>
-        <img
-          alt="share with facebook"
-          src="assets/icon/facebook.png"
-        /> </ion-avatar
-    ></ion-col>
-  </ion-row>
-  <ion-row>
-    <ion-col size="3"
-      ><ion-avatar>
-        <img
-          alt="share with whatsapp"
-          src="assets/icon/whatsapp.png"
-        /> </ion-avatar
-    ></ion-col>
-    <ion-col size="3"
-      ><ion-avatar>
-        <img
-          alt="share with twitter"
-          src="assets/icon/twitter.png"
-        /> </ion-avatar
-    ></ion-col>
-    <ion-col size="3"
-      ><ion-avatar>
-        <img
-          alt="share with instagram"
-          src="assets/icon/instagram.png"
-        /> </ion-avatar
-    ></ion-col>
-    <ion-col size="3"
-      ><ion-avatar>
-        <img
-          alt="share with snapchat"
-          src="assets/icon/snapchat.png"
-        /> </ion-avatar
-    ></ion-col>
-  </ion-row>
-</ion-grid>
+<div class="share-container">
+  <!-- Poignée visuelle pour le style "Sheet Modal" -->
+  <div class="modal-handle"></div>
+
+  <h2 class="share-title">Partager via</h2>
+
+  <ion-grid fixed>
+    <ion-row class="ion-justify-content-center">
+      <!-- Lien / Copier -->
+      <ion-col size="3" class="share-col" (click)="copyLink()">
+        <div class="share-icon-wrapper copy">
+          <div class="icon-circle">
+            <ion-icon name="link-outline"></ion-icon>
+          </div>
+          <ion-text class="share-label">Lien</ion-text>
+        </div>
+      </ion-col>
+
+      <!-- WhatsApp -->
+      <ion-col size="3" class="share-col" (click)="shareToSocial('whatsapp')">
+        <div class="share-icon-wrapper whatsapp">
+          <div class="icon-circle">
+            <ion-icon name="logo-whatsapp"></ion-icon>
+          </div>
+          <ion-text class="share-label">WhatsApp</ion-text>
+        </div>
+      </ion-col>
+
+      <!-- Twitter / X -->
+      <ion-col size="3" class="share-col" (click)="shareToSocial('twitter')">
+        <div class="share-icon-wrapper twitter">
+          <div class="icon-circle">
+            <ion-icon name="logo-twitter"></ion-icon>
+          </div>
+          <ion-text class="share-label">Twitter</ion-text>
+        </div>
+      </ion-col>
+
+      <!-- Natif / Plus -->
+      <ion-col size="3" class="share-col" (click)="shareNatively()">
+        <div class="share-icon-wrapper native">
+          <div class="icon-circle">
+            <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+          </div>
+          <ion-text class="share-label">Plus</ion-text>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</div>
