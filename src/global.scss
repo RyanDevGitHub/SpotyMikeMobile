@@ -206,3 +206,101 @@ ion-img {
     max-width: 100% !important;
   }
 }
+@media (min-width: 992px) {
+  /* 1. L'ENVIRONNEMENT DU PORTFOLIO */
+  html {
+    background: #121212 !important; 
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+  }
+
+  body {
+    position: relative !important;
+    width: 422px !important; 
+    height: 915px !important;
+    min-width: 422px !important;
+    max-width: 422px !important;
+    min-height: 915px !important;
+    max-height: 915px !important;
+    border: 12px solid #222 !important;
+    border-radius: 45px !important;
+    box-shadow: 0 0 100px rgba(0,0,0,0.6) !important;
+    background: white !important;
+    overflow: hidden !important;
+    margin: auto !important;
+  }
+
+  ion-app {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+
+  /* 2. RÈGLE GÉNÉRALE POUR LES MODALES (Quick Menu) */
+  /* On force le conteneur à prendre tout le téléphone */
+  ion-modal {
+    --width: 100% !important;
+    --height: 100% !important;
+    --max-width: 100% !important;
+    --max-height: 100% !important;
+    --border-radius: 0 !important;
+  }
+
+  /* On prépare le contenu pour l'animation de slide */
+  ion-modal::part(content) {
+    width: 100% !important;
+    height: 100% !important;
+    transform: none !important; 
+    top: 0 !important;
+    left: 0 !important;
+  }
+
+  /* L'ANIMATION SLIDE GAUCHE -> DROITE (Pour Quick Menu) */
+  /* On cible le composant à l'intérieur de la modale qui n'a pas la classe filtre */
+  ion-modal:not(.custom-modal-filter):not(.custom-modal-share) .ion-page {
+    animation: slideFromLeft 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards !important;
+  }
+
+  @keyframes slideFromLeft {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+  }
+
+  /* 3. EXCEPTIONS POUR LE FILTRE ET LE SHARE (Bottom Sheets) */
+  ion-modal.custom-modal-filter,
+  ion-modal.custom-modal-share {
+    --height: 40% !important; /* Ajuste la hauteur ici */
+    --max-height: 40% !important;
+    --vertical-align: flex-end !important;
+  }
+
+  ion-modal.custom-modal-filter::part(content),
+  ion-modal.custom-modal-share::part(content) {
+    height: 40% !important; 
+    top: auto !important;
+    bottom: 0 !important;
+    border-radius: 25px 25px 0 0 !important;
+    animation: slideFromBottom 0.4s ease-out !important;
+  }
+
+  @keyframes slideFromBottom {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  /* 4. OVERLAYS TECHNIQUES (Alertes, Spinners) */
+  .ion-app-overlay, ion-alert, ion-loading, ion-action-sheet {
+    position: absolute !important;
+    width: 100% !important;
+    height: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+}

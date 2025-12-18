@@ -27,6 +27,7 @@ export class FilterOptionComponent implements OnInit {
   async openFilter() {
     const modal = await this.ctrlModal.create({
       component: FilterModalComponent,
+      mode: 'md',
       componentProps: {
         songs: this.songs, // <-- le tableau de chansons à trier
         page: this.page, // <-- la page actuelle
