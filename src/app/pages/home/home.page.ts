@@ -15,8 +15,6 @@ import { map, Observable, Subscription } from 'rxjs';
 import { ISong } from 'src/app/core/interfaces/song';
 import { IUser } from 'src/app/core/interfaces/user';
 import { ModalStateService } from 'src/app/core/services/modal-state.service';
-import { loadArtists } from 'src/app/core/store/action/artist.action';
-import { loadUser } from 'src/app/core/store/action/user.action';
 import {
   selectLastSongsByUser,
   selectTopSongsByListeningCount,
@@ -69,8 +67,8 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.store.dispatch(loadArtists());
-    this.store.dispatch(loadUser());
+    // this.store.dispatch(loadArtists());
+    // this.store.dispatch(loadUser());
     console.log(MusicControls);
   }
 

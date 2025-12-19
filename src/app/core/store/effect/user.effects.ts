@@ -16,6 +16,7 @@ import { IUser, IUserDataBase } from '../../interfaces/user';
 import { AuthService } from '../../services/auth.service';
 import { AuthentificationService } from '../../services/authentification.service';
 import { AuthFacade } from '../../state/auth/auth.facade';
+import { loadArtists } from '../action/artist.action';
 import {
   addLastSongUser,
   addLastSongUserSuccess,
@@ -214,6 +215,14 @@ export class UserEffects {
         })
       ),
     { dispatch: false }
+  );
+
+  loadArtistsOnLogin$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loginSuccess),
+      // map retourne l'action, NgRx s'occupe du dispatch automatique
+      map(() => loadArtists())
+    )
   );
 
   rehydrateAuth$ = createEffect(() =>
