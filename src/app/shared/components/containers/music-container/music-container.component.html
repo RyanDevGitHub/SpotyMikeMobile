@@ -1,31 +1,30 @@
-<ion-row class="row-music-container">
-  <ion-col size="3" (click)="openPlayer()">
-    <ion-img [src]="song.cover"></ion-img>
+<ion-row class="row-music-container ion-align-items-center">
+  <ion-col size="auto" (click)="openPlayer()" class="ion-no-padding">
+    <ion-img [src]="song.cover" class="song-cover"></ion-img>
   </ion-col>
 
-  <ion-col size="4" (click)="openPlayer()">
-    <div class="music-name ion-text-center">
-      <h6>{{ song.title }}</h6>
-
-      <h6>{{ artistName }}</h6>
+  <ion-col (click)="openPlayer()" class="music-info-col">
+    <div class="music-name">
+      <h6 class="truncate-text">{{ song.title }}</h6>
+      <p class="truncate-text">{{ artistName }}</p>
     </div>
   </ion-col>
 
-  <ion-col size="auto" (click)="openPlayer()">
-    <div class="music-name ion-text-center ion-align-self-center">
-      <h6>{{ getFormattedDuration() }}</h6>
-    </div></ion-col
-  >
-
   <ion-col size="auto">
-    <app-song-option
-      (click)="openModal()"
-      id="{{ song.id }}"
-      [song]="song"
-      class="music-settings ion-align-self-center"
-    ></app-song-option>
+    <div class="duration-text">
+      {{ getFormattedDuration() }}
+    </div>
+  </ion-col>
 
-    <app-like-song [song]="song"></app-like-song>
-    <app-share-song id="{{ song.id }}"></app-share-song
-  ></ion-col>
+  <ion-col size="auto" class="actions-col">
+    <div class="actions-wrapper">
+      <app-song-option
+        (click)="openModal()"
+        [id]="song.id"
+        [song]="song"
+      ></app-song-option>
+      <app-like-song [song]="song"></app-like-song>
+      <app-share-song [id]="song.id"></app-share-song>
+    </div>
+  </ion-col>
 </ion-row>
