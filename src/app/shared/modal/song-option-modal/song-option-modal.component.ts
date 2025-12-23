@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, Input, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppState } from '@capacitor/app';
 import {
@@ -25,7 +25,7 @@ import { ShareModalComponent } from '../share-modal/share-modal.component';
   standalone: true,
   imports: [IonRow, IonCol, IonText, IonIcon, IonImg, IonGrid],
 })
-export class SongOptionModalComponent implements OnInit, OnDestroy {
+export class SongOptionModalComponent implements OnDestroy {
   private modalCtrl = inject(ModalController);
   private modalStateService = inject(ModalStateService);
   @Input() song: ISong;
@@ -39,10 +39,6 @@ export class SongOptionModalComponent implements OnInit, OnDestroy {
     this.modalSubscription = this.modalStateService.modalOpen$.subscribe(
       (value) => (this.isModalOpen = value)
     );
-  }
-
-  ngOnInit() {
-    console.log(this.song);
   }
 
   async onClickAddPlaylist() {

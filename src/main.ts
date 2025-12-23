@@ -1,23 +1,26 @@
-// Imports des services de l'application
+// Importe les fonctions de cache depuis @angular/fire/firestore
 import { provideHttpClient } from '@angular/common/http';
-// Imports Angular/Ionic de base
-import { enableProdMode, inject } from '@angular/core';
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-// Imports AngularFire (les modules natifs sont maintenant gérés par ceux-ci)
+import { enableProdMode, inject, isDevMode } from '@angular/core';
+// 1. Modifie tes imports Firebase pour utiliser uniquement @angular/fire
+import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { Auth, getAuth, provideAuth } from '@angular/fire/auth';
-import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  provideFirestore,
+} from '@angular/fire/firestore';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter, RouteReuseStrategy } from '@angular/router';
+import { provideServiceWorker } from '@angular/service-worker';
 import {
   IonicRouteStrategy,
   provideIonicAngular,
 } from '@ionic/angular/standalone';
 import { provideEffects } from '@ngrx/effects';
-// Imports NGRX
 import { provideStore } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
-// Imports Ionicons
 import { addIcons } from 'ionicons';
 import {
   addCircleOutline,
@@ -69,66 +72,98 @@ import { sortReducer } from './app/core/store/reducer/sort.reducer';
 import { userReducer } from './app/core/store/reducer/user.reducer';
 import { environment } from './environments/environment';
 
+// ... (tes autres imports)
 if (environment.production) {
   enableProdMode();
 }
-
 addIcons({
   'alert-outline': alertOutline,
-  'home-outline': homeOutline,
-  'person-circle-outline': personCircleOutline,
-  'play-skip-back-outline': playSkipBackOutline,
-  'play-skip-forward-outline': playSkipForwardOutline,
-  'ellipsis-horizontal-outline': ellipsisHorizontalOutline,
-  'add-circle-outline': addCircleOutline,
-  'albums-outline': albumsOutline,
-  'share-outline': shareOutline,
-  'person-add-outline': personAddOutline,
-  'musical-notes-outline': musicalNoteOutline,
-  'chevron-back-outline': chevronBackOutline,
-  'timer-outline': timerOutline,
-  'settings-outline': settingsOutline,
-  'repeat-outline': repeatOutline,
-  'shuffle-outline': shuffleOutline,
-  'chevron-forward-outline': chevronForwardOutline,
-  'heart-outline': heartOutline,
-  'play-outline': playOutline,
-  'person-outline': personOutline,
-  'pause-outline': pauseOutline,
-  'logo-twitter': logoTwitter,
-  'chatbubble-ellipses-outline': chatbubbleEllipsesOutline,
-  'logo-whatsapp': logoWhatsapp,
-  'link-outline': linkOutline,
-  book: book,
-  home: home,
-});
 
+  'home-outline': homeOutline,
+
+  'person-circle-outline': personCircleOutline,
+
+  'play-skip-back-outline': playSkipBackOutline,
+
+  'play-skip-forward-outline': playSkipForwardOutline,
+
+  'ellipsis-horizontal-outline': ellipsisHorizontalOutline,
+
+  'add-circle-outline': addCircleOutline,
+
+  'albums-outline': albumsOutline,
+
+  'share-outline': shareOutline,
+
+  'person-add-outline': personAddOutline,
+
+  'musical-notes-outline': musicalNoteOutline,
+
+  'chevron-back-outline': chevronBackOutline,
+
+  'timer-outline': timerOutline,
+
+  'settings-outline': settingsOutline,
+
+  'repeat-outline': repeatOutline,
+
+  'shuffle-outline': shuffleOutline,
+
+  'chevron-forward-outline': chevronForwardOutline,
+
+  'heart-outline': heartOutline,
+
+  'play-outline': playOutline,
+
+  'person-outline': personOutline,
+
+  'pause-outline': pauseOutline,
+
+  'logo-twitter': logoTwitter,
+
+  'chatbubble-ellipses-outline': chatbubbleEllipsesOutline,
+
+  'logo-whatsapp': logoWhatsapp,
+
+  'link-outline': linkOutline,
+
+  'book': book,
+
+  'home': home,
+});
 bootstrapApplication(AppComponent, {
   providers: [
-    // --- FOURNISSEURS DE BASE (Doivent être en haut) ---
     provideIonicAngular(),
     provideRouter(routes),
     provideHttpClient(),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
 
-    // --- FOURNISSEURS GLOBALS ---
     i18nProviders,
     LocalStorageService,
     AuthService,
     AuthentificationService,
 
-    // --- FIREBASE ---
+    // --- FIREBASE CORRIGÉ ---
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
-    provideFirestore(() => getFirestore()),
+
+    provideFirestore(() => {
+      // On utilise getApp() pour récupérer l'app initialisée juste au dessus
+      const app = getApp();
+      return initializeFirestore(app, {
+        localCache: persistentLocalCache({
+          tabManager: persistentMultipleTabManager(),
+        }),
+      });
+    }),
+
     provideAuth(() => getAuth()),
     {
-      // Mappe l'instance AngularFire Auth sur notre jeton explicite
       provide: FirebaseAuthToken,
       useFactory: () => inject(Auth),
     },
     provideStorage(() => getStorage()),
 
-    // --- NGRX / STORE ---
+    // --- NGRX & WORKER ---
     provideStore({
       music: musicReducer,
       user: userReducer,
@@ -144,9 +179,12 @@ bootstrapApplication(AppComponent, {
       AlbumEffects,
       ArtistsEffects,
     ]),
-    // Correction : retrait du double de provideStoreDevtools
     provideStoreDevtools({
       connectInZone: false,
+    }),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
     }),
   ],
 });

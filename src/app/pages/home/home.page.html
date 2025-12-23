@@ -6,9 +6,9 @@
     <ion-row class="">
       <app-new-song img="{{(firstTopSong$ | async)?.cover }}"></app-new-song>
     </ion-row>
-    <ion-row class="categories">
+    <!-- <ion-row class="categories">
       <app-music-genres></app-music-genres>
-    </ion-row>
+    </ion-row> -->
     <ion-row class="top-songs">
       <app-top-songs [items]="(topsSongs$ |async)"></app-top-songs>
     </ion-row>

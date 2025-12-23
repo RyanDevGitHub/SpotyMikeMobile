@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonCol, IonImg, IonRow, IonText } from '@ionic/angular/standalone';
 import { IArtist } from 'src/app/core/interfaces/user';
@@ -10,11 +10,14 @@ import { IArtist } from 'src/app/core/interfaces/user';
   standalone: true,
   imports: [IonText, IonCol, IonRow, IonImg],
 })
-export class ArtistContainerComponent {
+export class ArtistContainerComponent implements OnInit {
   @Input() artist: IArtist;
   private router = inject(Router);
   constructor() {}
 
+  ngOnInit(): void {
+    console.log(this.artist);
+  }
   redirectToArtist() {
     this.router.navigate(['/home/artist-page/' + this.artist.userId]);
   }

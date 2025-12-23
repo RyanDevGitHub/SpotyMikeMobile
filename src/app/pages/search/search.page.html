@@ -25,14 +25,14 @@
           <ion-row>
             <ion-col size="12"
               ><app-music-container
-                [openWith]="playContext"
+                [openWith]="{ type: pageType, sourceId: song.id }"
                 [song]="song"
               ></app-music-container>
             </ion-col>
           </ion-row>
 
-          } } @if (listPlaylists.length > 0) { @for (playlist of
-          listPlaylists; track playlist) {
+          } } @if (listPlaylists.length > 0) { @for (playlist of listPlaylists;
+          track playlist) {
           <ion-row>
             <ion-col size="12"
               ><app-playlist-container

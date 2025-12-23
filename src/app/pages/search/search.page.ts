@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   IonCol,
@@ -71,12 +71,15 @@ export class SearchPage implements OnInit {
   public albums$: Observable<IAlbum[]>;
   public artists$: Observable<IArtist[]>;
   store = inject(Store<AppState>);
+  private cd = inject(ChangeDetectorRef);
 
   constructor(private modalStateService: ModalStateService) {
-    this.modalSubscription = modalStateService.modalOpen$.subscribe(
-      (value) => (this.isModalOpen = value)
-    );
-    this.playContext = { type: this.pageType };
+    this.modalSubscription = modalStateService.modalOpen$.subscribe((value) => {
+      this.isModalOpen = value;
+      // VÉRIFIEZ LE LOG DANS LA CONSOLE DU NAVIGATEUR
+      console.log('HomePage: isModalOpen est mis à jour à', value);
+      this.cd.detectChanges();
+    });
   }
 
   ngOnInit() {
@@ -87,7 +90,7 @@ export class SearchPage implements OnInit {
       switchMap((term) => this.store.select(selectSearchResults(term))),
       // Optionnel: partager les résultats si plusieurs composants s'y abonnent
       shareReplay({ bufferSize: 1, refCount: true })
-    );  
+    );
 
     // Dériver les observables spécifiques à partir du résultat unique
     this.songs$ = searchResults$.pipe(map((results) => results.songs || []));
